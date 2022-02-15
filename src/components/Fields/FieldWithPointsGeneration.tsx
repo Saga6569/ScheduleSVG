@@ -44,7 +44,7 @@ export class FieldWithPointsGeneration extends React.Component<any, IFieldWithPo
     });
     console.log(result);
 
-    const path = <path d={`M${result.join(', ')}`} stroke="black" fill="transparent"/>
+    const path = <path className={styles.path} d={`M${result.join(', ')}`} stroke="black" fill="transparent"/>
     const circle = result.map((el) => {
       
       const number = el.split(' ');

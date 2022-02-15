@@ -90,7 +90,8 @@ export class Graph extends React.Component<IGraphProps, IGraphState> {
   //   console.log(result);
   // }
 
-  raz = (a: number, b: number) => a > b ?  ((a-b)/a) * 100 : ((b-a)/a) * 100
+  raz = (a: number, b: number) => a > b ?  `-${(((a-b)/a) * 100).toFixed(1)}` : `+${(((b-a)/a) * 100).toFixed(1)}`
+  
   
   buildGraphLine = () =>  {
     const data = this.calcValuesParams(this.props.values).valuesList;
@@ -103,17 +104,17 @@ export class Graph extends React.Component<IGraphProps, IGraphState> {
     path.push(x ,y)
     const value = Math.abs(y) / 20
     console.log(oldvalue, value)
-    const s = oldvalue === null ? 0 : this.raz(oldvalue, value).toFixed(1)
+    const s = oldvalue === null ? 0 : this.raz(oldvalue, value)
     oldvalue = value
     return (<>
       <circle cx={x} cy={y} r="4" fill="green"/>
-      <text x={x} y={y} font-size="10" text-anchor="middle" fill="white">{`${s}%`}</text>
+      <text x={x} y={y} font-size="10" text-anchor="middle" fill="black">{`${s}%`}</text>
       </>
       )
     })
-
+   
     return (<>
-      <path d={`M${path.join(', ')}`} stroke="black" fill="transparent"/>
+      <path className={styles.path} d={`M${path.join(', ')}`} stroke="black" fill="transparent"/>
       {result}
       </>)
   };
