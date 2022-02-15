@@ -103,11 +103,12 @@ export class Graph extends React.Component<IGraphProps, IGraphState> {
     path.push(x ,y)
     const value = Math.abs(y) / 20
     console.log(oldvalue, value)
-    const s = oldvalue === null ? 0 : this.difference(oldvalue, value)
+    const s = oldvalue === null ? '0%' : this.difference(oldvalue, value)
     oldvalue = value
+    const style = {'transform-origin': `${x}px ${y}px`, 'transform': 'rotateX(180deg)'}
     return (<>
-      <circle cx={x} cy={y} r="4" fill="green"/>
-      <text className={styles.text} x={x} y={y} font-size="10" text-anchor="middle" fill="black">{s}</text>
+      <circle cx={x} cy={y} r="4" fill="blue"/>
+      <text className={styles.Text} x={x} y={y} style={style} font-size="12" text-anchor="middle" fill="White">{s}</text>
       </>
       )
     })
