@@ -90,8 +90,7 @@ export class Graph extends React.Component<IGraphProps, IGraphState> {
   //   console.log(result);
   // }
 
-  raz = (a: number, b: number) => a > b ?  `-${(((a-b)/a) * 100).toFixed(1)}` : `+${(((b-a)/a) * 100).toFixed(1)}`
-  
+  difference = (a: number, b: number) => a > b ?  `-${(((a-b)/a) * 100).toFixed(1)}%` : `+${(((b-a)/a) * 100).toFixed(1)}%`
   
   buildGraphLine = () =>  {
     const data = this.calcValuesParams(this.props.values).valuesList;
@@ -104,11 +103,11 @@ export class Graph extends React.Component<IGraphProps, IGraphState> {
     path.push(x ,y)
     const value = Math.abs(y) / 20
     console.log(oldvalue, value)
-    const s = oldvalue === null ? 0 : this.raz(oldvalue, value)
+    const s = oldvalue === null ? 0 : this.difference(oldvalue, value)
     oldvalue = value
     return (<>
       <circle cx={x} cy={y} r="4" fill="green"/>
-      <text x={x} y={y} font-size="10" text-anchor="middle" fill="black">{`${s}%`}</text>
+      <text className={styles.text} x={x} y={y} font-size="10" text-anchor="middle" fill="black">{s}</text>
       </>
       )
     })
@@ -116,7 +115,7 @@ export class Graph extends React.Component<IGraphProps, IGraphState> {
     return (<>
       <path className={styles.path} d={`M${path.join(', ')}`} stroke="black" fill="transparent"/>
       {result}
-      </>)
+     </>)
   };
 
   render() {
@@ -128,6 +127,7 @@ export class Graph extends React.Component<IGraphProps, IGraphState> {
         onMouseLeave={() => this.setState({ dashVisibility: false })}
       >
         <svg width="300" height="300" xmlns="http://www.w3.org/2000/svg" transform="scale(1, -1)">
+          
           <defs>
             <linearGradient id="myGradient" gradientTransform="rotate(90)">
               <stop offset="5%"  stopColor="gold" />
