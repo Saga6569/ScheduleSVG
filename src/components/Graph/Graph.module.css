@@ -9,7 +9,7 @@
 }
 
 .path {
-  stroke-dasharray: 500;
+  stroke-dasharray: 1000;
   animation: dash 10s linear;
   animation-fill-mode: forwards;
 }
@@ -17,7 +17,7 @@
 
 @keyframes dash {
   from {
-    stroke-dashoffset: 500;
+    stroke-dashoffset: 1000;
   }
   to {
     stroke-dashoffset: 0;

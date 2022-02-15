@@ -90,8 +90,10 @@ export class Graph extends React.Component<IGraphProps, IGraphState> {
   //   console.log(result);
   // }
 
-  difference = (a: number, b: number) => a > b ?  `-${(((a-b)/a) * 100).toFixed(1)}%` : `+${(((b-a)/a) * 100).toFixed(1)}%`
+  // 
+  difference = (a: number, b: number) => a > b ?  `↓${(((a-b)/a) * 100).toFixed(1)}%` : `↑${(((b-a)/a) * 100).toFixed(1)}%`
   
+
   buildGraphLine = () =>  {
     const data = this.calcValuesParams(this.props.values).valuesList;
     const path: Array<number>  = []
@@ -102,17 +104,16 @@ export class Graph extends React.Component<IGraphProps, IGraphState> {
     const y = el.y + el.height;
     path.push(x ,y)
     const value = Math.abs(y) / 20
-    console.log(oldvalue, value)
-    const s = oldvalue === null ? '0%' : this.difference(oldvalue, value)
+    const meaning  = oldvalue === null ? '0%' : this.difference(oldvalue, value)
     oldvalue = value
     const style = {'transform-origin': `${x}px ${y}px`, 'transform': 'rotateX(180deg)'}
     return (<>
-      <circle cx={x} cy={y} r="4" fill="blue"/>
-      <text className={styles.Text} x={x} y={y} style={style} font-size="12" text-anchor="middle" fill="White">{s}</text>
+      <circle cx={x} cy={y} r="4" fill="White"/>
+      <text className={styles.Text} x={x} y={y} style={style} font-size="12" text-anchor="middle" fill={meaning.includes('↑') || meaning === '0%' ? 'green' : 'red' }>{meaning}</text>
       </>
       )
-    })
-   
+    });
+
     return (<>
       <path className={styles.path} d={`M${path.join(', ')}`} stroke="black" fill="transparent"/>
       {result}
@@ -131,8 +132,8 @@ export class Graph extends React.Component<IGraphProps, IGraphState> {
           
           <defs>
             <linearGradient id="myGradient" gradientTransform="rotate(90)">
-              <stop offset="5%"  stopColor="gold" />
-              <stop offset="95%" stopColor="red" />
+              <stop offset="10%"  stopColor="gold" />
+              <stop offset="90%" stopColor="#e0ae2f" />
             </linearGradient>
           </defs>
           <rect x="0" y="0" width="300" height="300" fill="#c0c0fa"/>
