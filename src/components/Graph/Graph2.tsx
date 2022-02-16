@@ -2,19 +2,24 @@ import React from 'react';
 import styles from './Graph.module.css';
 
 interface IGraphProps {
-  values: Array<number>,
+  values: {
+    value: Array<number>,
+    collors:Array<string>
+  } 
 }
 
 interface IGraphState {
   dashLineX: number,
   dashVisibility: boolean,
   valueElements: Array<object>
+  collors: any
 }
 
-export class Graph extends React.Component<IGraphProps, IGraphState> {
+export class Graph2 extends React.Component<IGraphProps, IGraphState> {
   constructor(props: IGraphProps) {
     super(props);
-    const valuesList = this.calcValuesParams(props.values).valuesList;
+    const valuesList = this.calcValuesParams(props.values.value).valuesList;
+    const collors = props.values.collors;
     
     const valueElements = valuesList.map((el) => (
       <rect 
@@ -31,6 +36,7 @@ export class Graph extends React.Component<IGraphProps, IGraphState> {
       dashLineX: 0,
       dashVisibility: false,
       valueElements,
+      collors,
     }
   };
 
@@ -95,7 +101,7 @@ export class Graph extends React.Component<IGraphProps, IGraphState> {
   
 
   buildGraphLine = () =>  {
-    const data = this.calcValuesParams(this.props.values).valuesList;
+    const data = this.calcValuesParams(this.props.values.value).valuesList;
     const path: Array<number>  = []
     let oldvalue: null | number = null
 
@@ -108,7 +114,7 @@ export class Graph extends React.Component<IGraphProps, IGraphState> {
     oldvalue = value
     const style = {'transform-origin': `${x}px ${y}px`, 'transform': 'rotateX(180deg)'}
     return (<>
-      <circle cx={x} cy={y} r="4" fill="White"/>
+      <circle cx={x} cy={y} r="2" fill={this.state.collors.dotColor ?? 'black'}/>
       <text className={styles.Text} x={x} y={y} style={style} font-size="12" text-anchor="middle" fill={meaning.includes('↑') || meaning === '0%' ? 'green' : 'red' }>{meaning}</text>
       </>
       )
@@ -131,15 +137,14 @@ export class Graph extends React.Component<IGraphProps, IGraphState> {
         <svg width="300" height="300" xmlns="http://www.w3.org/2000/svg" transform="scale(1, -1)">
           
           <defs>
-            <linearGradient id="myGradient" gradientTransform="rotate(90)">
+            <linearGradient id="myGradient1" gradientTransform="rotate(90)">
               <stop offset="10%"  stopColor="gold" />
               <stop offset="90%" stopColor="Wheat" />
             </linearGradient>
           </defs>
-          <rect x="0" y="0" width="300" height="300" fill="#c0c0fa"/>
-          
+          <rect x="0" y="0" width="300" height="300" fill={this.state.collors.backgroundColor ?? '#c0c0fa'}/>
           { this.state.valueElements }
-
+          {console.log(this.state.collors.chartColor)}
           {this.buildGraphLine()}
 
           <line 
