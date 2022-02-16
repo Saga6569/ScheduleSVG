@@ -144,7 +144,6 @@ export class Graph2 extends React.Component<IGraphProps, IGraphState> {
           </defs>
           <rect x="0" y="0" width="300" height="300" fill={this.state.collors.backgroundColor ?? '#c0c0fa'}/>
           { this.state.valueElements }
-          {console.log(this.state.collors.chartColor)}
           {this.buildGraphLine()}
 
           <line 

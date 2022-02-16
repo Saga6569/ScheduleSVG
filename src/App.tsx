@@ -2,6 +2,7 @@ import { FieldWithMoveablePoint } from './components/Fields/FieldWithMoveablePoi
 import { FieldWithPointsGeneration } from './components/Fields/FieldWithPointsGeneration';
 import { Graph } from './components/Graph/Graph';
 import { Graph2 } from './components/Graph/Graph2';
+import { GraphCircle } from './components/GraphCircle/GraphCircle';
 import './App.css';
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
       <FieldWithPointsGeneration/>
       <Graph values={ [6, 7, 8 ,9, 10, 8, 6, 4, 3] }/>
       <Graph2 values={ data }/>
+      <GraphCircle values={ [1, 1, 1 ,1, 1, 1, 1, 1, 1]}/>
     </div>
   );
 }

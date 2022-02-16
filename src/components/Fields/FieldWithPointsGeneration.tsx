@@ -42,7 +42,6 @@ export class FieldWithPointsGeneration extends React.Component<any, IFieldWithPo
      count += 25;
       return `${count} ${150 - (el * 10)}`
     });
-    console.log(result);
 
     const path = <path className={styles.path} d={`M${result.join(', ')}`} stroke="black" fill="transparent"/>
     const circle = result.map((el) => {

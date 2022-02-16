@@ -55,45 +55,9 @@ export class Graph extends React.Component<IGraphProps, IGraphState> {
     this.setState({ dashLineX: x });
     console.log(this);
   }
-// создаем линейный график.
 
-  // bbg = () => {
-  //   const data = this.props.values;
-  //   const result = data.reduce((acc, item) => {
-  //     const pointNumber = acc.length === 0 ? 1 : acc.length + 1
-  //     const value = item
-  //     const x = acc;
-  //     const y = item * 20;
-  //     const item = {pointNumber, x, y}
-  //     iNumber++
-  //     stepPoint += 30;
-  //     return [];
-  //   }, [])
-    
-  // }
-
-
-  // bbg = () => {
-  //   const data = this.props.values;
-  //   let iNumber = 1;
-  //   let stepPoint = 20;
-  //   const result = data.map((el) => {
-  //     const pointNumber = iNumber;
-  //     const value = el
-  //     const x = stepPoint;
-  //     const y = el * 20;
-  //     const item = {pointNumber, x, y}
-  //     iNumber++
-  //     stepPoint += 30;
-  //     return item;
-  //   })
-  //   console.log(result);
-  // }
-
-  // 
   difference = (a: number, b: number) => a > b ?  `↓${(((a-b)/a) * 100).toFixed(1)}%` : `↑${(((b-a)/a) * 100).toFixed(1)}%`
   
-
   buildGraphLine = () =>  {
     const data = this.calcValuesParams(this.props.values).valuesList;
     const path: Array<number>  = []
