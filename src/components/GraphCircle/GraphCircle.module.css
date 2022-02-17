@@ -7,3 +7,7 @@
   align-items: center;
   background-color: rgb(157, 157, 214);
 }
+
+circle:hover {
+  stroke: aliceblue;
+}

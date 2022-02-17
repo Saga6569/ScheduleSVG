@@ -18,7 +18,7 @@ function App() {
       <FieldWithPointsGeneration/>
       <Graph values={ [6, 7, 8 ,9, 10, 8, 6, 4, 3] }/>
       <Graph2 values={ data }/>
-      <GraphCircle values={ [1, 1, 1 ,1, 1, 1, 1, 1, 1]}/>
+      <GraphCircle values={ [5, 5, 2 ,2, 8, 8, 4, 3, 2]}/>
     </div>
   );
 }
