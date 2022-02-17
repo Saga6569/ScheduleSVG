@@ -54,9 +54,9 @@ export class GraphCircle extends React.Component<IGraphProps, IGraphState> {
     let clockwiseShiftAcc = 0
     const result = data.map(({value, collor, name}: {value: number, collor: string, name: string}) => {
       const ircleData = this.detCircleData(value)
-      const mystyle: object = { 'stroke-dasharray': ircleData}
-      const shadedPart  = <circle r="80" className={styles.Circle} style={mystyle} cx="120" cy="150" fill="none" stroke={collor} stroke-dasharray={ircleData.pour} stroke-dashoffset={clockwiseShiftAcc} stroke-width="60">
-      </circle>
+      const mystyle: any = { 'stroke-dasharray': ircleData}
+      const shadedPart  = <circle r="80" className={styles.Circle} style={mystyle} cx="120" cy="150" fill="none" stroke={collor} stroke-dasharray={ircleData.pour} stroke-dashoffset={clockwiseShiftAcc} stroke-width="60"/>
+     
       clockwiseShiftAcc += -ircleData.clockwiseShift
       return shadedPart;
     })

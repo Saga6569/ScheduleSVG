@@ -6,16 +6,18 @@
   justify-content: center;
   align-items: center;
   background-color: rgb(157, 157, 214);
-}
-
+};
 
 @keyframes stroke {
   from {
     stroke-dashoffset: 0;
   }
-}
+};
 
 .Circle {
   animation: stroke 1s ease-out forwards;
-}
+};
 
+circle:hover {
+  stroke-width: 70;
+};
