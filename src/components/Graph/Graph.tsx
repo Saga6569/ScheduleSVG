@@ -53,7 +53,7 @@ export class Graph extends React.Component<IGraphProps, IGraphState> {
     e.preventDefault();
     const x = e.nativeEvent.offsetX;
     this.setState({ dashLineX: x });
-    console.log(this);
+    // console.log(this);
   }
 
   difference = (a: number, b: number) => a > b ?  `↓${(((a-b)/a) * 100).toFixed(1)}%` : `↑${(((b-a)/a) * 100).toFixed(1)}%`

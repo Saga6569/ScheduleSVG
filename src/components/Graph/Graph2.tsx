@@ -59,7 +59,7 @@ export class Graph2 extends React.Component<IGraphProps, IGraphState> {
     e.preventDefault();
     const x = e.nativeEvent.offsetX;
     this.setState({ dashLineX: x });
-    console.log(this);
+    // console.log(this);
   }
 // создаем линейный график.
 

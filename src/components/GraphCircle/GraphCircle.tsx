@@ -54,7 +54,8 @@ export class GraphCircle extends React.Component<IGraphProps, IGraphState> {
     let clockwiseShiftAcc = 0
     const result = data.map(({value, collor, name}: {value: number, collor: string, name: string}) => {
       const ircleData = this.detCircleData(value)
-      const shadedPart  = <circle r="80"  cx="120" cy="150" fill="none" stroke={collor} stroke-dasharray={ircleData.pour} stroke-dashoffset={clockwiseShiftAcc} stroke-width="60"/>
+      const shadedPart  = <circle r="80" className={styles.Circle}  cx="120" cy="150" fill="none" stroke={collor} stroke-dasharray={ircleData.pour} stroke-dashoffset={clockwiseShiftAcc} stroke-width="60">
+      </circle>
       clockwiseShiftAcc += -ircleData.clockwiseShift
       return shadedPart;
     })
@@ -64,8 +65,8 @@ export class GraphCircle extends React.Component<IGraphProps, IGraphState> {
   render() {
     return (
       <div className={styles.container} >
-        <svg width="300" height="300" xmlns="http://www.w3.org/2000/svg">
-          <rect x="0" y="0" width="300" height="300" fill="#c0c0fa"/>
+        <svg width="500" height="300" xmlns="http://www.w3.org/2000/svg">
+          <rect x="0" y="0" width="500" height="300" fill="#c0c0fa"/>
           {this.creationGraphics()}
         </svg>
       </div>

@@ -8,6 +8,15 @@
   background-color: rgb(157, 157, 214);
 }
 
-circle:hover {
-  stroke: aliceblue;
+@keyframes stroke {
+  from {
+    stroke-dashoffset: 0;
+  }
 }
+
+.Circle {
+  stroke-dasharray: 503;
+  animation: stroke 2s ease-out forwards;
+}
+
+
