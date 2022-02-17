@@ -1,57 +1,55 @@
 import React from 'react';
 import styles from './GraphCircle.module.css';
+import _ from 'lodash'
 
 interface IGraphProps {
-  values: Array<number>,
+  values: Array<number> | Array<{}>
 };
 
 interface IGraphState {
-  data:any,
+  data: Array<number> | Array<{}>,
 }
-  
+
 export class GraphCircle extends React.Component<IGraphProps, IGraphState> {
-  constructor(props: any) {
+  constructor(props: IGraphProps) {
     super(props);
+    
     this.state = {
-      data: this.props.values
+      data: this.props.values,
+   
     }
   }
 
-  upDate = (dataSet: any) => {
+  upDate = () => {
     const collorArr = ['blue', 'red', 'black', 'tomato', 'green', 'MediumOrchid', 'Yellow', 'Lime', 'LightCyan'];
-    if (dataSet.length !== undefined) {
-      const newData: any = [];
-      for (let i = 0; i <= this.props.values.length - 1; i++ ) {
-        const value = this.props.values[i];
-        const collor = collorArr[i];
-        newData[i] = {value, collor}
-      }
-     return newData;
-    }
-    return dataSet;
+    const newData = this.state.data.reduce((acc: Array<{ value: number; name: string; collor: string; }>, el: { value: number; name: string; collor: string; }) => {
+      const value = el.value ?? el;
+      const name = el.name ?? `${value}`
+      const collor = el.collor ?? collorArr[acc.length]
+      return [...acc,{value, name, collor}]
+    },[])
+    
+    //const sumValue = _.sumBy(newData, 'value');
+
+    return newData;
   }
 
 
   res = (value: number) => {
-    let dataSum = 0;
-    const s = this.upDate(this.state.data);
-    for(const item of s) {
-      dataSum += item.value ?? item
-    }
+    let dataSum = _.sumBy(this.upDate(), 'value')
     const circle: number = (80 * 2 * 3.14);
     const result: number = (value * 100 / dataSum);
     const shadedPart = (circle * result / 100);
-    console.log(`${shadedPart},${circle}`)
-    return {answer: `${shadedPart},${circle}`, value: shadedPart} ;
+    return {pour: `${shadedPart},${circle}`, clockwiseShift : shadedPart} ;
   };
 
   creationGraphics = () => {
-    const data = this.upDate(this.state.data)
-    let a = 0
+    const data = this.upDate()
+    let clockwiseShiftAcc = 0
     const result = data.map(({value, collor}: {value: number, collor: string}) => {
-      const s = <circle r="80"  cx="150" cy="150" fill="none" stroke={collor} stroke-dasharray={this.res(value).answer} stroke-dashoffset={a} stroke-width="60"/>
-      a += -this.res(value).value
-      return s;
+      const shadedPart  = <circle r="80"  cx="120" cy="150" fill="none" stroke={collor} stroke-dasharray={this.res(value).pour} stroke-dashoffset={clockwiseShiftAcc} stroke-width="60"/>
+      clockwiseShiftAcc += -this.res(value).clockwiseShift
+      return shadedPart;
     })
     return (<>{result}</>);
   }
