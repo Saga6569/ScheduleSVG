@@ -8,6 +8,7 @@
   background-color: rgb(157, 157, 214);
 }
 
+
 @keyframes stroke {
   from {
     stroke-dashoffset: 0;
@@ -15,8 +16,6 @@
 }
 
 .Circle {
-  stroke-dasharray: 503;
-  animation: stroke 2s ease-out forwards;
+  animation: stroke 1s ease-out forwards;
 }
-
 
