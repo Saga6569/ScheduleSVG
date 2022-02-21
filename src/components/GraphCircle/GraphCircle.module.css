@@ -5,7 +5,11 @@
   height: max-content;
   justify-content: center;
   align-items: center;
-  background-color: rgb(157, 157, 214);
+  background-color: #c0c0fa
+}
+
+.containerInfo {
+  width: 150px;
 }
 
 @keyframes stroke1 {
@@ -18,6 +22,6 @@
   animation: stroke1 1s ease-out forwards;
 }
 
-.Circle:hover {
+.ss :hover{
   stroke-width: 70;
 }
