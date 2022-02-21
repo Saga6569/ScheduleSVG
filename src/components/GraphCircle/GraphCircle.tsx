@@ -53,7 +53,7 @@ const GraphCircle = (props: IGraphProps ) =>  {
     const infoData = data.map((el: IelDate) =>{
       const circle = <circle cx="15" cy="7" r="5" fill={el.collor} />;
       const percentageValue =  (el.value * 100 / dataSum);
-      const text = el.name === String(el.value) ? `${percentageValue.toFixed(2)} %` : `${el.name} ${percentageValue} %`;
+      const text = el.name === String(el.value) ? `${percentageValue.toFixed(2)} %` : `${el.name} ${percentageValue.toFixed(2)} %`;
       const textСrcle = <text x="40" y="11" font-size="12" fill="black">{text}</text>;
       return <svg width="150" height="15" xmlns="http://www.w3.org/2000/svg" key={el.id} > 
         {circle}

@@ -9,7 +9,7 @@ function App() {
 
   //const data: any = [ { value:[6, 7, 8 ,9, 10, 8, 6, 4, 3],  }, {typeGraphics: 'line' ,value:[6, 7, 8 ,9, 10, 8, 6, 4, 3],  }]
 
-
+  const res = [{value: 2, name: 'Пермь'}, {value: 4, name: 'Москва'}, {value: 6, name: 'Сочи'}, {value: 6, name: 'Осиновик'}, {value: 11, name: 'Новосибирск'}, {value: 12, name: 'Томск'}, {value: 5, name: 'Губаха'} ]
   const data: any = {value: [6, 7, 8 ,9, 10, 8, 6, 4, 3], collors: {backgroundColor: '#c0c0fa', dotColor: '#000080', } };
 
   return (
@@ -18,7 +18,7 @@ function App() {
       <FieldWithPointsGeneration/>
       <Graph values={ [6, 7, 8 ,9, 10, 8, 6, 4, 3] }/>
       <Graph2 values={ data }/>
-      <GraphCircle values={ [5, 5, 2 ,2, 8, 8, 4, 3, 1]}/>
+      <GraphCircle values={res}/>
     </div>
   );
 }
