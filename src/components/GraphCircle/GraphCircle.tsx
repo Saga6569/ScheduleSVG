@@ -77,10 +77,10 @@ const GraphCircle = (props: IGraphProps ) =>  {
       const ircleData = detCircleData(value);
       const mystyle: {} = { 'stroke-dasharray': ircleData};
       const shadedPart  = <circle r="90" className={styles.Circle} style={mystyle} cx="130" cy="150" fill="none" stroke={collor} stroke-dasharray={ircleData.pour} stroke-dashoffset={clockwiseShiftAcc} stroke-width="60"/>
-      const textСrcle = <text x="100" y="160" style={{'display': 'none'}} font-size="18" fill={collor}>{`${(value * 100 / dataSum).toFixed(2)}%`}</text>;
+      const textСrcle = <text x="100" y="160" font-size="18" fill={collor}>{`${(value * 100 / dataSum).toFixed(2)}%`}</text>
       clockwiseShiftAcc += -ircleData.clockwiseShift;
      
-      return <svg className={styles.ss}>
+      return <svg className={styles.containerGradient}>
         {shadedPart}
         {textСrcle}
       </svg>

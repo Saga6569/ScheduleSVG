@@ -22,6 +22,8 @@
   animation: stroke1 1s ease-out forwards;
 }
 
-.ss :hover{
-  stroke-width: 70;
-}
+.containerGradient :hover { stroke-width: 70}
+
+.containerGradient > text {display: none}
+
+.containerGradient:hover > text  {display: block}
