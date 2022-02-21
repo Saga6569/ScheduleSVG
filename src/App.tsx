@@ -2,7 +2,7 @@ import { FieldWithMoveablePoint } from './components/Fields/FieldWithMoveablePoi
 import { FieldWithPointsGeneration } from './components/Fields/FieldWithPointsGeneration';
 import { Graph } from './components/Graph/Graph';
 import { Graph2 } from './components/Graph/Graph2';
-import { GraphCircle } from './components/GraphCircle/GraphCircle';
+import GraphCircle from './components/GraphCircle/GraphCircle';
 import './App.css';
 
 function App() {
