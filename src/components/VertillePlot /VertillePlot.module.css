@@ -1,0 +1,31 @@
+.container {
+  margin: 20px;
+  display: flex;
+  width: max-content;
+  height: max-content;
+  justify-content: center;
+  align-items: center;
+  background-color: #c0c0fa
+}
+
+path {
+  stroke-dasharray: 1000;
+  animation: dash 5s linear;
+  animation-fill-mode: forwards;
+}
+
+
+@keyframes dash {
+  from {
+    stroke-dashoffset: 1000;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.containerGradient > .textEng {display: none}
+.containerGradient > rect {display: none}
+
+.containerGradient:hover > .textEng  {display: block}
+.containerGradient:hover > rect  {display: block}
