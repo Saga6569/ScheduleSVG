@@ -3,13 +3,17 @@ import styles from './VertillePlot.module.css';
 import _ from 'lodash'
 
 
-// const masseg = (x: number, y: number) => {
-//   const myStyle: any = {position: 'absolute', height: x, width: y,}
-//   return <svg fill="none" style={myStyle} height="25" viewBox="0 0 15 15" width="35" xmlns="http://www.w3.org/2000/svg">
-//     <path  clip-rule="evenodd" d="M5.5 11.4928L7.5 14.4909L9.5 11.4928H13.5C14.053 11.4928 14.5 11.0461 14.5 10.4935V1.49935C14.5 0.946709 14.053 0.5 13.5 0.5H1.5C0.947 0.5 0.5 0.946709 0.5 1.49935V10.4935C0.5 11.0461 0.947 11.4928 1.5 11.4928H5.5Z" fill-rule="evenodd" stroke="black" stroke-linecap="square" stroke-linejoin="round"/>
-//   </svg>
-// };
-
+const PopUpWindow = (point: {x: number; y: number; collor: string, name: string, value: number}) => {
+  const textEnd = <text  className={styles.S} x={point.x - 20 } y={point.y - 10} font-size="6" fill="black" >{`${point.name} ${point.value}`}</text>
+  const scr =  <rect width="40" className={styles.S} x={point.x - 20} y={point.y - 20} height="15" fill={point.collor} stroke-width='1' stroke="black" />
+  const text = <p>{`${point.name} ${point.value}`}</p>
+  return (
+    <svg width="600" height="300" fill='red' className={styles.S} >
+      {scr}
+      {textEnd}
+    </svg>
+  )
+};
 
 interface IGraphProps {
     values: Array<number> | Array<{}>,
@@ -38,6 +42,8 @@ const VertillePlot = (props: IGraphProps) => {
     return newData;
   };
 
+  const [point, setPoint] = useState({x: 50, y: 50 , collor: 'red', name: '', value: 0})
+
   const dataS = upDate().sort().sort((a, b) => b.value - a.value);
 
   const createDataForRendering = () => {
@@ -50,16 +56,13 @@ const VertillePlot = (props: IGraphProps) => {
       const valueY = (300 - (valueOfMax * 300 / maximumPercentageValue)); // значение подъема линии
       const graphLine = <path key={elDate.id} d={`M${initPointX} 280 V ${valueY}Z`} fill="transparent" stroke={elDate.collor} stroke-width="30"/>
       const circle =  <circle cx={initPointX} cy={valueY} r="2" fill="red"/>
-      const masseg = <rect x={initPointX - 25} y={valueY - 25} width="65" height="20" fill={elDate.collor} stroke-width='3' stroke='none' /> //
-      const textEnd = <text  className={styles.textEng} x={initPointX - 20 } y={valueY - 10} font-size="6" fill="black" >{`${elDate.name} ${elDate.value}`}</text>
+      //const masseg = <rect x={initPointX - 25} y={valueY - 25} width="65" height="20" fill={elDate.collor} stroke-width='3' stroke='none' /> //
       const textStart = <text x={initPointX - 15 } y={290} font-size="6" fill="black" >{`${elDate.name}`}</text>
-
-      const result = (<svg  className={styles.containerGradient}>
+      const x = initPointX
+      const result = (<svg onClick={() => setPoint({x: x, y: valueY, collor: elDate.collor, name: elDate.name, value: elDate.value})}  className={point.name === '' ? styles.containerGradient : styles.containerGradientOff}>
             {textStart}
             {graphLine}
             {circle}
-            {masseg}
-            {textEnd}
           </svg>)
           
           initPointX += 50;
@@ -95,6 +98,7 @@ const VertillePlot = (props: IGraphProps) => {
           {createDataForRendering()}
           {creatingHorizontalGrid()}
           {creatingVerticalGrid()}
+          {PopUpWindow(point)}
           </svg>
         </div>
       );

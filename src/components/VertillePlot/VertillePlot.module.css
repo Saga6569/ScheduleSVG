@@ -8,7 +8,11 @@
   background-color: #c0c0fa
 }
 
-path {
+.containerGradientOff {
+
+}
+
+.containerGradient > path {
   stroke-dasharray: 1000;
   animation: dash 5s linear;
   animation-fill-mode: forwards;
@@ -24,8 +28,14 @@ path {
   }
 }
 
-.containerGradient > .textEng {display: none}
+/* .containerGradient > .textEng {display: none}
 .containerGradient > rect {display: none}
 
 .containerGradient:hover > .textEng  {display: block}
-.containerGradient:hover > rect  {display: block}
+.containerGradient:hover > rect  {display: block} */
+
+
+.S {
+  position: absolute;
+  transition-duration: 0.5s;
+}
