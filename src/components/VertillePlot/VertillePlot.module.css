@@ -34,8 +34,25 @@
 .containerGradient:hover > .textEng  {display: block}
 .containerGradient:hover > rect  {display: block} */
 
-
 .S {
   position: absolute;
-  transition-duration: 0.5s;
+  transition-property: fill;
+  transition: 0.5s;  
 }
+
+.S > text{
+  position: absolute;
+  transition-property: fill;
+  transition: 0.5s;  
+}
+
+
+/* .S > text{
+  position: absolute;
+  transition: top 0.5s cubic-bezier(0, 0, 1, 1), left 0.5s cubic-bezier(0, 0, 1, 1) 
+}
+
+.S > text  {
+  transition-property: fill;
+  transition-duration: 0.5s;
+} */

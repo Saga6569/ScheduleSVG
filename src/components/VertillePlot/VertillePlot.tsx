@@ -3,12 +3,13 @@ import styles from './VertillePlot.module.css';
 import _ from 'lodash'
 
 
-const PopUpWindow = (point: {x: number; y: number; collor: string, name: string, value: number}) => {
+const PopUpWindow = (point: {x: number; y: number; color: string, name: string, value: number}) => {
   const textEnd = <text  className={styles.S} x={point.x - 20 } y={point.y - 10} font-size="6" fill="black" >{`${point.name} ${point.value}`}</text>
-  const scr =  <rect width="40" className={styles.S} x={point.x - 20} y={point.y - 20} height="15" fill={point.collor} stroke-width='1' stroke="black" />
-  const text = <p>{`${point.name} ${point.value}`}</p>
+  const scr =  <rect width="40" className={styles.S} x={point.x - 20} y={point.y - 20} height="15" fill={point.color} stroke-width='1' stroke="none" />
+  //const text = <p>{`${point.name} ${point.value}`}</p>
+  //const s =  <text dominant-baseline="middle" text-anchor="middle">TEXT</text> 
   return (
-    <svg width="600" height="300" fill='red' className={styles.S} >
+    <svg className={styles.S} >
       {scr}
       {textEnd}
     </svg>
@@ -16,35 +17,40 @@ const PopUpWindow = (point: {x: number; y: number; collor: string, name: string,
 };
 
 interface IGraphProps {
-    values: Array<number> | Array<{}>,
+    values: number[] | object[],
   };
   
   interface IelDate {
     id: string; 
     value: number; 
     name: string; 
-    collor: string
+    color: string
   }
 
 const VertillePlot = (props: IGraphProps) => {
 
   const upDate = () => {
-    const collorArr = ['blue', 'red', '#5aa5c4', 'tomato', 'green', 'MediumOrchid', 'Yellow', 'Lime', 'LightCyan'];
+    const colors = ['blue', 'red', '#5aa5c4', 'tomato', 'green', 'MediumOrchid', 'Yellow', 'Lime', 'LightCyan'];
     const newData = [];
       for(let i = 0; i<= props.values.length - 1; i++) {
         const el: any = props.values[i];
         const value = el.value ?? el;
         const name = el.name ?? `${value}`;
-        const collor = el.collor ?? collorArr[i];
+        const color = el.color ?? colors[i];
         const id: string = _.uniqueId();
-        newData[i] = {id, value, name, collor};
+        newData[i] = {id, value, name, color};
       }
     return newData;
   };
 
-  const [point, setPoint] = useState({x: 50, y: 50 , collor: 'red', name: '', value: 0})
+  const [point, setPoint] = useState({x: 50, y: 50 , color: 'red', name: '', value: 0})
 
   const dataS = upDate().sort().sort((a, b) => b.value - a.value);
+
+
+  // const hende = (el) => (e) => {
+  //   console.log(e)
+  // };
 
   const createDataForRendering = () => {
     let initPointX = 70;
@@ -54,12 +60,11 @@ const VertillePlot = (props: IGraphProps) => {
       const upValue = elDate.value * 100 / maximumPercentageValue; // процент значение от  максиально в propse 
       const valueOfMax = maximumPercentageValue / 100 * upValue;  // процент значения  от максимального 
       const valueY = (300 - (valueOfMax * 300 / maximumPercentageValue)); // значение подъема линии
-      const graphLine = <path key={elDate.id} d={`M${initPointX} 280 V ${valueY}Z`} fill="transparent" stroke={elDate.collor} stroke-width="30"/>
+      const graphLine = <path key={elDate.id} d={`M${initPointX} 280 V ${valueY}Z`} fill="transparent" stroke={elDate.color} stroke-width="30"/>
       const circle =  <circle cx={initPointX} cy={valueY} r="2" fill="red"/>
-      //const masseg = <rect x={initPointX - 25} y={valueY - 25} width="65" height="20" fill={elDate.collor} stroke-width='3' stroke='none' /> //
       const textStart = <text x={initPointX - 15 } y={290} font-size="6" fill="black" >{`${elDate.name}`}</text>
       const x = initPointX
-      const result = (<svg onClick={() => setPoint({x: x, y: valueY, collor: elDate.collor, name: elDate.name, value: elDate.value})}  className={point.name === '' ? styles.containerGradient : styles.containerGradientOff}>
+      const result = (<svg  onMouseOver={() => setPoint({x: x, y: valueY, color: elDate.color, name: elDate.name, value: elDate.value})}  className={point.name === '' ? styles.containerGradient : styles.containerGradientOff}>
             {textStart}
             {graphLine}
             {circle}
@@ -93,7 +98,7 @@ const VertillePlot = (props: IGraphProps) => {
 
     return (
         <div className={styles.container} >
-          <svg width="650" height="300" xmlns="http://www.w3.org/2000/svg">
+          <svg   width="650" height="300" xmlns="http://www.w3.org/2000/svg">
           <rect x="0" y="0" width="800" height="300" fill="#c0c0fa"/>
           {createDataForRendering()}
           {creatingHorizontalGrid()}
