@@ -3,11 +3,11 @@ import styles from './VertillePlot.module.css';
 import _ from 'lodash'
 
 
-const PopUpWindow = (point: {x: number; y: number; color: string, name: string, value: number}) => {
+const PopUpWindow = (point: {x: number; y: number; color: string, name: string, value: number, visit: boolean}) => {
+
   const textEnd = <text  className={styles.S} x={point.x - 20 } y={point.y - 10} font-size="6" fill="black" >{`${point.name} ${point.value}`}</text>
-  const scr =  <rect width="40" className={styles.S} x={point.x - 20} y={point.y - 20} height="15" fill={point.color} stroke-width='1' stroke="none" />
-  //const text = <p>{`${point.name} ${point.value}`}</p>
-  //const s =  <text dominant-baseline="middle" text-anchor="middle">TEXT</text> 
+  const scr =  <rect width="40" className={styles.S} x={point.x - 20} y={point.y - 20} height="15" fill={point.color} stroke-width='1' opacity={point.visit === true ? 1 : 0} stroke="none" />
+  
   return (
     <svg className={styles.S} >
       {scr}
@@ -43,14 +43,9 @@ const VertillePlot = (props: IGraphProps) => {
     return newData;
   };
 
-  const [point, setPoint] = useState({x: 50, y: 50 , color: 'red', name: '', value: 0})
+  const [point, setPoint] = useState({x: 50, y: 50 , color: 'red', name: '', value: 0, visit: false})
 
   const dataS = upDate().sort().sort((a, b) => b.value - a.value);
-
-
-  // const hende = (el) => (e) => {
-  //   console.log(e)
-  // };
 
   const createDataForRendering = () => {
     let initPointX = 70;
@@ -64,12 +59,14 @@ const VertillePlot = (props: IGraphProps) => {
       const circle =  <circle cx={initPointX} cy={valueY} r="2" fill="red"/>
       const textStart = <text x={initPointX - 15 } y={290} font-size="6" fill="black" >{`${elDate.name}`}</text>
       const x = initPointX
-      const result = (<svg  onMouseOver={() => setPoint({x: x, y: valueY, color: elDate.color, name: elDate.name, value: elDate.value})}  className={point.name === '' ? styles.containerGradient : styles.containerGradientOff}>
+      const result = (<svg 
+      onMouseLeave={() => setPoint({...point, visit: false})}
+      onMouseEnter={ () => setPoint({x: x, y: valueY, color: elDate.color, name: elDate.name, value: elDate.value, visit: true})}
+      className={point.name === '' ? styles.containerGradient : ''}>
             {textStart}
             {graphLine}
             {circle}
           </svg>)
-          
           initPointX += 50;
           return result;
         })
