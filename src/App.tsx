@@ -3,7 +3,7 @@ import { FieldWithPointsGeneration } from './components/Fields/FieldWithPointsGe
 import { Graph } from './components/Graph/Graph';
 import { Graph2 } from './components/Graph/Graph2';
 import GraphCircle from './components/GraphCircle/GraphCircle';
-import VertillePlot from './components/VertillePlot /VertillePlot';
+import VertillePlot from './components/VertillePlot/VertillePlot';
 import './App.css';
 
 function App() {
