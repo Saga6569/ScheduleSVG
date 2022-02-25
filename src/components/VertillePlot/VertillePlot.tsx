@@ -87,41 +87,20 @@ const VertillePlot = (props: IGraphProps) => {
         const numberHorizontalLines = 6;
         let initPointY = 0;
         const result = [];
-
-
+        const maxValueEl = dataSort[0].value;
+        let acc = 0
+        const step  = maxValueEl * 100 / 80 / numberHorizontalLines
         for(let i = 0; i <= numberHorizontalLines; i++) {
-
-
-        const maxValueEl = dataSort[0].value;  // максимальное значчение в стеке данных
-        console.log(maxValueEl + maxValueEl * 1)
-          
           const companent = <>
-          <text x={25} y={280 - initPointY} font-size="6" fill="black" >{`${0}`}</text>
-          <path d={`M${600} ${280 - initPointY} H ${0}Z`} fill="transparent" stroke='#696666' stroke-width="2"/>
-         
-          
+          <text x={15} y={275 - initPointY} font-size="10" fill="black" >{`${acc.toFixed()}`}</text>
+          <path d={`M${600} ${278 - initPointY} H ${0}Z`} fill="transparent" stroke='#696666' stroke-width="2"/>
           </>
           result[i] =  companent;
           initPointY += 40
+          acc += step
         }
        return result;
       };
-
-      // const gg = () => {
-      //   let initPointY = 0;
-      //   const result = [];
-      //   const maxValue = dataSort[0].value;
-      //   console.log(maxValue);
-      //   for(let i = 0; i <= dataSort.length - 1; i++) {
-      //     result[i] =  <>
-      //     <circle cx={25} cy={initPointY} r="2" fill="red"/>
-      //     <text x={25} y={initPointY} font-size="6" fill="black" >{`${0}`}</text>
-      //     </>
-          
-      //     initPointY += 40
-      //   }
-      //  return result;
-      // }
 
     return (
         <div className={styles.container} >
