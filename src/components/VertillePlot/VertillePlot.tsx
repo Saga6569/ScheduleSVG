@@ -5,11 +5,11 @@ import _ from 'lodash'
 
 const PopUpWindow = (point: {x: number; y: number; color: string, name: string, value: number, visit: boolean}) => {
 
-  const textEnd = <text  className={styles.S} x={point.x - 20 } y={point.y - 10} font-size="6" fill="black" >{`${point.name} ${point.value}`}</text>
-  const scr =  <rect width="40" className={styles.S} x={point.x - 20} y={point.y - 20} height="15" fill={point.color} stroke-width='1' opacity={point.visit === true ? 1 : 0} stroke="none" />
+  const textEnd = <text   x={point.x - 20 } y={point.y - 10} font-size="6" fill="black" >{`${point.name} ${point.value}`}</text>
+  const scr =  <rect width="40" className={styles.informationWndow} x={point.x - 20} y={point.y - 20} height="15" fill={point.color} stroke-width='1' opacity={point.visit === true ? 1 : 0} stroke="none" />
   
   return (
-    <svg className={styles.S} >
+    <svg >
       {scr}
       {textEnd}
     </svg>
@@ -45,12 +45,12 @@ const VertillePlot = (props: IGraphProps) => {
 
   const [point, setPoint] = useState({x: 50, y: 50 , color: 'red', name: '', value: 0, visit: false})
 
-  const dataS = upDate().sort().sort((a, b) => b.value - a.value);
+  const dataSort = upDate().sort().sort((a, b) => b.value - a.value);
 
   const createDataForRendering = () => {
     let initPointX = 70;
-    const result = dataS.map((elDate: IelDate) => {
-      const maxValueEl = dataS[0].value;  // максимальное значчение в стеке данных
+    const result = dataSort.map((elDate: IelDate) => {
+      const maxValueEl = dataSort[0].value;  // максимальное значчение в стеке данных
       const maximumPercentageValue  = Math.round(maxValueEl * 100 / 80); // 100% от размера блока
       const upValue = elDate.value * 100 / maximumPercentageValue; // процент значение от  максиально в propse 
       const valueOfMax = maximumPercentageValue / 100 * upValue;  // процент значения  от максимального 
@@ -72,26 +72,56 @@ const VertillePlot = (props: IGraphProps) => {
         })
          return result
       };
-
-      const creatingHorizontalGrid  = () => {
+      
+      const creatingVerticalGrid  = () => {
         let initPointX = 45;
         const result = [];
-        for(let i = 0; i <= dataS.length - 1; i++) {
+        for(let i = 0; i <= dataSort.length - 1; i++) {
           result[i] =  <path d={`M${initPointX} 280 V ${0}Z`} fill="transparent" stroke='#696666' stroke-width="1"/>
           initPointX += 50
         }
        return result;
       };
 
-      const creatingVerticalGrid = () => {
+      const creatingHorizontalGrid = () => {
+        const numberHorizontalLines = 6;
         let initPointY = 0;
         const result = [];
-        for(let i = 0; i <= dataS.length - 1; i++) {
-          result[i] =  <path d={`M${600} ${280 - initPointY} H ${0}Z`} fill="transparent" stroke='#696666' stroke-width="1"/>
+
+
+        for(let i = 0; i <= numberHorizontalLines; i++) {
+
+
+        const maxValueEl = dataSort[0].value;  // максимальное значчение в стеке данных
+        console.log(maxValueEl + maxValueEl * 1)
+          
+          const companent = <>
+          <text x={25} y={280 - initPointY} font-size="6" fill="black" >{`${0}`}</text>
+          <path d={`M${600} ${280 - initPointY} H ${0}Z`} fill="transparent" stroke='#696666' stroke-width="2"/>
+         
+          
+          </>
+          result[i] =  companent;
           initPointY += 40
         }
        return result;
-      }
+      };
+
+      // const gg = () => {
+      //   let initPointY = 0;
+      //   const result = [];
+      //   const maxValue = dataSort[0].value;
+      //   console.log(maxValue);
+      //   for(let i = 0; i <= dataSort.length - 1; i++) {
+      //     result[i] =  <>
+      //     <circle cx={25} cy={initPointY} r="2" fill="red"/>
+      //     <text x={25} y={initPointY} font-size="6" fill="black" >{`${0}`}</text>
+      //     </>
+          
+      //     initPointY += 40
+      //   }
+      //  return result;
+      // }
 
     return (
         <div className={styles.container} >
@@ -101,6 +131,7 @@ const VertillePlot = (props: IGraphProps) => {
           {creatingHorizontalGrid()}
           {creatingVerticalGrid()}
           {PopUpWindow(point)}
+        
           </svg>
         </div>
       );

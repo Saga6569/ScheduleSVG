@@ -24,7 +24,7 @@
   }
 }
 
-.S {
+.informationWndow {
   position: absolute;
   transition-property: fill;
   transition: 0.5s;  
