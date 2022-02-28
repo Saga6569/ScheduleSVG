@@ -23,15 +23,15 @@ function App() {
   const data: any = {value: [6, 7, 8 ,9, 10, 8, 6, 4, 3], collors: {backgroundColor: '#c0c0fa', dotColor: '#000080', } };
 
   const res2 = [
-    {value: 2350, name: 'Пермь'}, 
-    {value: 1200, name: 'Москва'}, 
-    {value: 3454, name: 'Сочи'}, 
-    {value: 5000, name: 'Осиновик'}, 
-    {value: 4563, name: 'Новосибирск'}, 
-    {value: 2345, name: 'Томск'}, 
-    {value: 4999, name: 'Губаха'},
-    {value: 2345, name: 'Томск'}, 
-    {value: 4100, name: 'Губаха'},
+    {value: 1565, name: 'Пермь'}, 
+    {value: 4516, name: 'Москва'}, 
+    {value: 3144, name: 'Сочи'}, 
+    {value: 6116, name: 'Осиновик'}, 
+    {value: 1513, name: 'Новосибирск'}, 
+    {value: 2521, name: 'Томск'}, 
+    {value: 7285, name: 'Губаха'},
+    {value: 5124, name: 'Томск'}, 
+    {value: 3345, name: 'Губаха'},
   ];
 
   return (
