@@ -23,10 +23,10 @@ function App() {
   const data: any = {value: [6, 7, 8 ,9, 10, 8, 6, 4, 3], collors: {backgroundColor: '#c0c0fa', dotColor: '#000080', } };
 
   const res2 = [
-    {value: 1565, name: 'Пермь'}, 
+    {value: 1665, name: 'Пермь'}, 
     {value: 4516, name: 'Москва'}, 
     {value: 3144, name: 'Сочи'}, 
-    {value: 6116, name: 'Осиновик'}, 
+    {value: 2535, name: 'Осиновик'}, 
     {value: 1513, name: 'Новосибирск'}, 
     {value: 2521, name: 'Томск'}, 
     {value: 7285, name: 'Губаха'},

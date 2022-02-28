@@ -4,16 +4,10 @@ import _ from 'lodash'
 import Pdf from "react-to-pdf";
 
 const PopUpWindow = (point: {x: number; y: number; color: string, name: string, value: number, visit: boolean}) => {
-
-  const textEnd = <text   x={point.x - 20 } y={point.y - 10} font-size="6" fill="black" >{`${point.name} ${point.value}`}</text>
-  const scr =  <rect width="40" className={styles.informationWndow} x={point.x - 20} y={point.y - 20} height="15" fill={point.color} stroke-width='1' opacity={point.visit === true ? 1 : 0} stroke="none" />
-  
-  return (
-    <svg >
-      {scr}
-      {textEnd}
-    </svg>
-  )
+  const textEnd = <text   x={point.x - 20 } y={point.y - 10} font-size="6" fill="black">{point.visit === false ? '' : `${point.name} ${point.value}`}</text>
+  const scr =  <rect width="40" className={styles.informationWndow} x={point.x - 20} 
+  y={point.y - 20} height="15" fill={point.color} stroke-width='1' opacity={point.visit === true ? 1 : 0} stroke="none" />
+  return (<svg >{scr}{textEnd}</svg>);
 };
 
 interface IGraphProps {
@@ -81,11 +75,14 @@ const VertillePlot = (props: IGraphProps) => {
          return result
       };
       
+      const long = props.values.length * 50 + 45 // Длинна горизонтальных линий
+      const v = 40 * 10 + 30 // Длинна горизонтальных линий
+      
       const creatingVerticalGrid  = () => {
         let initPointX = 45;
         const result = [];
         for(let i = 0; i <= dataSort.length - 1; i++) {
-          result[i] =  <path d={`M${initPointX} 430 V ${0}Z`} fill="transparent" stroke='#696666' stroke-width="1"/>
+          result[i] =  <path d={`M${initPointX} ${v} V ${0}Z`} fill="transparent" stroke='#696666' stroke-width="1"/>
           initPointX += 50
         }
        return result;
@@ -102,12 +99,14 @@ const VertillePlot = (props: IGraphProps) => {
         const roundedAverage = '0'.repeat(String(roundedMaximumNumber).length - 1); // Получаем количество нулей для округления среднего значения значения
         const step  = Math.round(roundedMaximumNumber / numberHorizontalLines / Number(`1${roundedAverage}`) ) * Number(`1${roundedAverage}`) // округляем среднее значение
 
+       
+
         let initPointY = 0;
         let acc = 0;
         for(let i = 0; i <= numberHorizontalLines; i++) {
           const companent = <>
           <text x={15} y={428 - initPointY} font-size="10" fill="black" >{`${acc.toFixed()}`}</text> 
-          <path d={`M${600} ${430 - initPointY} H ${0}Z`} fill="transparent" stroke='#696666' stroke-width="1"/>
+          <path d={`M${long} ${430 - initPointY} H ${0}Z`} fill="transparent" stroke='#696666' stroke-width="1"/>
           </>
           result[i] =  companent;
           initPointY += 40
@@ -118,45 +117,36 @@ const VertillePlot = (props: IGraphProps) => {
 
     const coponentrender = (
       <div className={styles.container} >
-        <svg  width="650" height="450" xmlns="http://www.w3.org/2000/svg" >
-        <rect x="0" y="0" width="500" height="500" fill='#c0c0fa'/>
-        {createDataForRendering()}
+        <svg  width={long + 50} height="450" xmlns="http://www.w3.org/2000/svg" >
+        <rect x="0" y="0" width={long + 50} height="500" fill='#c0c0fa'/>
+        {PopUpWindow(point)}
         {creatingHorizontalGrid()}
         {creatingVerticalGrid()}
-        {PopUpWindow(point)}
+        {createDataForRendering()}
         </svg>
       </div>
     );
 
-    const PDFComp = (
-      <div className={styles.containerPDF} >
-      <svg  width="650" height="650" xmlns="http://www.w3.org/2000/svg" >
-      <rect x="0" y="0" width="650" height="650" fill='#c0c0fa'/>
-      {createDataForRendering()}
-      {creatingHorizontalGrid()}
-      {creatingVerticalGrid()}
-      {PopUpWindow(point)}
-      </svg>
-      </div>
-    )
-
-
-      const on = () => {
-      return(
-        Pdf.toPdf
-      ) 
-      }
+    // const PDFComp = (
+    //   <div className={styles.containerPDF} >
+    //   <svg  width="650" height="650" xmlns="http://www.w3.org/2000/svg" >
+    //   <rect x="0" y="0" width="650" height="650" fill='#c0c0fa'/>
+    //   {createDataForRendering()}
+    //   {creatingHorizontalGrid()}
+    //   {creatingVerticalGrid()}
+    //   {PopUpWindow(point)}
+    //   </svg>
+    //   </div>
+    // )
 
     return (<>
-       <Pdf targetRef={ref} x={1} y={1} scale={1.6} filename="code-example.pdf">
+       <Pdf targetRef={ref} x={2} y={2} scale={1.1} filename="code-example.pdf">
         {({ toPdf }) => <button onClick={toPdf}>Generate Pdf</button>}
       </Pdf>
       <div ref={ref}>
-        {PDFComp}
+        {coponentrender}
       </div>
     </>)
-
- 
 };
 
 export default VertillePlot;
