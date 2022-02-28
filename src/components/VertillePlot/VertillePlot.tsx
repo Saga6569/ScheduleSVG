@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styles from './VertillePlot.module.css';
 import _ from 'lodash'
-
+import Pdf from "react-to-pdf";
 
 const PopUpWindow = (point: {x: number; y: number; color: string, name: string, value: number, visit: boolean}) => {
 
@@ -28,6 +28,8 @@ interface IGraphProps {
   }
 
 const VertillePlot = (props: IGraphProps) => {
+
+  const ref = React.createRef();
 
   const upDate = () => {
     const colors = ['blue', 'red', '#5aa5c4', 'tomato', 'green', 'MediumOrchid', 'Yellow', 'Lime', 'LightCyan'];
@@ -103,41 +105,58 @@ const VertillePlot = (props: IGraphProps) => {
         let initPointY = 0;
         let acc = 0;
         for(let i = 0; i <= numberHorizontalLines; i++) {
-          // if (acc > maxValueEl) {
-          //   const companent = <>
-          //   <text x={15} y={428 - initPointY} font-size="10" fill="black" >{`${acc.toFixed()}`}</text> 
-          //   <path d={`M${600} ${430 - initPointY} H ${0}Z`} fill="transparent" stroke='#696666' stroke-width="1"/>
-          //   </>
-          //   result[i] =  companent;
-          //   initPointY += 40
-          //   return result;
-          // }
           const companent = <>
           <text x={15} y={428 - initPointY} font-size="10" fill="black" >{`${acc.toFixed()}`}</text> 
           <path d={`M${600} ${430 - initPointY} H ${0}Z`} fill="transparent" stroke='#696666' stroke-width="1"/>
           </>
           result[i] =  companent;
           initPointY += 40
-          if (acc > maxValueEl) {
-            i = 9
-          }
           acc += step
         }
        return result;
       };
 
-    return (
-        <div className={styles.container} >
-          <svg   width="650" height="450" xmlns="http://www.w3.org/2000/svg">
-          <rect x="0" y="0" width="800" height="300" fill="#c0c0fa"/>
-          {createDataForRendering()}
-          {creatingHorizontalGrid()}
-          {creatingVerticalGrid()}
-          {PopUpWindow(point)}
-        
-          </svg>
-        </div>
-      );
+    const coponentrender = (
+      <div className={styles.container} >
+        <svg  width="650" height="450" xmlns="http://www.w3.org/2000/svg" >
+        <rect x="0" y="0" width="500" height="500" fill='#c0c0fa'/>
+        {createDataForRendering()}
+        {creatingHorizontalGrid()}
+        {creatingVerticalGrid()}
+        {PopUpWindow(point)}
+        </svg>
+      </div>
+    );
+
+    const PDFComp = (
+      <div className={styles.containerPDF} >
+      <svg  width="650" height="650" xmlns="http://www.w3.org/2000/svg" >
+      <rect x="0" y="0" width="650" height="650" fill='#c0c0fa'/>
+      {createDataForRendering()}
+      {creatingHorizontalGrid()}
+      {creatingVerticalGrid()}
+      {PopUpWindow(point)}
+      </svg>
+      </div>
+    )
+
+
+      const on = () => {
+      return(
+        Pdf.toPdf
+      ) 
+      }
+
+    return (<>
+       <Pdf targetRef={ref} x={1} y={1} scale={1.6} filename="code-example.pdf">
+        {({ toPdf }) => <button onClick={toPdf}>Generate Pdf</button>}
+      </Pdf>
+      <div ref={ref}>
+        {PDFComp}
+      </div>
+    </>)
+
+ 
 };
 
 export default VertillePlot;
