@@ -27,10 +27,10 @@ interface IelDate {
 const textInfo = (point: Ipoint) => {
   const left = point.x === 0 ?  0 : point.x
   const top = point.y === 0 ?  0 : point.y
-  const styleClass: {top: string, left: string} = {top: `${top - 235}px`, left: `${left - 515}px`};
+  const styleClass: {top: string, left: string} = {top: `${top - 245}px`, left: `${left - 515}px`};
     return (
       <div style ={styleClass} className={styles.informationWndowT} > 
-        <svg  width="50" height="50" >
+        <svg  width="50" height="25" >
           <text x='0' y='25' font-size="5" opacity={point.visit === true ? 1 : 0} fill="black">{`${point.name} ${point.value}`}</text>
         </svg>
       </div>)
@@ -77,25 +77,23 @@ const VertillePlot = (props: IGraphProps) => {
   const LengthVerticalLines = 40 * 10 + 25 // Длинна вериткальных линий
 
   const [point, setPoint] = useState({x: 0, y: 0 , color: '', name: '', value: 0, visit: false});
-  console.log(point)
+  
   const createDataForRendering = () => {
     let initPointX = 70;
     const maxValueEls = roundedWholeScreenValue / chartHeight
     const result = dataSort.map((elDate: IelDate) => {
       const valueY =  elDate.value / maxValueEls;
       const x = initPointX;
-      const data : any = {x: x, y: startPointBottomPointY - valueY, color: elDate.color, name: elDate.name, value: elDate.value, visit: true }
+
       const graphLine = <path 
-      // onMouseOut onMouseOver
       onMouseOut={() => {
-        console.log('убрал')
         setPoint({...point, visit: false})
       }}  
       onMouseEnter={() =>  {
-        console.log('навел')
-        setPoint({x: data.x, y: data.y, color: data.color, name: data.name, value: data.value, visit: true})
-      }}
-        key={elDate.id} d={`M${initPointX} ${startPointBottomPointY} V ${startPointBottomPointY - valueY}`} fill="transparent" stroke={elDate.color} stroke-width="30"/>
+        setPoint({x: x, y: startPointBottomPointY - valueY, color: elDate.color, name: elDate.name, value: elDate.value, visit: true})
+      }} 
+      key={elDate.id} d={`M${initPointX} ${startPointBottomPointY} V ${startPointBottomPointY - valueY}`} fill="transparent" stroke={elDate.color} stroke-width="30"/>
+
       const circle =  <circle cx={initPointX} cy={startPointBottomPointY - valueY} r="2" fill="red"/>
       const textStart = <text x={initPointX - 12} y={435} font-size="6" fill="black" >{`${elDate.name}`}</text>
     
