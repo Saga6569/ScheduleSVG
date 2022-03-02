@@ -35,13 +35,6 @@ const GraphCircle = (props: IGraphProps ) =>  {
       }
     return newData;
   };
- 
-
-  // const hoverEl = (el: {id: number}) => (e: any) => {
-  // console.log(e.targer)
-  // //onMouseLeave={hoverEl(el)}
-  // }
-
 
   const updatedInput: Array<IelDate> = upDate();
 

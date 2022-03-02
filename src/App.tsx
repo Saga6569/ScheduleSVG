@@ -34,7 +34,7 @@ function App() {
     {value: 3345, name: 'Губаха'},
   ];
 
-  return (
+  return ( 
     <div className="App">
       <FieldWithMoveablePoint/>
       <FieldWithPointsGeneration/>
