@@ -117,7 +117,7 @@ const VertillePlot = (props: IGraphProps) => {
     let initPointX = 45;
     const result = [];
       for(let i = 0; i <= dataSort.length - 1; i++) {
-        result[i] =  <path d={`M${initPointX} ${LengthVerticalLines} V ${25}Z`} fill="transparent" stroke='#696666' stroke-width="1"/>
+        result[i] =  <path d={`M${initPointX} ${LengthVerticalLines} V ${25}Z`}  stroke='#696666' stroke-width="1"/>
         initPointX += verticalLineSpacing
       };
     return result;
@@ -129,18 +129,13 @@ const VertillePlot = (props: IGraphProps) => {
     let acc = 0;
       for(let i = 0; i <= numberHorizontalLines ; i++) {
         const companent = <>
-          <text x={25} y={chartHeight + 28 - initPointY} font-size="10" fill="black" >{`${acc.toFixed()}`}</text> 
+          <text x={i === 0 ? 35 : 15} y={chartHeight + 28 - initPointY} font-size="10" fill="black" >{`${acc.toFixed()}`}</text> 
            <path d={`M${chartWidth + 45} ${chartHeight + 25 - initPointY} H ${45}Z`} fill="transparent" stroke='#696666' stroke-width="1"/>
         </>
         result[i] =  companent;
         initPointY += 40;
         acc += horizontalLineInterval; 
       };
-      const lastCompanent = <>
-        <text x={15} y={startPointBottomPointY - 2 - initPointY} font-size="10" fill="black" >{`${acc.toFixed()}`}</text> 
-        <path d={`M${chartWidth} ${startPointBottomPointY - initPointY} H ${0}Z`} fill="transparent" stroke='#696666' stroke-width="1"/>
-      </>
-      result[result.length] = lastCompanent;
     return result;
   };
 
