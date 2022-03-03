@@ -29,7 +29,7 @@ function App() {
     {value: 2535, name: 'Осиновик'}, 
     {value: 1513, name: 'Новосибирск'}, 
     {value: 2521, name: 'Томск'}, 
-    {value: 7285, name: 'Губаха'},
+    {value: 6285, name: 'Губаха'},
     {value: 5124, name: 'Томск'}, 
     {value: 3345, name: 'Губаха'},
   ];

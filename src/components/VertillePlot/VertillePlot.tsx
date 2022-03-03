@@ -10,7 +10,8 @@ interface Ipoint {
   color: string, 
   name: string, 
   value: number, 
-  visit: boolean
+  visit: boolean,
+  count: number,
 };
 
 interface IGraphProps {
@@ -24,13 +25,14 @@ interface IelDate {
   color: string
 };
 
-const textInfo = (option: Ipoint) => {  
-  const left = option.x
-  const top = option.y
-  const styleClass: {top: string, left: string} = {top: `${top - 245}px`, left: `${left - 515}px`};
+const textInfo = (option: Ipoint) => {
+  const left = option.x - option.count * 50 - 65;
+  const top = option.y - 245;
+  const styleClass: {top: string, left: string} = {top: `${top}px`, left: `${left}px`};
     return (
       <div style ={styleClass} className={styles.informationWndowT} > 
         <svg  width="50" height="25" >
+        <rect width="40"  x={option.x - 20} y={option.y - 20} height="15" fill='red' stroke-width='1'  stroke="none"/>
           <text x='0' y='25' font-size="5" opacity={option.visit === true ? 1 : 0} fill="black">{`${option.name} ${option.value}`}</text>
         </svg>
       </div>)
@@ -80,7 +82,7 @@ const VertillePlot = (props: IGraphProps) => {
   const verticalLineSpacing = 50; // шаг вертикальных линиий 
   const LengthVerticalLines = 40 * 10 + 25 // Длинна вериткальных линий
 
-  const [option, setOption] = useState({x: 0, y: 0 , color: '', name: '', value: 0, visit: false});
+  const [option, setOption] = useState({x: 0, y: 0 , color: '', name: '', value: 0, visit: false, count: 0});
 
   const createDataForRendering = () => {    // Функция обрисовывает пришедшие данные в график 
     let initPointX = 70;
@@ -94,7 +96,7 @@ const VertillePlot = (props: IGraphProps) => {
         setOption({...option, visit: false})
       }}  
       onMouseEnter={() =>  { // Событие наведение курсора на элемент
-        setOption({x: x, y: startPointBottomPointY - valueY, color: elDate.color, name: elDate.name, value: elDate.value, visit: true})
+        setOption({x: x, y: startPointBottomPointY - valueY, color: elDate.color, name: elDate.name, value: elDate.value, visit: true, count: dataSort.length })
       }} 
       key={elDate.id} d={`M${initPointX} ${startPointBottomPointY} V ${startPointBottomPointY - valueY}`} fill="transparent" stroke={elDate.color} stroke-width="30"/>
 
