@@ -155,17 +155,20 @@ const VertillePlot = (props: IGraphProps) => {
   const componentRef = useRef<HTMLDivElement | null>(null)
  
   return (<>
-    <button style={{left: '570px' , position: 'absolute'}} onClick={() => {
+    <button style={{left: '570px' , position: 'absolute'}} 
+    onClick={() => {
       exportComponentAsJPEG(componentRef)
     }}>
       Export As JPEG
     </button>
-    <button style={{left: '680px', position: 'absolute'}} onClick={() => {
+    <button style={{left: '680px', position: 'absolute'}} 
+    onClick={() => {
       exportComponentAsPDF(componentRef,  {pdfOptions: {w: 750, h: 200, y: 5}})
     }}>
       Export As PDF
     </button>
-    <button style={{left: '782px' , position: 'absolute'}} onClick={() => {
+    <button style={{left: '782px' , position: 'absolute'}} 
+    onClick={() => {
       exportComponentAsPNG(componentRef)
     }}>
       Export As PNG
