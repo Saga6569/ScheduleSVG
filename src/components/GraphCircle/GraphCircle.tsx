@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styles from './GraphCircle.module.css';
 import _ from 'lodash'
 
@@ -8,8 +8,8 @@ interface IGraphProps {
 
 interface IelDate {
   id: string; 
-  value: number; 
-  valueRender: number;
+  value: number;
+  renderValue: number;
   name: string; 
   visible: boolean;
   collor: string;
@@ -22,6 +22,7 @@ const GraphCircle = (props: IGraphProps ) =>  {
   const [dataSumm,  setDataSumm] = useState(_.sumBy(props.values, 'value'))
 
   const upDate = () => {
+
     const collorArr = ['blue', 'red', 'black', 'tomato', 'green', 'MediumOrchid', 'Yellow', 'Lime', 'LightCyan'];
     // const newData = this.props.values.reduce((acc: Array<{ value: number; name: string; collor: string; }>, el: { value: number; name: string; collor: string; }) => {
     //   const value = el.value ?? el;
@@ -41,7 +42,7 @@ const GraphCircle = (props: IGraphProps ) =>  {
         const id: string = _.uniqueId();
         const graphRadius = 90;
         const visible = el.visible ?? true
-        const valueRender = 0;
+        const renderValue = 0;
 
         const circle: number = (graphRadius * 2 * 3.14);
         const result: number = (value * 100 / dataSumm);
@@ -50,7 +51,7 @@ const GraphCircle = (props: IGraphProps ) =>  {
 
         const valueTextRender = `${(value * 100 / dataSumm).toFixed(2)}%`
 
-        newData[i] = {id, value, valueRender, name, visible, collor,
+        newData[i] = {id, value, renderValue, name, visible, collor,
           circle: {graphRadius, cx: 130, cy: 150, fill: 'none', stroke: collor, strokeWidth: 60, strokeDasharray: ircleData.pour, strokeDashoffset: clockwiseShiftAcc, ircleData},
           text: {x: 100, y: 160, fontSize: 18, fill: collor, valueTextRender},
         }
@@ -62,10 +63,8 @@ const GraphCircle = (props: IGraphProps ) =>  {
 
   const [data, setData] = useState(upDate());
 
-  const [valueR, setValueR] = useState(data)
-
   const HendleClickHideElement = (id: string) => () => {
-  
+ 
     const newData = data.map((elData: any) => {
       if (elData.id === id) {
         elData.visible = elData.visible === true ? false : true;
@@ -84,7 +83,7 @@ const GraphCircle = (props: IGraphProps ) =>  {
         resultData[i] = el
       } else {
         const circle: number = (el.circle.graphRadius * 2 * 3.14);
-        const result: number = (el.value * 100 / newSumm);
+        const result: number = (el.value* 100 / newSumm);
         const shadedPart: number = (circle * result / 100);
         const ircleData = {pour: `${shadedPart},${circle}`, clockwiseShift : shadedPart};
         resultData[i] = {...el,
@@ -98,25 +97,40 @@ const GraphCircle = (props: IGraphProps ) =>  {
     setData(resultData)
   };
 
+
+
+
+
+
   const HendleClickMoveElement = (id: string) => () => {
     console.log(id)
   };
 
+
+
+
   const tableDate = () => {
+
     const infoData = data.map((el: IelDate) => {
+      
       const circle = <circle cx="5" cy="7" r="5" fill={el.visible === false ? 'Gray' : el.collor} />;
-      const percentageValue = (el.value * 100 / dataSumm).toFixed(2);
-      const text = el.name === String(el.value) ? `${percentageValue} %` : `${el.name} ${percentageValue} %`;
-      const textZero = el.visible === false ? `${el.name} 0%` : text
-      const textСrcle = <text x="20" y="11" font-size="10" fill="black">{textZero}</text>;
+      const percentageValue = (el.renderValue * 100 / dataSumm).toFixed(2);
+      const text = el.name === String(el.renderValue) ? `${percentageValue} %` : `${el.name} ${percentageValue} %`;
+      const textСrcle = <text x="20" y="11" font-size="10" fill="black">{text}</text>;
       
       return <svg  width="100%" height="15" preserveAspectRatio="xMidYMin meet" key={el.id} onClick={HendleClickHideElement(el.id)} > 
         {circle}
         {textСrcle}
       </svg>
     });
+
     return (<div className={styles.containerInfo}>{infoData}</div>);
     };
+
+
+useEffect(() => {
+  upIf()
+}, [data])
 
   const creationGraphics = () => {
     const result = data.map((elData: IelDate) => {
@@ -139,29 +153,40 @@ const GraphCircle = (props: IGraphProps ) =>  {
     return (<>{result}</>);
   };
 
-  // const ss = () => {
-  //   let start = Date.now();
-  //   console.log(step)
-  //   let acc = 0;
-  //   let timer = setInterval(() => {
-  //     let timePassed = Date.now() - start;
-  //     acc += step;
-  //     console.log(acc)
-  //     const newSd: any = data.map((eld: IelDate) =>  {
-  //       if (eld.id === el.id) {
-  //         eld.valueRender = acc
-  //         return eld;
-  //       }
-  //       return eld
-  //     })
 
-  //     if (timePassed > 2000) clearInterval(timer);
-  //     setData(newSd)
-  //   }, 80);
-  // }
-  //ss()
+  const upIf = async () => {
+    const res = data.filter((el) => el.visible === true).every((el) =>  el.value === el.renderValue);
+    const res2 = data.filter((el) => el.visible === false).every((el) => el.renderValue === 0);
+    if (res && res2 ) {
+      return 
+    }
+   
+      const newDa = data.map((el) => {
+        if(el.visible === false) {
+          if (Number(el.renderValue.toFixed(2)) === 0) {
+            return el
+          }
+          el.renderValue = Number((el.renderValue -= 0.02).toFixed(2))
+          return el
+        }
 
+
+
+        if (el.value !== Number(el.renderValue.toFixed(2))) {
+          el.renderValue = Number((el.renderValue += 0.02).toFixed(2))
+          return el
+        }
+       return el
+      })
+       setData(newDa)
+      
   
+  }
+ 
+ 
+
+
+ // console.log(data)
   return (
     <div className={styles.container} >
       <svg width="350" height="300" xmlns="http://www.w3.org/2000/svg">
