@@ -13,6 +13,7 @@ interface IelDate {
   name: string; 
   visible: boolean;
   collor: string;
+  prochent: {oldValue: number, newValue: number};
   circle: {graphRadius: number, cx: number, cy: number, fill: string, stroke: string, strokeWidth: number, strokeDasharray: any, strokeDashoffset: any, ircleData: any}
   text: {x: number, y: number, fontSize: number, fill: string, valueTextRender: string}
 }
@@ -51,7 +52,7 @@ const GraphCircle = (props: IGraphProps ) =>  {
 
         const valueTextRender = `${(value * 100 / dataSumm).toFixed(2)}%`
 
-        newData[i] = {id, value, renderValue, name, visible, collor,
+        newData[i] = {id, value, renderValue, name, visible, collor, prochent: {oldValue: 0, newValue:Number(result.toFixed(2))},
           circle: {graphRadius, cx: 130, cy: 150, fill: 'none', stroke: collor, strokeWidth: 60, strokeDasharray: ircleData.pour, strokeDashoffset: clockwiseShiftAcc, ircleData},
           text: {x: 100, y: 160, fontSize: 18, fill: collor, valueTextRender},
         }
@@ -79,14 +80,20 @@ const GraphCircle = (props: IGraphProps ) =>  {
     const resultData: any = [];
     for(let i = 0; i<= newData.length - 1; i++) {
       const el: any = newData[i];
+
+      const circle: number = (el.circle.graphRadius * 2 * 3.14);
+      const result: number = (el.value* 100 / newSumm);
+      const shadedPart: number = (circle * result / 100);
+      const ircleData = {pour: `${shadedPart},${circle}`, clockwiseShift : shadedPart};
+      const oldValue = el.prochent.oldValue
       if (el.visible === false) {
-        resultData[i] = el
+        const prochent = {oldValue, newValue: 0};
+        resultData[i] = {...el, prochent}
+
+        
       } else {
-        const circle: number = (el.circle.graphRadius * 2 * 3.14);
-        const result: number = (el.value* 100 / newSumm);
-        const shadedPart: number = (circle * result / 100);
-        const ircleData = {pour: `${shadedPart},${circle}`, clockwiseShift : shadedPart};
-        resultData[i] = {...el,
+        const prochent = {oldValue, newValue: Number(result.toFixed(2))}
+        resultData[i] = {...el, prochent, 
           circle: {graphRadius: el.circle.graphRadius, cx: 130, cy: 150, fill: 'none', stroke: el.collor, strokeWidth: 60, strokeDasharray: ircleData.pour, strokeDashoffset: clockwiseShiftAcc, ircleData},
           text: {x: 100, y: 160, fontSize: 18, fill: el.collor, valueTextRender: `${(el.value * 100 / newSumm).toFixed(2)}%`},
         }
@@ -95,6 +102,7 @@ const GraphCircle = (props: IGraphProps ) =>  {
     };
     setDataSumm(newSumm)
     setData(resultData)
+   
   };
 
 
@@ -106,16 +114,12 @@ const GraphCircle = (props: IGraphProps ) =>  {
     console.log(id)
   };
 
-
-
-
   const tableDate = () => {
 
     const infoData = data.map((el: IelDate) => {
-      
       const circle = <circle cx="5" cy="7" r="5" fill={el.visible === false ? 'Gray' : el.collor} />;
-      const percentageValue = (el.renderValue * 100 / dataSumm).toFixed(2);
-      const text = el.name === String(el.renderValue) ? `${percentageValue} %` : `${el.name} ${percentageValue} %`;
+      
+      const text = `${el.name} ${el.prochent.oldValue} %`;
       const textСrcle = <text x="20" y="11" font-size="10" fill="black">{text}</text>;
       
       return <svg  width="100%" height="15" preserveAspectRatio="xMidYMin meet" key={el.id} onClick={HendleClickHideElement(el.id)} > 
@@ -129,7 +133,7 @@ const GraphCircle = (props: IGraphProps ) =>  {
 
 
 useEffect(() => {
-  upIf()
+  upTableDate()
 }, [data])
 
   const creationGraphics = () => {
@@ -154,39 +158,49 @@ useEffect(() => {
   };
 
 
-  const upIf = async () => {
-    const res = data.filter((el) => el.visible === true).every((el) =>  el.value === el.renderValue);
-    const res2 = data.filter((el) => el.visible === false).every((el) => el.renderValue === 0);
-    if (res && res2 ) {
+  const upTableDate = async () => {  // обновлаем значение информации графика
+    const res = data.filter((el) => el.visible === true).every((el) =>  el.prochent.oldValue === el.prochent.newValue);
+    const res2 = data.filter((el) => el.visible === false).every((el) =>  el.prochent.oldValue === 0);
+  
+    if (res && res2) {
       return 
     }
-   
-      const newDa = data.map((el) => {
-        if(el.visible === false) {
-          if (Number(el.renderValue.toFixed(2)) === 0) {
-            return el
-          }
-          el.renderValue = Number((el.renderValue -= 0.02).toFixed(2))
-          return el
-        }
-
-
-
-        if (el.value !== Number(el.renderValue.toFixed(2))) {
-          el.renderValue = Number((el.renderValue += 0.02).toFixed(2))
-          return el
-        }
-       return el
-      })
-       setData(newDa)
-      
   
+      console.log('1')
+      const newDa = data.map((el: IelDate) => {
+
+        if (el.visible === false) {
+          if (el.prochent.oldValue > 0 ) {
+            el.prochent.oldValue = Number((el.prochent.oldValue - 0.05).toFixed(2))
+            return el;
+          }
+          
+          if (el.prochent.oldValue <= 0  )
+          el.prochent.oldValue = 0
+          return el;
+        }
+
+        if (el.prochent.oldValue > el.prochent.newValue) {
+          el.prochent.oldValue = Number((el.prochent.oldValue - 0.05).toFixed(2))
+           if (el.prochent.oldValue < el.prochent.newValue) {
+            el.prochent.oldValue = el.prochent.newValue
+           }
+          return el
+        } if (el.prochent.oldValue < el.prochent.newValue) {
+
+          el.prochent.oldValue = Number((el.prochent.oldValue + 0.05).toFixed(2))
+          return el;
+        }
+
+        
+
+        return el
+      })
+        setData(newDa);
+  
+    
   }
- 
- 
 
-
- // console.log(data)
   return (
     <div className={styles.container} >
       <svg width="350" height="300" xmlns="http://www.w3.org/2000/svg">
