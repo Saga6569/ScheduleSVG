@@ -9,7 +9,6 @@ interface IGraphProps {
 interface IelDate {
   id: string; 
   value: number;
-  renderValue: number;
   name: string; 
   visible: boolean;
   collor: string;
@@ -44,7 +43,6 @@ const GraphCircle = (props: IGraphProps ) =>  {
         const id: string = _.uniqueId();
         const graphRadius = 90;
         const visible = el.visible ?? true
-        const renderValue = 0;
 
         const circle: number = (graphRadius * 2 * 3.14);
         const result: number = (value * 100 / dataSumm);
@@ -53,7 +51,7 @@ const GraphCircle = (props: IGraphProps ) =>  {
 
         const valueTextRender = `${(value * 100 / dataSumm).toFixed(2)}%`
 
-        newData[i] = {id, value, renderValue, name, visible, collor, prochent: {oldValue: 0, newValue:Number(result.toFixed(2))},  style: {display: 'none'},
+        newData[i] = {id, value, name, visible, collor, prochent: {oldValue: 0, newValue:Number(result.toFixed(2))},  style: {display: 'none'},
           circle: {graphRadius, cx: 130, cy: 150, fill: 'none', stroke: collor, strokeWidth: 60, strokeDasharray: ircleData.pour, strokeDashoffset: clockwiseShiftAcc, ircleData},
           text: {x: 100, y: 160, fontSize: 18, fill: collor, valueTextRender},
         }
@@ -90,8 +88,6 @@ const GraphCircle = (props: IGraphProps ) =>  {
       if (el.visible === false) {
         const prochent = {oldValue, newValue: 0};
         resultData[i] = {...el, prochent}
-
-        
       } else {
         const prochent = {oldValue, newValue: Number(result.toFixed(2))}
         resultData[i] = {...el, prochent, 
@@ -103,15 +99,6 @@ const GraphCircle = (props: IGraphProps ) =>  {
     };
     setDataSumm(newSumm)
     setData(resultData)
-   
-  };
-
-
-
-
-
-
-  const HendleClickMoveElement = (id: string) => () => {
    
   };
 
@@ -128,7 +115,7 @@ const GraphCircle = (props: IGraphProps ) =>  {
          onMouseOut={() => {
           const result = data.map((resulrEl) => {
             if (resulrEl.id === el.id) {
-              resulrEl.circle.strokeWidth = 60
+              resulrEl.circle.strokeWidth = 60;
               resulrEl.style = {display: 'none'}
             }
             return resulrEl
@@ -167,8 +154,18 @@ useEffect(() => {
       }
       const mystyle: {} = { 'stroke-dasharray': elData.circle.ircleData};
 
+     // stop-opacity='1' 
+      const defs = <defs>
+        <radialGradient id={elData.id}>
+          <stop offset="80%" stop-color={elData.collor} stop-opacity='1' />
+          <stop offset="90%" stop-color={elData.collor} stop-opacity='0.5'/>
+          <stop offset="100%" stop-color={elData.collor} stop-opacity='1' />
+        </radialGradient>
+      </defs>
+
+
       const shadedPart  = <circle r={elData.circle.graphRadius} className={styles.Circle}  style={mystyle}
-        cx={elData.circle.cx} cy={elData.circle.cy} fill={elData.circle.fill} stroke={elData.circle.stroke} 
+        cx={elData.circle.cx} cy={elData.circle.cy} fill={elData.circle.fill} stroke={`url(#${elData.id})`}
         stroke-dasharray={elData.circle.strokeDasharray} stroke-dashoffset={elData.circle.strokeDashoffset} stroke-width={elData.circle.strokeWidth}
         
         onMouseOut={() => {
@@ -191,12 +188,12 @@ useEffect(() => {
           })
           setData(result)
         }} 
-        
         />
+      const textСrcle = <text x={elData.text.x} style={elData.style} y={elData.text.y} 
+        font-size={elData.text.fontSize} fill={elData.text.fill}>{elData.text.valueTextRender}</text>
 
-      const textСrcle = <text x={elData.text.x} style={elData.style} y={elData.text.y} font-size={elData.text.fontSize} fill={elData.text.fill}>{elData.text.valueTextRender}</text>
-
-      return <svg className={styles.containerGradient} onClick={HendleClickMoveElement(elData.id)}>
+      return <svg className={styles.containerGradient}>
+        {defs}
         {shadedPart}
         {textСrcle}
       </svg>
