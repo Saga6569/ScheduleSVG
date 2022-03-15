@@ -13,6 +13,7 @@ interface IelDate {
   name: string; 
   visible: boolean;
   collor: string;
+  style: {display: string}
   prochent: {oldValue: number, newValue: number};
   circle: {graphRadius: number, cx: number, cy: number, fill: string, stroke: string, strokeWidth: number, strokeDasharray: any, strokeDashoffset: any, ircleData: any}
   text: {x: number, y: number, fontSize: number, fill: string, valueTextRender: string}
@@ -52,7 +53,7 @@ const GraphCircle = (props: IGraphProps ) =>  {
 
         const valueTextRender = `${(value * 100 / dataSumm).toFixed(2)}%`
 
-        newData[i] = {id, value, renderValue, name, visible, collor, prochent: {oldValue: 0, newValue:Number(result.toFixed(2))},
+        newData[i] = {id, value, renderValue, name, visible, collor, prochent: {oldValue: 0, newValue:Number(result.toFixed(2))},  style: {display: 'none'},
           circle: {graphRadius, cx: 130, cy: 150, fill: 'none', stroke: collor, strokeWidth: 60, strokeDasharray: ircleData.pour, strokeDashoffset: clockwiseShiftAcc, ircleData},
           text: {x: 100, y: 160, fontSize: 18, fill: collor, valueTextRender},
         }
@@ -111,20 +112,43 @@ const GraphCircle = (props: IGraphProps ) =>  {
 
 
   const HendleClickMoveElement = (id: string) => () => {
-    console.log(id)
+   
   };
 
   const tableDate = () => {
 
     const infoData = data.map((el: IelDate) => {
-      const circle = <circle cx="5" cy="7" r="5" fill={el.visible === false ? 'Gray' : el.collor} />;
+      const circle = <circle cx="13" cy="8" r="5" fill={el.visible === false ? 'Gray' : el.collor} />;
       
       const text = `${el.name} ${el.prochent.oldValue} %`;
       const textСrcle = <text x="20" y="11" font-size="10" fill="black">{text}</text>;
       
-      return <svg  width="100%" height="15" preserveAspectRatio="xMidYMin meet" key={el.id} onClick={HendleClickHideElement(el.id)} > 
+      return <svg  width="100%" height="15" preserveAspectRatio="xMidYMin meet" key={el.id} onClick={HendleClickHideElement(el.id)}>
+        <g
+         onMouseOut={() => {
+          const result = data.map((resulrEl) => {
+            if (resulrEl.id === el.id) {
+              resulrEl.circle.strokeWidth = 60
+              resulrEl.style = {display: 'none'}
+            }
+            return resulrEl
+          })
+        setData(result)
+        }}  
+        onMouseEnter={() => {
+          const result = data.map((resulrEl) => {
+            if (resulrEl.id === el.id) {
+              resulrEl.circle.strokeWidth = 75;
+              resulrEl.style = {display: 'block'}
+            }
+            return resulrEl
+          })
+          setData(result)
+        }} 
+        >
         {circle}
         {textСrcle}
+        </g>
       </svg>
     });
 
@@ -133,7 +157,7 @@ const GraphCircle = (props: IGraphProps ) =>  {
 
 
 useEffect(() => {
-  upTableDate()
+ upTableDate()
 }, [data])
 
   const creationGraphics = () => {
@@ -145,9 +169,32 @@ useEffect(() => {
 
       const shadedPart  = <circle r={elData.circle.graphRadius} className={styles.Circle}  style={mystyle}
         cx={elData.circle.cx} cy={elData.circle.cy} fill={elData.circle.fill} stroke={elData.circle.stroke} 
-        stroke-dasharray={elData.circle.strokeDasharray} stroke-dashoffset={elData.circle.strokeDashoffset} stroke-width={elData.circle.strokeWidth}/>
+        stroke-dasharray={elData.circle.strokeDasharray} stroke-dashoffset={elData.circle.strokeDashoffset} stroke-width={elData.circle.strokeWidth}
+        
+        onMouseOut={() => {
+          const result = data.map((resulrEl) => {
+            if (resulrEl.id === elData.id) {
+              resulrEl.circle.strokeWidth = 60
+              resulrEl.style = {display: 'none'}
+            }
+            return resulrEl
+          })
+        setData(result)
+        }}  
+        onMouseEnter={() => {
+          const result = data.map((resulrEl) => {
+            if (resulrEl.id === elData.id) {
+              resulrEl.circle.strokeWidth = 75
+              resulrEl.style = {display: 'block'}
+            }
+            return resulrEl
+          })
+          setData(result)
+        }} 
+        
+        />
 
-      const textСrcle = <text x={elData.text.x} y={elData.text.y} font-size={elData.text.fontSize} fill={elData.text.fill}>{elData.text.valueTextRender}</text>
+      const textСrcle = <text x={elData.text.x} style={elData.style} y={elData.text.y} font-size={elData.text.fontSize} fill={elData.text.fill}>{elData.text.valueTextRender}</text>
 
       return <svg className={styles.containerGradient} onClick={HendleClickMoveElement(elData.id)}>
         {shadedPart}
@@ -158,47 +205,37 @@ useEffect(() => {
   };
 
 
-  const upTableDate = async () => {  // обновлаем значение информации графика
-    const res = data.filter((el) => el.visible === true).every((el) =>  el.prochent.oldValue === el.prochent.newValue);
-    const res2 = data.filter((el) => el.visible === false).every((el) =>  el.prochent.oldValue === 0);
-  
-    if (res && res2) {
+  const upTableDate = () => {  // обновлаем значение информации графика
+    const condition1 = data.filter((el) => el.visible === true).every((el) =>  el.prochent.oldValue === el.prochent.newValue);
+    const condition2 = data.filter((el) => el.visible === false).every((el) =>  el.prochent.oldValue === 0);
+    if (condition1 && condition2) {
       return 
     }
-  
-      console.log('1')
-      const newDa = data.map((el: IelDate) => {
-
-        if (el.visible === false) {
-          if (el.prochent.oldValue > 0 ) {
-            el.prochent.oldValue = Number((el.prochent.oldValue - 0.05).toFixed(2))
-            return el;
-          }
-          
-          if (el.prochent.oldValue <= 0  )
-          el.prochent.oldValue = 0
-          return el;
+    console.log('1')
+    const newDa = data.map((el: IelDate) => {
+    if (el.visible === false) {
+      if (el.prochent.oldValue > 0 ) {
+        el.prochent.oldValue = Number((el.prochent.oldValue - 0.08).toFixed(2))
+        return el;
+      }     
+      if (el.prochent.oldValue <= 0 ) {
+        el.prochent.oldValue = 0;
+        return el;
+      }  
+    }
+    if (el.prochent.oldValue > el.prochent.newValue) {
+      el.prochent.oldValue = Number((el.prochent.oldValue - 0.08).toFixed(2))
+        if (el.prochent.oldValue < el.prochent.newValue) {
+          el.prochent.oldValue = el.prochent.newValue
         }
-
-        if (el.prochent.oldValue > el.prochent.newValue) {
-          el.prochent.oldValue = Number((el.prochent.oldValue - 0.05).toFixed(2))
-           if (el.prochent.oldValue < el.prochent.newValue) {
-            el.prochent.oldValue = el.prochent.newValue
-           }
-          return el
-        } if (el.prochent.oldValue < el.prochent.newValue) {
-
-          el.prochent.oldValue = Number((el.prochent.oldValue + 0.05).toFixed(2))
-          return el;
-        }
-
-        
-
         return el
-      })
-        setData(newDa);
-  
-    
+    } if (el.prochent.oldValue < el.prochent.newValue) {
+        el.prochent.oldValue = Number((el.prochent.oldValue + 0.08).toFixed(2))
+        return el;
+      }
+        return el;
+    })
+    setData(newDa);
   }
 
   return (
