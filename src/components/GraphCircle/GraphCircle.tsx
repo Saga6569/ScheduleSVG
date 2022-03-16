@@ -109,10 +109,12 @@ const GraphCircle = (props: IGraphProps ) =>  {
     const result = data.map((resulrEl) => {
       if (resulrEl.id === id) {
         const ugol = resulrEl.displacementAngle * 0.01745329252
-        const x = 5 * Math.cos(ugol)
-        const y = 5 * Math.sin(ugol)   
-        // resulrEl.circle.cx -= x;
-        // resulrEl.circle.cy -= y;
+        const x = 15 * Math.cos(ugol);
+        const y = 15 * Math.sin(ugol);
+        const xx = 130 + x;
+        const yy = 150 + y;
+        resulrEl.circle.cx = resulrEl.circle.cx === xx ? xx : 130
+        resulrEl.circle.cy = resulrEl.circle.cy === yy ? yy : 150
         resulrEl.style = {display: 'none'};
       }
       return resulrEl;
@@ -124,10 +126,12 @@ const GraphCircle = (props: IGraphProps ) =>  {
     const result = data.map((resulrEl) => {
       if (resulrEl.id === id) {
         const ugol = resulrEl.displacementAngle * 0.01745329252
-        const x = 5 * Math.cos(ugol)
-        const y = 5 * Math.sin(ugol)
-        // resulrEl.circle.cx += x;
-        // resulrEl.circle.cy += y;
+        const x = 5 * Math.cos(ugol);
+        const y = 5 * Math.sin(ugol);
+        const xx = 130 + x;
+        const yy = 150 + y;
+        resulrEl.circle.cx = xx;
+        resulrEl.circle.cy = yy;
         resulrEl.style = {display: 'block'};
       }
       return resulrEl;
@@ -169,8 +173,12 @@ const onclicc = (id: string) => () => {
       const ugol = el.displacementAngle * 0.01745329252
       const x = 15 * Math.cos(ugol)
       const y = 15 * Math.sin(ugol)
-      el.circle.cx = el.circle.cx !== 130 ? 130 : el.circle.cx += x
-      el.circle.cy = el.circle.cy !== 150 ? 150 : el.circle.cy += y
+      const xx = 130 + x
+      const yy = 150 + y
+      console.log(el.circle.cx)
+      console.log(el.circle.cy)
+      el.circle.cx = el.circle.cx === xx ? 130 : xx
+      el.circle.cy = el.circle.cy === yy ? 150 : yy
       return el;
     }
     return el;
@@ -185,7 +193,6 @@ const onclicc = (id: string) => () => {
       }
       const mystyle: {} = { 'stroke-dasharray': elData.circle.ircleData};
 
-     // stop-opacity='1' 
       const defs = <defs>
         <radialGradient id={elData.id}>
           <stop offset="80%" stop-color={elData.collor} stop-opacity='1' />
@@ -201,6 +208,7 @@ const onclicc = (id: string) => () => {
         onMouseOut={hendleOnMouseOut(elData.id)} 
         onMouseEnter={hendleOnMouseEnter(elData.id)}
         onClick={onclicc(elData.id)}
+        
       />
 
       const textСrcle = <text x={elData.text.x} style={elData.style} y={elData.text.y} 

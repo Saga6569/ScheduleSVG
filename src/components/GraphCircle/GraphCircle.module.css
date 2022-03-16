@@ -12,18 +12,16 @@
   width: 150px;
 }
 
-@keyframes stroke1 {
+@keyframes stroke {
   from {
     stroke-dashoffset: 0
   }
 }
 
 .Circle {
-  animation: stroke1 1s ease-out forwards;
+  animation: stroke 1s ease-out forwards;
 }
 
-/* .containerGradient :hover { stroke-width: 70}
-
-.containerGradient > text {display: none}
-
-.containerGradient:hover > text  {display: block} */
+.Circle {
+  transition: 1s;  
+}
