@@ -7,6 +7,7 @@ interface IGraphProps {
 };
 
 interface IelDate {
+  displacementAngle: number; 
   id: string; 
   value: number;
   name: string; 
@@ -51,7 +52,10 @@ const GraphCircle = (props: IGraphProps ) =>  {
 
         const valueTextRender = `${(value * 100 / dataSumm).toFixed(2)}%`
 
-        newData[i] = {id, value, name, visible, collor, prochent: {oldValue: 0, newValue:Number(result.toFixed(2))},  style: {display: 'none'},
+
+        const displacementAngle = ((shadedPart / 2) + Math.abs(clockwiseShiftAcc)) / (circle / 360);
+
+        newData[i] = {displacementAngle, id, value, name, visible, collor, prochent: {oldValue: 0, newValue:Number(result.toFixed(2))},  style: {display: 'none'},
           circle: {graphRadius, cx: 130, cy: 150, fill: 'none', stroke: collor, strokeWidth: 60, strokeDasharray: ircleData.pour, strokeDashoffset: clockwiseShiftAcc, ircleData},
           text: {x: 100, y: 160, fontSize: 18, fill: collor, valueTextRender},
         }
@@ -96,11 +100,42 @@ const GraphCircle = (props: IGraphProps ) =>  {
         }
         clockwiseShiftAcc += -ircleData.clockwiseShift;
       }
-    };
+    }
     setDataSumm(newSumm)
     setData(resultData)
-   
   };
+
+  const hendleOnMouseOut = (id: string) => () => {
+    const result = data.map((resulrEl) => {
+      if (resulrEl.id === id) {
+        const ugol = resulrEl.displacementAngle * 0.01745329252
+        const x = 5 * Math.cos(ugol)
+        const y = 5 * Math.sin(ugol)   
+        // resulrEl.circle.cx -= x;
+        // resulrEl.circle.cy -= y;
+        resulrEl.style = {display: 'none'};
+      }
+      return resulrEl;
+    })
+    setData(result);
+  };
+
+  const hendleOnMouseEnter = (id: string) => () => {
+    const result = data.map((resulrEl) => {
+      if (resulrEl.id === id) {
+        const ugol = resulrEl.displacementAngle * 0.01745329252
+        const x = 5 * Math.cos(ugol)
+        const y = 5 * Math.sin(ugol)
+        // resulrEl.circle.cx += x;
+        // resulrEl.circle.cy += y;
+        resulrEl.style = {display: 'block'};
+      }
+      return resulrEl;
+    })
+    setData(result);
+  };
+
+ 
 
   const tableDate = () => {
 
@@ -111,28 +146,7 @@ const GraphCircle = (props: IGraphProps ) =>  {
       const textСrcle = <text x="20" y="11" font-size="10" fill="black">{text}</text>;
       
       return <svg  width="100%" height="15" preserveAspectRatio="xMidYMin meet" key={el.id} onClick={HendleClickHideElement(el.id)}>
-        <g
-         onMouseOut={() => {
-          const result = data.map((resulrEl) => {
-            if (resulrEl.id === el.id) {
-              resulrEl.circle.strokeWidth = 60;
-              resulrEl.style = {display: 'none'}
-            }
-            return resulrEl
-          })
-        setData(result)
-        }}  
-        onMouseEnter={() => {
-          const result = data.map((resulrEl) => {
-            if (resulrEl.id === el.id) {
-              resulrEl.circle.strokeWidth = 75;
-              resulrEl.style = {display: 'block'}
-            }
-            return resulrEl
-          })
-          setData(result)
-        }} 
-        >
+        <g onMouseOut={hendleOnMouseOut(el.id)} onMouseEnter={hendleOnMouseEnter(el.id)}>
         {circle}
         {textСrcle}
         </g>
@@ -146,6 +160,23 @@ const GraphCircle = (props: IGraphProps ) =>  {
 useEffect(() => {
  upTableDate()
 }, [data])
+
+
+
+const onclicc = (id: string) => () => {
+  const newData = data.map((el :IelDate) => {
+    if (id === el.id) {
+      const ugol = el.displacementAngle * 0.01745329252
+      const x = 15 * Math.cos(ugol)
+      const y = 15 * Math.sin(ugol)
+      el.circle.cx = el.circle.cx !== 130 ? 130 : el.circle.cx += x
+      el.circle.cy = el.circle.cy !== 150 ? 150 : el.circle.cy += y
+      return el;
+    }
+    return el;
+  })
+  setData(newData)
+  }
 
   const creationGraphics = () => {
     const result = data.map((elData: IelDate) => {
@@ -167,30 +198,14 @@ useEffect(() => {
       const shadedPart  = <circle r={elData.circle.graphRadius} className={styles.Circle}  style={mystyle}
         cx={elData.circle.cx} cy={elData.circle.cy} fill={elData.circle.fill} stroke={`url(#${elData.id})`}
         stroke-dasharray={elData.circle.strokeDasharray} stroke-dashoffset={elData.circle.strokeDashoffset} stroke-width={elData.circle.strokeWidth}
-        
-        onMouseOut={() => {
-          const result = data.map((resulrEl) => {
-            if (resulrEl.id === elData.id) {
-              resulrEl.circle.strokeWidth = 60
-              resulrEl.style = {display: 'none'}
-            }
-            return resulrEl
-          })
-        setData(result)
-        }}  
-        onMouseEnter={() => {
-          const result = data.map((resulrEl) => {
-            if (resulrEl.id === elData.id) {
-              resulrEl.circle.strokeWidth = 75
-              resulrEl.style = {display: 'block'}
-            }
-            return resulrEl
-          })
-          setData(result)
-        }} 
-        />
+        onMouseOut={hendleOnMouseOut(elData.id)} 
+        onMouseEnter={hendleOnMouseEnter(elData.id)}
+        onClick={onclicc(elData.id)}
+      />
+
       const textСrcle = <text x={elData.text.x} style={elData.style} y={elData.text.y} 
-        font-size={elData.text.fontSize} fill={elData.text.fill}>{elData.text.valueTextRender}</text>
+        font-size={elData.text.fontSize} fill={elData.text.fill}>{elData.text.valueTextRender}
+      </text>
 
       return <svg className={styles.containerGradient}>
         {defs}
@@ -240,8 +255,16 @@ useEffect(() => {
       <svg width="350" height="300" xmlns="http://www.w3.org/2000/svg">
         <rect x="0" y="0" width="350" height="300" fill="#c0c0fa"/>
         {creationGraphics()}
+        {/* <path d={`M${130} ${150} ${226} ${177} `}  stroke='#696666' stroke-width="0.5"/>
+        <path d={`M${130} ${150} ${226} ${150} `}  stroke='#696666' stroke-width="0.5"/>
+        <path d={`M${130} ${150} ${139.6} ${152.7} `}  stroke='red' stroke-width="0.5"/>
+        <path d={`M${130} ${150} ${216} ${174.8} `}  stroke='red' stroke-width="0.5"/> */}
+        {/* <path d={`M${130} ${150} ${191.5} ${215}`}  stroke='red' stroke-width="0.5"/>
+        <path d={`M${130} ${150} ${207} ${196.69}`}  stroke='red' stroke-width="0.5"/> */}
+        {/* <path d={`M${130} ${150} ${206.9} ${196.68}`}  stroke='red' stroke-width="0.5"/> */}
       </svg>
       {tableDate()}
+   
     </div>
   );
 };
