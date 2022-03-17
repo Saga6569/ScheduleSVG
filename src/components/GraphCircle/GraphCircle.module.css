@@ -18,10 +18,10 @@
   }
 }
 
-.Circle {
+.CircleStart {
   animation: stroke 1s ease-out forwards;
 }
 
-.Circle {
-  transition: 1s;  
+.CircleEnd {
+  transition: 0.5s;  
 }

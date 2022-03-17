@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import styles from './GraphCircle.module.css';
 import _ from 'lodash'
 
@@ -13,18 +13,24 @@ interface IelDate {
   name: string; 
   visible: boolean;
   collor: string;
-  style: {display: string}
+  style: {display: string};
   prochent: {oldValue: number, newValue: number};
-  circle: {graphRadius: number, cx: number, cy: number, fill: string, stroke: string, strokeWidth: number, strokeDasharray: any, strokeDashoffset: any, ircleData: any}
+
+  circle: {graphRadius: number, cx: number, cy: number, fill: string, stroke: string, 
+    strokeDasharray: {renderingPart: number, nonDrawingPart: number},
+    strokeWidth: number, strokeDashoffset: number};
+
   text: {x: number, y: number, fontSize: number, fill: string, valueTextRender: string}
 }
 
 const GraphCircle = (props: IGraphProps ) =>  {
 
+  const [render, setRender] = useState(false)
+
   const [dataSumm,  setDataSumm] = useState(_.sumBy(props.values, 'value'))
 
   const upDate = () => {
-
+    
     const collorArr = ['blue', 'red', 'black', 'tomato', 'green', 'MediumOrchid', 'Yellow', 'Lime', 'LightCyan'];
     // const newData = this.props.values.reduce((acc: Array<{ value: number; name: string; collor: string; }>, el: { value: number; name: string; collor: string; }) => {
     //   const value = el.value ?? el;
@@ -37,6 +43,7 @@ const GraphCircle = (props: IGraphProps ) =>  {
 
     const newData = [];
       for(let i = 0; i<= props.values.length - 1; i++) {
+        
         const el: any = props.values[i];
         const value = el.value ?? el;
         const name = el.name ?? `${value}`;
@@ -48,18 +55,19 @@ const GraphCircle = (props: IGraphProps ) =>  {
         const circle: number = (graphRadius * 2 * 3.14);
         const result: number = (value * 100 / dataSumm);
         const shadedPart: number = (circle * result / 100);
-        const ircleData = {pour: `${shadedPart},${circle}`, clockwiseShift : shadedPart};
+       
+
+        const strokeDasharray = {renderingPart: shadedPart, nonDrawingPart: circle}
 
         const valueTextRender = `${(value * 100 / dataSumm).toFixed(2)}%`
-
 
         const displacementAngle = ((shadedPart / 2) + Math.abs(clockwiseShiftAcc)) / (circle / 360);
 
         newData[i] = {displacementAngle, id, value, name, visible, collor, prochent: {oldValue: 0, newValue:Number(result.toFixed(2))},  style: {display: 'none'},
-          circle: {graphRadius, cx: 130, cy: 150, fill: 'none', stroke: collor, strokeWidth: 60, strokeDasharray: ircleData.pour, strokeDashoffset: clockwiseShiftAcc, ircleData},
+          circle: {graphRadius, cx: 130, cy: 150, fill: 'none', stroke: collor, strokeWidth: 60, strokeDasharray, strokeDashoffset: clockwiseShiftAcc},
           text: {x: 100, y: 160, fontSize: 18, fill: collor, valueTextRender},
         }
-        clockwiseShiftAcc += -ircleData.clockwiseShift;
+        clockwiseShiftAcc += -shadedPart;
       };
       
     return newData;
@@ -68,6 +76,8 @@ const GraphCircle = (props: IGraphProps ) =>  {
   const [data, setData] = useState(upDate());
 
   const HendleClickHideElement = (id: string) => () => {
+
+   
  
     const newData = data.map((elData: any) => {
       if (elData.id === id) {
@@ -85,9 +95,11 @@ const GraphCircle = (props: IGraphProps ) =>  {
       const el: any = newData[i];
 
       const circle: number = (el.circle.graphRadius * 2 * 3.14);
-      const result: number = (el.value* 100 / newSumm);
+      const result: number = (el.value * 100 / newSumm);
       const shadedPart: number = (circle * result / 100);
-      const ircleData = {pour: `${shadedPart},${circle}`, clockwiseShift : shadedPart};
+
+      const strokeDasharray = {renderingPart: shadedPart, nonDrawingPart: circle}
+
       const oldValue = el.prochent.oldValue
       if (el.visible === false) {
         const prochent = {oldValue, newValue: 0};
@@ -95,51 +107,55 @@ const GraphCircle = (props: IGraphProps ) =>  {
       } else {
         const prochent = {oldValue, newValue: Number(result.toFixed(2))}
         resultData[i] = {...el, prochent, 
-          circle: {graphRadius: el.circle.graphRadius, cx: 130, cy: 150, fill: 'none', stroke: el.collor, strokeWidth: 60, strokeDasharray: ircleData.pour, strokeDashoffset: clockwiseShiftAcc, ircleData},
+          circle: {graphRadius: el.circle.graphRadius, cx: 130, cy: 150, fill: 'none', stroke: el.collor, strokeWidth: 60, strokeDasharray, strokeDashoffset: clockwiseShiftAcc},
           text: {x: 100, y: 160, fontSize: 18, fill: el.collor, valueTextRender: `${(el.value * 100 / newSumm).toFixed(2)}%`},
         }
-        clockwiseShiftAcc += -ircleData.clockwiseShift;
+        clockwiseShiftAcc += -shadedPart;
       }
     }
     setDataSumm(newSumm)
     setData(resultData)
   };
 
+  const hendleOnMouseEnter = (id: string) => () => {
+    const result = data.map((el) => {
+      if (el.id === id) {
+        const renderingPart = el.circle.strokeDasharray.renderingPart
+        const strokeDashoffset = el.circle.strokeDashoffset 
+        const ugol = (((renderingPart / 2) +   Math.abs(strokeDashoffset)) / 1.57) * 0.01745329252
+        const x = 5 * Math.cos(ugol);
+        const y = 5 * Math.sin(ugol);
+        if (el.circle.cx !== 130) {
+          return el;
+        }
+        const xx = 130 + x;
+        const yy = 150 + y;
+        el.circle.cx = xx;
+        el.circle.cy = yy;
+        el.style = {display: 'block'};
+      }
+      return el;
+    })
+    setData(result);
+  };
+
   const hendleOnMouseOut = (id: string) => () => {
-    const result = data.map((resulrEl) => {
-      if (resulrEl.id === id) {
-        const ugol = resulrEl.displacementAngle * 0.01745329252
+    const result = data.map((el) => {
+      if (el.id === id) {
+        const ugol = el.displacementAngle * 0.01745329252
         const x = 15 * Math.cos(ugol);
         const y = 15 * Math.sin(ugol);
         const xx = 130 + x;
         const yy = 150 + y;
-        resulrEl.circle.cx = resulrEl.circle.cx === xx ? xx : 130
-        resulrEl.circle.cy = resulrEl.circle.cy === yy ? yy : 150
-        resulrEl.style = {display: 'none'};
+        el.circle.cx = el.circle.cx === xx ? xx : 130
+        el.circle.cy = el.circle.cy === yy ? yy : 150
+        el.style = {display: 'none'};
+        return el;
       }
-      return resulrEl;
+      return el;
     })
     setData(result);
   };
-
-  const hendleOnMouseEnter = (id: string) => () => {
-    const result = data.map((resulrEl) => {
-      if (resulrEl.id === id) {
-        const ugol = resulrEl.displacementAngle * 0.01745329252
-        const x = 5 * Math.cos(ugol);
-        const y = 5 * Math.sin(ugol);
-        const xx = 130 + x;
-        const yy = 150 + y;
-        resulrEl.circle.cx = xx;
-        resulrEl.circle.cy = yy;
-        resulrEl.style = {display: 'block'};
-      }
-      return resulrEl;
-    })
-    setData(result);
-  };
-
- 
 
   const tableDate = () => {
 
@@ -165,18 +181,22 @@ useEffect(() => {
  upTableDate()
 }, [data])
 
-
+useEffect(() => {
+  setTimeout(() => {
+    setRender(true)
+  }, 2000)
+ }, [])
 
 const onclicc = (id: string) => () => {
   const newData = data.map((el :IelDate) => {
     if (id === el.id) {
-      const ugol = el.displacementAngle * 0.01745329252
+      const renderingPart = el.circle.strokeDasharray.renderingPart
+      const strokeDashoffset = el.circle.strokeDashoffset 
+      const ugol = (((renderingPart / 2) +   Math.abs(strokeDashoffset)) / 1.57) * 0.01745329252
       const x = 15 * Math.cos(ugol)
       const y = 15 * Math.sin(ugol)
       const xx = 130 + x
       const yy = 150 + y
-      console.log(el.circle.cx)
-      console.log(el.circle.cy)
       el.circle.cx = el.circle.cx === xx ? 130 : xx
       el.circle.cy = el.circle.cy === yy ? 150 : yy
       return el;
@@ -189,10 +209,8 @@ const onclicc = (id: string) => () => {
   const creationGraphics = () => {
     const result = data.map((elData: IelDate) => {
       if (elData.visible === false) {
-        return null
+        return null;
       }
-      const mystyle: {} = { 'stroke-dasharray': elData.circle.ircleData};
-
       const defs = <defs>
         <radialGradient id={elData.id}>
           <stop offset="80%" stop-color={elData.collor} stop-opacity='1' />
@@ -201,10 +219,11 @@ const onclicc = (id: string) => () => {
         </radialGradient>
       </defs>
 
+      const strokeDasharray = `${elData.circle.strokeDasharray.renderingPart}, ${elData.circle.strokeDasharray.nonDrawingPart}`
 
-      const shadedPart  = <circle r={elData.circle.graphRadius} className={styles.Circle}  style={mystyle}
+      const shadedPart  = <circle r={elData.circle.graphRadius} className={render === false ? styles.CircleStart :styles.CircleEnd }
         cx={elData.circle.cx} cy={elData.circle.cy} fill={elData.circle.fill} stroke={`url(#${elData.id})`}
-        stroke-dasharray={elData.circle.strokeDasharray} stroke-dashoffset={elData.circle.strokeDashoffset} stroke-width={elData.circle.strokeWidth}
+        stroke-dasharray={strokeDasharray} stroke-dashoffset={elData.circle.strokeDashoffset} stroke-width={elData.circle.strokeWidth}
         onMouseOut={hendleOnMouseOut(elData.id)} 
         onMouseEnter={hendleOnMouseEnter(elData.id)}
         onClick={onclicc(elData.id)}
@@ -224,6 +243,20 @@ const onclicc = (id: string) => () => {
     return (<>{result}</>);
   };
 
+  const centerLine = () => {
+    const cen = data.map((el) => {
+      const renderingPart = el.circle.strokeDasharray.renderingPart
+      const strokeDashoffset = el.circle.strokeDashoffset 
+      const ugol = (((renderingPart / 2) + Math.abs(strokeDashoffset)) / 1.57) * 0.01745329252
+      const x = 90 * Math.cos(ugol)
+      const y = 90 * Math.sin(ugol)
+      if (el.visible === true) {
+        return <path d={`M${130} ${150} ${130 + x} ${150 + y} `}  stroke='#696666' stroke-width="0.5"/>
+      }
+      return null
+    });
+    return cen;
+  }
 
   const upTableDate = () => {  // обновлаем значение информации графика
     const condition1 = data.filter((el) => el.visible === true).every((el) =>  el.prochent.oldValue === el.prochent.newValue);
@@ -231,7 +264,7 @@ const onclicc = (id: string) => () => {
     if (condition1 && condition2) {
       return 
     }
-    console.log('1')
+    //console.log('1')
     const newDa = data.map((el: IelDate) => {
     if (el.visible === false) {
       if (el.prochent.oldValue > 0 ) {
@@ -257,19 +290,13 @@ const onclicc = (id: string) => () => {
     })
     setData(newDa);
   }
-
+  // console.log(data)
   return (
     <div className={styles.container} >
       <svg width="350" height="300" xmlns="http://www.w3.org/2000/svg">
         <rect x="0" y="0" width="350" height="300" fill="#c0c0fa"/>
         {creationGraphics()}
-        {/* <path d={`M${130} ${150} ${226} ${177} `}  stroke='#696666' stroke-width="0.5"/>
-        <path d={`M${130} ${150} ${226} ${150} `}  stroke='#696666' stroke-width="0.5"/>
-        <path d={`M${130} ${150} ${139.6} ${152.7} `}  stroke='red' stroke-width="0.5"/>
-        <path d={`M${130} ${150} ${216} ${174.8} `}  stroke='red' stroke-width="0.5"/> */}
-        {/* <path d={`M${130} ${150} ${191.5} ${215}`}  stroke='red' stroke-width="0.5"/>
-        <path d={`M${130} ${150} ${207} ${196.69}`}  stroke='red' stroke-width="0.5"/> */}
-        {/* <path d={`M${130} ${150} ${206.9} ${196.68}`}  stroke='red' stroke-width="0.5"/> */}
+        {centerLine()}
       </svg>
       {tableDate()}
    
