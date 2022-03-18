@@ -10,6 +10,8 @@
 
 .containerInfo {
   width: 150px;
+  position: relative;
+  left: -90px;
 }
 
 @keyframes stroke {
@@ -29,7 +31,7 @@
 .informationWndowT {
   position: relative;
   transition: 0.5s;
-  width: 80px;
-  height: 30;
+  width: 175px;
+  height: 30px;
   pointer-events: none;
 }
