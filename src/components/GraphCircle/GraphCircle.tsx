@@ -7,7 +7,6 @@ interface IGraphProps {
 };
 
 interface IelDate {
- 
   id: string;
   value: number;
   name: string; 
@@ -15,20 +14,15 @@ interface IelDate {
   color: string;
   style: {display: string};
   prochent: {oldValue: number, newValue: number};
-
   circle: {graphRadius: number, cx: number, cy: number, fill: string, stroke: string, 
     strokeDasharray: {renderingPart: number, nonDrawingPart: number},
     strokeWidth: number, strokeDashoffset: number};
-
   text: {x: number, y: number, fontSize: number, fill: string, valueTextRender: string}
 }
 
 const GraphCircle = (props: IGraphProps ) =>  {
 
   const [render, setRender] = useState(false);
-
-  
-
   const [dataSumm,  setDataSumm] = useState(_.sumBy(props.values, 'value'))
 
   const upDate = () => {
@@ -44,6 +38,7 @@ const GraphCircle = (props: IGraphProps ) =>  {
     let clockwiseShiftAcc = 0;
     const newData = [];
       for(let i = 0; i<= props.values.length - 1; i++) {
+
         const el: any = props.values[i];
         const value = el.value ?? el;
         const name = el.name ?? `${value}`;
@@ -51,11 +46,15 @@ const GraphCircle = (props: IGraphProps ) =>  {
         const id: string = _.uniqueId();
         const graphRadius = 90;
         const visible = el.visible ?? true
+
         const circle: number = (graphRadius * 2 * 3.14);
         const result: number = (value * 100 / dataSumm);
         const shadedPart: number = (circle * result / 100);
+
         const strokeDasharray = {renderingPart: shadedPart, nonDrawingPart: circle}
+
         const valueTextRender = `${(value * 100 / dataSumm).toFixed(2)}%`
+        
         newData[i] = {id, value, name, visible, color, prochent: {oldValue: 0, newValue:Number(result.toFixed(2))},  style: {display: 'none'},
           circle: {graphRadius, cx: 160, cy: 150, fill: 'none', stroke: color, strokeWidth: 60, strokeDasharray, strokeDashoffset: clockwiseShiftAcc},
           text: {x: 100, y: 160, fontSize: 18, fill: color, valueTextRender},
@@ -67,6 +66,8 @@ const GraphCircle = (props: IGraphProps ) =>  {
 
   const [data, setData] = useState(upDate());
   const [idTarget, setIdTarget] = useState({id : data[0].id, visible: false})
+
+
 
   const HendleClickHideElement = (id: string) => () => { // Убирает элемент из круговой диаграммы и наоборот 
     const newData = data.map((elData: any) => {
@@ -81,8 +82,9 @@ const GraphCircle = (props: IGraphProps ) =>  {
     
     let clockwiseShiftAcc = 0;
     const resultData: any = [];
+    
     for(let i = 0; i<= newData.length - 1; i++) {
-      const el: any = newData[i];
+      const el: IelDate = newData[i];
       const circle: number = (el.circle.graphRadius * 2 * 3.14);
       const result: number = (el.value * 100 / newSumm);
       const shadedPart: number = (circle * result / 100);
@@ -94,7 +96,7 @@ const GraphCircle = (props: IGraphProps ) =>  {
       } else {
         const prochent = {oldValue, newValue: Number(result.toFixed(2))}
         resultData[i] = {...el, prochent, 
-          circle: {graphRadius: el.circle.graphRadius, cx: 160, cy: 150, fill: 'none', stroke: el.color, strokeWidth: 60, strokeDasharray, strokeDashoffset: clockwiseShiftAcc},
+          circle: {graphRadius: el.circle.graphRadius, cx: el.circle.cx, cy: el.circle.cy, fill: 'none', stroke: el.color, strokeWidth: 60, strokeDasharray, strokeDashoffset: clockwiseShiftAcc},
           text: {x: 100, y: 160, fontSize: 18, fill: el.color, valueTextRender: `${(el.value * 100 / newSumm).toFixed(2)}%`},
         }
         clockwiseShiftAcc += -shadedPart;
@@ -104,16 +106,42 @@ const GraphCircle = (props: IGraphProps ) =>  {
     setData(resultData)
   };
 
-  const hendleOnMouseEnter = (id: string) => () => {
-    const result = data.map((el) => {
-      if (el.id === id) {
-        const renderingPart = el.circle.strokeDasharray.renderingPart
-        const strokeDashoffset = el.circle.strokeDashoffset 
+  const onclicc = (id: string) => () => {
+    const newData = data.map((el :IelDate) => {
+      if (id === el.id) {
+        const renderingPart = el.circle.strokeDasharray.renderingPart;
+        const strokeDashoffset = el.circle.strokeDashoffset ;
         const ugol = (((renderingPart / 2) +   Math.abs(strokeDashoffset)) / 1.57) * 0.01745329252;
         const xPointOffset  = 15 * Math.cos(ugol);
         const YPointOffset = 15 * Math.sin(ugol);
-        const newX = el.circle.cx + xPointOffset;
-        const newY = el.circle.cy + YPointOffset;
+        const initX = 160;
+        const initY = 150;
+        const newX = Math.round(xPointOffset) + initX;
+        const newY = Math.round(YPointOffset) + initY;
+        el.circle.cx = el.circle.cx === initX ? newX : initX;
+        el.circle.cy = el.circle.cy === initY ? newY : initY;
+        console.log(Math.round(el.circle.cx))
+        console.log(Math.round(el.circle.cy))
+        return el;
+      }
+      return el;
+    })
+    setData(newData)
+    };
+
+  const hendleOnMouseEnter = (id: string) => () => {
+    const result = data.map((el) => {
+      if (el.id === id) {
+        if (el.visible === false) {
+          return el;
+        }
+        //const renderingPart = el.circle.strokeDasharray.renderingPart
+        // const strokeDashoffset = el.circle.strokeDashoffset 
+        // const ugol = (((renderingPart / 2) +   Math.abs(strokeDashoffset)) / 1.57) * 0.01745329252;
+        // const xPointOffset  = 15 * Math.cos(ugol);
+        // const YPointOffset = 15 * Math.sin(ugol);
+        // const newX = el.circle.cx + xPointOffset;
+        // const newY = el.circle.cy + YPointOffset;
         if (el.circle.cx !== 160) {
           return el;
         }
@@ -131,14 +159,15 @@ const GraphCircle = (props: IGraphProps ) =>  {
   const hendleOnMouseOut = (id: string) => () => {
     const result = data.map((el) => {
       if (el.id === id) {
-        const renderingPart = el.circle.strokeDasharray.renderingPart
-        const strokeDashoffset = el.circle.strokeDashoffset;
-        const gradus = el.circle.strokeDasharray.nonDrawingPart / 360 // величина пикселей в 1 градусе примерно 1,57
-        const ugol = (((renderingPart / 2) +   Math.abs(strokeDashoffset)) / gradus) * 0.01745329252
-        const xPointOffset  = 15 * Math.cos(ugol);
-        const YPointOffset = 15 * Math.sin(ugol);
-        const newX = el.circle.cx + xPointOffset;
-        const newY = el.circle.cy + YPointOffset;
+        
+        // const renderingPart = el.circle.strokeDasharray.renderingPart
+        // const strokeDashoffset = el.circle.strokeDashoffset;
+        // const gradus = el.circle.strokeDasharray.nonDrawingPart / 360 // величина пикселей в 1 градусе примерно 1,57
+        // const ugol = (((renderingPart / 2) +   Math.abs(strokeDashoffset)) / gradus) * 0.01745329252
+        // const xPointOffset  = 15 * Math.cos(ugol);
+        // const YPointOffset = 15 * Math.sin(ugol);
+        // const newX = el.circle.cx + xPointOffset;
+        // const newY = el.circle.cy + YPointOffset;
         // el.circle.cx = el.circle.cx === xx ? xx : 130
         // el.circle.cy = el.circle.cy === yy ? yy : 150
         el.circle.strokeWidth = 60
@@ -176,26 +205,6 @@ useEffect(() => {
     setRender(true)
   }, 1000)
  }, [])
-
-const onclicc = (id: string) => () => {
-  const newData = data.map((el :IelDate) => {
-    if (id === el.id) {
-      const renderingPart = el.circle.strokeDasharray.renderingPart;
-      const strokeDashoffset = el.circle.strokeDashoffset ;
-      const ugol = (((renderingPart / 2) +   Math.abs(strokeDashoffset)) / 1.57) * 0.01745329252;
-      const xPointOffset  = 15 * Math.cos(ugol);
-      const YPointOffset = 15 * Math.sin(ugol);
-      // const newX = el.circle.cx + xPointOffset;
-      // const newY = el.circle.cy + YPointOffset;
-      
-      el.circle.cx = el.circle.cx === 160 + xPointOffset ? 160 : 160 + xPointOffset;
-      el.circle.cy = el.circle.cy === 150 + YPointOffset ? 150 : 150 + YPointOffset;
-      return el;
-    }
-    return el;
-  })
-  setData(newData)
-  };
 
   const creationGraphics = () => {
     const result = data.map((elData: IelDate) => {
@@ -286,16 +295,8 @@ const onclicc = (id: string) => () => {
     const y = 90 * Math.sin(ugol);
 
     return (<rect width="65" height="15" style={myStyle} x={el.circle.cx + x - 32.5} y={el.circle.cy + y - 7.5}
-    opacity={idTarget.visible === true ? 1 : 0}   fill={el.color} stroke-width='1' stroke="LightCyan"
-    >
-      
-      </rect>)
-  
+    opacity={idTarget.visible && el.visible ? 1 : 0}   fill={el.color} stroke-width='1' stroke="LightCyan"/>)
   };
-
- //x={130 - 32.5} y={150 - 7.5}
-  // const left = -240
-  // const top = 5
  
   const textInfo = () => {
     const el = data.filter((el) => el.id === idTarget.id)[0];
@@ -311,7 +312,7 @@ const onclicc = (id: string) => () => {
       return (
         <div style ={styleClass} className={styles.informationWndowT} >
           <svg  width="100" height="50">
-            <text x='0' y='28' font-size="5" opacity={idTarget.visible === true ? 1 : 0}  fill="Snow">{`${el.name} ${el.prochent.newValue} %`}</text>
+            <text x='0' y='28' font-size="5" opacity={idTarget.visible && el.visible ? 1 : 0} fill="Snow">{`${el.name} ${el.prochent.newValue} %`}</text>
           </svg>
         </div>)
   };
