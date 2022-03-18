@@ -57,7 +57,7 @@ const GraphCircle = (props: IGraphProps ) =>  {
         const strokeDasharray = {renderingPart: shadedPart, nonDrawingPart: circle}
         const valueTextRender = `${(value * 100 / dataSumm).toFixed(2)}%`
         newData[i] = {id, value, name, visible, color, prochent: {oldValue: 0, newValue:Number(result.toFixed(2))},  style: {display: 'none'},
-          circle: {graphRadius, cx: 130, cy: 150, fill: 'none', stroke: color, strokeWidth: 60, strokeDasharray, strokeDashoffset: clockwiseShiftAcc},
+          circle: {graphRadius, cx: 160, cy: 150, fill: 'none', stroke: color, strokeWidth: 60, strokeDasharray, strokeDashoffset: clockwiseShiftAcc},
           text: {x: 100, y: 160, fontSize: 18, fill: color, valueTextRender},
         }
         clockwiseShiftAcc += -shadedPart;
@@ -94,7 +94,7 @@ const GraphCircle = (props: IGraphProps ) =>  {
       } else {
         const prochent = {oldValue, newValue: Number(result.toFixed(2))}
         resultData[i] = {...el, prochent, 
-          circle: {graphRadius: el.circle.graphRadius, cx: 130, cy: 150, fill: 'none', stroke: el.color, strokeWidth: 60, strokeDasharray, strokeDashoffset: clockwiseShiftAcc},
+          circle: {graphRadius: el.circle.graphRadius, cx: 160, cy: 150, fill: 'none', stroke: el.color, strokeWidth: 60, strokeDasharray, strokeDashoffset: clockwiseShiftAcc},
           text: {x: 100, y: 160, fontSize: 18, fill: el.color, valueTextRender: `${(el.value * 100 / newSumm).toFixed(2)}%`},
         }
         clockwiseShiftAcc += -shadedPart;
@@ -114,7 +114,7 @@ const GraphCircle = (props: IGraphProps ) =>  {
         const YPointOffset = 15 * Math.sin(ugol);
         const newX = el.circle.cx + xPointOffset;
         const newY = el.circle.cy + YPointOffset;
-        if (el.circle.cx !== 130) {
+        if (el.circle.cx !== 160) {
           return el;
         }
         el.circle.strokeWidth = 70;
@@ -188,7 +188,7 @@ const onclicc = (id: string) => () => {
       // const newX = el.circle.cx + xPointOffset;
       // const newY = el.circle.cy + YPointOffset;
       
-      el.circle.cx = el.circle.cx === 130 + xPointOffset ? 130 : 130 + xPointOffset;
+      el.circle.cx = el.circle.cx === 160 + xPointOffset ? 160 : 160 + xPointOffset;
       el.circle.cy = el.circle.cy === 150 + YPointOffset ? 150 : 150 + YPointOffset;
       return el;
     }
@@ -219,15 +219,9 @@ const onclicc = (id: string) => () => {
         onMouseEnter={hendleOnMouseEnter(elData.id)}
         onClick={onclicc(elData.id)}
       />
-
-      const textСrcle = <text x={elData.text.x} style={elData.style} y={elData.text.y} 
-        font-size={elData.text.fontSize} fill={elData.text.fill}>{elData.text.valueTextRender}
-      </text>
-
       return <svg className={styles.containerGradient}>
         {defs}
         {shadedPart}
-        {/* {textСrcle} */}
       </svg>
     })
     return (<>{result}</>);
@@ -282,7 +276,7 @@ const onclicc = (id: string) => () => {
   };
   
   const PopUpWindow = () => { // окно информации
-    const myStyle = {'transition': '0.5s'}
+    const myStyle = {'transition': '0.5s' , 'pointer-events': 'none'}
     const el = data.filter((el) => el.id === idTarget.id)[0];
    
     const renderingPart = el.circle.strokeDasharray.renderingPart;
@@ -291,15 +285,18 @@ const onclicc = (id: string) => () => {
     const x = 90 * Math.cos(ugol);
     const y = 90 * Math.sin(ugol);
 
-    return (<rect width="65" height="15" style={myStyle} x={el.circle.cx + x - 20} y={el.circle.cy + y - 10}
-      opacity={idTarget.visible === true ? 1 : 0}  fill={el.color} stroke-width='1' stroke="LightCyan"
-      onMouseEnter={hendleOnMouseEnter(idTarget.id)}
-      onClick={onclicc(idTarget.id)}>
-
+    return (<rect width="65" height="15" style={myStyle} x={el.circle.cx + x - 32.5} y={el.circle.cy + y - 7.5}
+    opacity={idTarget.visible === true ? 1 : 0}   fill={el.color} stroke-width='1' stroke="LightCyan"
+    >
+      
       </rect>)
   
   };
 
+ //x={130 - 32.5} y={150 - 7.5}
+  // const left = -240
+  // const top = 5
+ 
   const textInfo = () => {
     const el = data.filter((el) => el.id === idTarget.id)[0];
     const renderingPart = el.circle.strokeDasharray.renderingPart;
@@ -308,14 +305,13 @@ const onclicc = (id: string) => () => {
     const x = 90 * Math.cos(ugol);
     const y = 90 * Math.sin(ugol);
 
-    const left = x - 235
-    const top = y
+    const left = el.circle.cx  + x - 370
+    const top = el.circle.cy + y - 150 
     const styleClass: {top: string, left: string} = {top: `${top}px`, left: `${left}px`};
       return (
-        <div style ={styleClass} className={styles.informationWndowT}  onMouseEnter={hendleOnMouseEnter(idTarget.id)}
-        onClick={onclicc(idTarget.id)}>
-          <svg  width="100" height="50" >
-            <text x='0' y='25' font-size="5" opacity={1} fill="Snow">{`${el.name} ${el.prochent.newValue} %`}</text>
+        <div style ={styleClass} className={styles.informationWndowT} >
+          <svg  width="100" height="50">
+            <text x='0' y='28' font-size="5" opacity={idTarget.visible === true ? 1 : 0}  fill="Snow">{`${el.name} ${el.prochent.newValue} %`}</text>
           </svg>
         </div>)
   };
@@ -327,7 +323,6 @@ const onclicc = (id: string) => () => {
         <rect x="0" y="0" width="350" height="300" fill="#c0c0fa"/>
         {creationGraphics()}
         {PopUpWindow()}
-     
       </svg>
       {textInfo()}
       {tableDate()}

@@ -28,5 +28,8 @@
 
 .informationWndowT {
   position: relative;
-  transition: 0.5s;  
- }
+  transition: 0.5s;
+  width: 80px;
+  height: 30;
+  pointer-events: none;
+}
