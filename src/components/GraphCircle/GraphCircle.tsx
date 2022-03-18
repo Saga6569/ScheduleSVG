@@ -33,7 +33,7 @@ const GraphCircle = (props: IGraphProps ) =>  {
 
   const upDate = () => {
     
-    const colorArr = ['blue', 'red', 'black', 'tomato', 'green', 'MediumOrchid', 'Yellow', 'Lime', 'LightCyan'];
+    const colorArr = ['blue', 'red', 'black', 'tomato', 'green', 'MediumOrchid', 'Peru', 'Lime', 'LightCyan'];
     // const newData = this.props.values.reduce((acc: Array<{ value: number; name: string; color: string; }>, el: { value: number; name: string; color: string; }) => {
     //   const value = el.value ?? el;
     //   const name = el.name ?? `${value}`
@@ -109,22 +109,22 @@ const GraphCircle = (props: IGraphProps ) =>  {
       if (el.id === id) {
         const renderingPart = el.circle.strokeDasharray.renderingPart
         const strokeDashoffset = el.circle.strokeDashoffset 
-        const ugol = (((renderingPart / 2) +   Math.abs(strokeDashoffset)) / 1.57) * 0.01745329252
-        const x = 5 * Math.cos(ugol);
-        const y = 5 * Math.sin(ugol);
+        const ugol = (((renderingPart / 2) +   Math.abs(strokeDashoffset)) / 1.57) * 0.01745329252;
+        const xPointOffset  = 15 * Math.cos(ugol);
+        const YPointOffset = 15 * Math.sin(ugol);
+        const newX = el.circle.cx + xPointOffset;
+        const newY = el.circle.cy + YPointOffset;
         if (el.circle.cx !== 130) {
           return el;
         }
-        const xx = 130 + x;
-        const yy = 150 + y;
-        el.circle.strokeWidth = 70
-        // el.circle.cx = xx;
-        // el.circle.cy = yy;
+        el.circle.strokeWidth = 70;
+        // el.circle.cx = newX;
+        // el.circle.cy = newY;
         el.style = {display: 'block'};
       }
       return el;
     })
-    setIdTarget({id: id, visible: true })
+    setIdTarget({id: id, visible: true });
     setData(result);
   };
 
@@ -132,12 +132,13 @@ const GraphCircle = (props: IGraphProps ) =>  {
     const result = data.map((el) => {
       if (el.id === id) {
         const renderingPart = el.circle.strokeDasharray.renderingPart
-        const strokeDashoffset = el.circle.strokeDashoffset 
-        const ugol = (((renderingPart / 2) +   Math.abs(strokeDashoffset)) / 1.57) * 0.01745329252
-        const x = 15 * Math.cos(ugol);
-        const y = 15 * Math.sin(ugol);
-        const xx = 130 + x;
-        const yy = 150 + y;
+        const strokeDashoffset = el.circle.strokeDashoffset;
+        const gradus = el.circle.strokeDasharray.nonDrawingPart / 360 // величина пикселей в 1 градусе примерно 1,57
+        const ugol = (((renderingPart / 2) +   Math.abs(strokeDashoffset)) / gradus) * 0.01745329252
+        const xPointOffset  = 15 * Math.cos(ugol);
+        const YPointOffset = 15 * Math.sin(ugol);
+        const newX = el.circle.cx + xPointOffset;
+        const newY = el.circle.cy + YPointOffset;
         // el.circle.cx = el.circle.cx === xx ? xx : 130
         // el.circle.cy = el.circle.cy === yy ? yy : 150
         el.circle.strokeWidth = 60
@@ -179,15 +180,16 @@ useEffect(() => {
 const onclicc = (id: string) => () => {
   const newData = data.map((el :IelDate) => {
     if (id === el.id) {
-      const renderingPart = el.circle.strokeDasharray.renderingPart
-      const strokeDashoffset = el.circle.strokeDashoffset 
-      const ugol = (((renderingPart / 2) +   Math.abs(strokeDashoffset)) / 1.57) * 0.01745329252
-      const x = 15 * Math.cos(ugol)
-      const y = 15 * Math.sin(ugol)
-      const xx = 130 + x
-      const yy = 150 + y
-      el.circle.cx = el.circle.cx === xx ? 130 : xx
-      el.circle.cy = el.circle.cy === yy ? 150 : yy
+      const renderingPart = el.circle.strokeDasharray.renderingPart;
+      const strokeDashoffset = el.circle.strokeDashoffset ;
+      const ugol = (((renderingPart / 2) +   Math.abs(strokeDashoffset)) / 1.57) * 0.01745329252;
+      const xPointOffset  = 15 * Math.cos(ugol);
+      const YPointOffset = 15 * Math.sin(ugol);
+      // const newX = el.circle.cx + xPointOffset;
+      // const newY = el.circle.cy + YPointOffset;
+      
+      el.circle.cx = el.circle.cx === 130 + xPointOffset ? 130 : 130 + xPointOffset;
+      el.circle.cy = el.circle.cy === 150 + YPointOffset ? 150 : 150 + YPointOffset;
       return el;
     }
     return el;
@@ -225,7 +227,7 @@ const onclicc = (id: string) => () => {
       return <svg className={styles.containerGradient}>
         {defs}
         {shadedPart}
-        {textСrcle}
+        {/* {textСrcle} */}
       </svg>
     })
     return (<>{result}</>);
@@ -249,33 +251,33 @@ const onclicc = (id: string) => () => {
   const upTableDate = () => {  // обновлаем значение информации графика
     const condition1 = data.filter((el) => el.visible === true).every((el) =>  el.prochent.oldValue === el.prochent.newValue);
     const condition2 = data.filter((el) => el.visible === false).every((el) =>  el.prochent.oldValue === 0);
-    if (condition1 && condition2) {
-      return 
-    }
+      if (condition1 && condition2) {
+        return; 
+      }
     //console.log('1')
     const newDa = data.map((el: IelDate) => {
-    if (el.visible === false) {
-      if (el.prochent.oldValue > 0 ) {
+      if (el.visible === false) {
+        if (el.prochent.oldValue > 0 ) {
+          el.prochent.oldValue = Number((el.prochent.oldValue - 0.08).toFixed(2))
+          return el;
+        }     
+        if (el.prochent.oldValue <= 0 ) {
+          el.prochent.oldValue = 0;
+          return el;
+        }  
+      }
+      if (el.prochent.oldValue > el.prochent.newValue) {
         el.prochent.oldValue = Number((el.prochent.oldValue - 0.08).toFixed(2))
-        return el;
-      }     
-      if (el.prochent.oldValue <= 0 ) {
-        el.prochent.oldValue = 0;
-        return el;
-      }  
-    }
-    if (el.prochent.oldValue > el.prochent.newValue) {
-      el.prochent.oldValue = Number((el.prochent.oldValue - 0.08).toFixed(2))
-        if (el.prochent.oldValue < el.prochent.newValue) {
-          el.prochent.oldValue = el.prochent.newValue
-        }
+          if (el.prochent.oldValue < el.prochent.newValue) {
+            el.prochent.oldValue = el.prochent.newValue;
+          }
         return el
-    } if (el.prochent.oldValue < el.prochent.newValue) {
+      } if (el.prochent.oldValue < el.prochent.newValue) {
         el.prochent.oldValue = Number((el.prochent.oldValue + 0.08).toFixed(2))
         return el;
       }
-        return el;
-    })
+      return el;
+    });
     setData(newDa);
   };
   
@@ -283,25 +285,51 @@ const onclicc = (id: string) => () => {
     const myStyle = {'transition': '0.5s'}
     const el = data.filter((el) => el.id === idTarget.id)[0];
    
-    const renderingPart = el.circle.strokeDasharray.renderingPart
-    const strokeDashoffset = el.circle.strokeDashoffset 
-    const ugol = (((renderingPart / 2) + Math.abs(strokeDashoffset)) / 1.57) * 0.01745329252
-    const x = 90 * Math.cos(ugol)
-    const y = 90 * Math.sin(ugol)
+    const renderingPart = el.circle.strokeDasharray.renderingPart;
+    const strokeDashoffset = el.circle.strokeDashoffset ;
+    const ugol = (((renderingPart / 2) + Math.abs(strokeDashoffset)) / 1.57) * 0.01745329252;
+    const x = 90 * Math.cos(ugol);
+    const y = 90 * Math.sin(ugol);
 
-    return (<rect width="40" style={myStyle} x={el.circle.cx + x - 20} y={el.circle.cy + y - 10}
-    opacity={idTarget.visible === true ? 1 : 0} height="10" fill={el.color} stroke-width='1' stroke="LightCyan">
-    </rect>
-    )
+    return (<rect width="65" height="15" style={myStyle} x={el.circle.cx + x - 20} y={el.circle.cy + y - 10}
+      opacity={idTarget.visible === true ? 1 : 0}  fill={el.color} stroke-width='1' stroke="LightCyan"
+      onMouseEnter={hendleOnMouseEnter(idTarget.id)}
+      onClick={onclicc(idTarget.id)}>
+
+      </rect>)
+  
   };
+
+  const textInfo = () => {
+    const el = data.filter((el) => el.id === idTarget.id)[0];
+    const renderingPart = el.circle.strokeDasharray.renderingPart;
+    const strokeDashoffset = el.circle.strokeDashoffset ;
+    const ugol = (((renderingPart / 2) + Math.abs(strokeDashoffset)) / 1.57) * 0.01745329252;
+    const x = 90 * Math.cos(ugol);
+    const y = 90 * Math.sin(ugol);
+
+    const left = x - 235
+    const top = y
+    const styleClass: {top: string, left: string} = {top: `${top}px`, left: `${left}px`};
+      return (
+        <div style ={styleClass} className={styles.informationWndowT}  onMouseEnter={hendleOnMouseEnter(idTarget.id)}
+        onClick={onclicc(idTarget.id)}>
+          <svg  width="100" height="50" >
+            <text x='0' y='25' font-size="5" opacity={1} fill="Snow">{`${el.name} ${el.prochent.newValue} %`}</text>
+          </svg>
+        </div>)
+  };
+ 
 
   return (
     <div className={styles.container} >
-      <svg width="350" height="300" xmlns="http://www.w3.org/2000/svg">
+      <svg width="350" height="300" cx='10' xmlns="http://www.w3.org/2000/svg">
         <rect x="0" y="0" width="350" height="300" fill="#c0c0fa"/>
         {creationGraphics()}
         {PopUpWindow()}
+     
       </svg>
+      {textInfo()}
       {tableDate()}
     </div>
   );
