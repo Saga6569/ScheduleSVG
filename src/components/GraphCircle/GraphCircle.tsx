@@ -174,10 +174,10 @@ useEffect(() => {
         return null;
       }
       const defs = <defs>
-        <radialGradient id={elData.id}>
-          <stop offset="80%" stop-color={elData.color} stop-opacity='0.9' />
-          <stop offset="90%" stop-color={elData.color} stop-opacity='0.1'/>
-          <stop offset="100%" stop-color={elData.color} stop-opacity='0.9' />
+        <radialGradient id={elData.id} cx="50%" cy="50%" r="100%" >
+        <stop offset="35%" stop-color={elData.color} stop-opacity="1" />
+          <stop offset="50%" stop-color={elData.color} stop-opacity='0.4'/>
+          <stop offset="65%" stop-color={elData.color} stop-opacity='1' />
         </radialGradient>
       </defs>
 
