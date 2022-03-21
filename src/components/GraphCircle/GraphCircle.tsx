@@ -22,6 +22,11 @@ interface IelDate {
 }
 
 const GraphCircle = (props: IGraphProps ) =>  {
+  // начальные параментры 
+  const initX = 350;
+  const initY = 370;
+  const graphRadius = 200;
+  const strokeWidth =  150;
 
   const [render, setRender] = useState(false);
   const [dataSumm,  setDataSumm] = useState(_.sumBy(props.values, 'value'))
@@ -36,26 +41,27 @@ const GraphCircle = (props: IGraphProps ) =>  {
         const name = el.name ?? `${value}`;
         const color = el.color ?? colorArr[i];
         const id: string = _.uniqueId();
-        const graphRadius = 200;
-        const visible = el.visible ?? true
+        const visible = el.visible ?? true;
+
         const circle: number = (graphRadius * 2 * 3.14);
         const result: number = (value * 100 / dataSumm);
         const shadedPart: number = (circle * result / 100);
-        const strokeDasharray = {renderingPart: shadedPart, nonDrawingPart: circle}
-        const strokeDashoffset: number = i === 0 ? 0 : newData[i-1].circle.strokeDasharray.renderingPart * (-1) - newData[i-1].circle.strokeDashoffset * (-1)
-        newData[i] = {id, value, name, visible, color, prochent: {oldValue: 0, newValue:Number(result.toFixed(2))},  style: {display: 'none'},
-          circle: {graphRadius, cx: 350, cy: 370, fill: 'none', stroke: color, strokeWidth: 150, strokeDasharray, strokeDashoffset},
+        const strokeDasharray = {renderingPart: shadedPart, nonDrawingPart: circle};
+        const style = {display: visible === true ? 'block' : 'none'};
+        
+        const strokeDashoffset: number = i === 0 ? 0 : newData[i-1].circle.strokeDasharray.renderingPart * (-1) - newData[i-1].circle.strokeDashoffset * (-1);
+
+        newData[i] = {id, value, name, visible, color, prochent: {oldValue: 0, newValue:Number(result.toFixed(2))},  style,
+          circle: {graphRadius, cx: initX, cy: initY, fill: 'none', stroke: color, strokeWidth, strokeDasharray, strokeDashoffset},
         }
       };
     return newData;
   };
-
   const [data, setData] = useState(upDate());
   const [idTarget, setIdTarget] = useState({id : data[0].id, visible: false})
 
   const HendleClickHideElement = (id: string) => () => { // Убирает элемент из круговой диаграммы и наоборот 
-    const initX = 350;
-    const initY = 370;
+   
     const newData = data.map((elData: any) => {
       if (elData.id === id) {
         elData.visible = elData.visible === true ? false : true;
@@ -74,22 +80,22 @@ const GraphCircle = (props: IGraphProps ) =>  {
       const circle: number = (el.circle.graphRadius * 2 * 3.14);
       const result: number = (el.value * 100 / newSumm);
       const shadedPart: number = (circle * result / 100);
-      const strokeDasharray = {renderingPart: shadedPart, nonDrawingPart: circle}
-      const oldValue = el.prochent.oldValue
+      const strokeDasharray = {renderingPart: shadedPart, nonDrawingPart: circle};
+      const oldValue = el.prochent.oldValue;
       if (el.visible === false) {
         const prochent = {oldValue, newValue: 0};
-        resultData[i] = {...el, circle: {...el.circle, cx: initX, cy: initY}, prochent,}
+        resultData[i] = {...el, circle: {...el.circle, cx: initX, cy: initY}, prochent};
       } else {
         const prochent = {oldValue, newValue: Number(result.toFixed(2))}
         resultData[i] = {...el, prochent, 
-          circle: {graphRadius: el.circle.graphRadius, cx: el.circle.cx, cy: el.circle.cy, fill: 'none', stroke: el.color, strokeWidth: 150, strokeDasharray, strokeDashoffset: clockwiseShiftAcc},
-          text: {x: 100, y: 350, fontSize: 18, fill: el.color, valueTextRender: `${(el.value * 100 / newSumm).toFixed(2)}%`},
+          circle: {graphRadius: el.circle.graphRadius, cx: el.circle.cx, cy: el.circle.cy, fill: 'none', 
+          stroke: el.color, strokeWidth, strokeDasharray, strokeDashoffset: clockwiseShiftAcc},
         }
         clockwiseShiftAcc += -shadedPart;
       }
     };
-    setDataSumm(newSumm)
-    setData(resultData)
+    setDataSumm(newSumm);
+    setData(resultData);
   };
 
   const onclicc = (id: string) => () => {
@@ -99,10 +105,8 @@ const GraphCircle = (props: IGraphProps ) =>  {
         const strokeDashoffset = el.circle.strokeDashoffset;
         const pxTograd = el.circle.strokeDasharray.nonDrawingPart / 360;
         const ugol = (((renderingPart / 2) + Math.abs(strokeDashoffset)) / pxTograd) * 0.01745329252;
-        const xPointOffset  = 40 * Math.cos(ugol);
-        const YPointOffset = 40 * Math.sin(ugol);
-        const initX = 350;
-        const initY = 370;
+        const xPointOffset  = 25 * Math.cos(ugol);
+        const YPointOffset = 25 * Math.sin(ugol);
         const newX = Math.round(xPointOffset) + initX;
         const newY = Math.round(YPointOffset) + initY;
         el.circle.cx = el.circle.cx === initX ? newX : initX;
@@ -115,14 +119,12 @@ const GraphCircle = (props: IGraphProps ) =>  {
     };
 
   const hendleOnMouseEnter = (id: string) => () => {
-    const initX = 350;
     const result = data.map((el) => {
       if (el.id === id) {
         if (el.visible === false || el.circle.cx !== initX) {
           return el;
         }
         el.circle.strokeWidth = 170;
-        el.style = {display: 'block'};
       }
       return el;
     })
@@ -134,7 +136,6 @@ const GraphCircle = (props: IGraphProps ) =>  {
     const result = data.map((el) => {
       if (el.id === id) {
         el.circle.strokeWidth = 150
-        el.style = {display: 'none'};
         return el;
       }
       return el;
@@ -148,15 +149,18 @@ const GraphCircle = (props: IGraphProps ) =>  {
       const circle = <circle cx="20" cy="25" r="15" fill={el.visible === false ? 'Gray' : el.color} />;
       const text = `${el.name} ${el.prochent.oldValue} %`;
       const textСrcle = <text x="40" y="30" font-size="18" fill="black">{text}</text>;
-      return <svg  width="250" height="40" preserveAspectRatio="xMidYMin meet" key={el.id} onClick={HendleClickHideElement(el.id)}>
-        <g onMouseOut={hendleOnMouseOut(el.id)} onMouseEnter={hendleOnMouseEnter(el.id)}>
+      return <svg width="250" height="40" preserveAspectRatio="xMidYMin meet" key={el.id} >
+        <g
+          onClick={HendleClickHideElement(el.id)}
+          onMouseOut={hendleOnMouseOut(el.id)}
+          onMouseEnter={hendleOnMouseEnter(el.id)}>
           {circle}
           {textСrcle}
         </g>
       </svg>
     });
     return (<div className={styles.containerInfo}>{infoData}</div>);
-    };
+  };
 
 useEffect(() => {
  upTableDate()
@@ -175,7 +179,7 @@ useEffect(() => {
       }
       const defs = <defs>
         <radialGradient id={elData.id} cx="50%" cy="50%" r="100%" >
-        <stop offset="35%" stop-color={elData.color} stop-opacity="1" />
+          <stop offset="35%" stop-color={elData.color} stop-opacity="1" />
           <stop offset="50%" stop-color={elData.color} stop-opacity='0.4'/>
           <stop offset="65%" stop-color={elData.color} stop-opacity='1' />
         </radialGradient>
