@@ -14,6 +14,7 @@ interface IelDate {
   color: string;
   style: {display: string};
   prochent: {oldValue: number, newValue: number};
+  bias: boolean,
   circle: {
     graphRadius: number, cx: number, cy: number, fill: string, stroke: string, 
     strokeDasharray: {renderingPart: number, nonDrawingPart: number},
@@ -42,7 +43,7 @@ const GraphCircle = (props: IGraphProps ) =>  {
         const color = el.color ?? colorArr[i];
         const id: string = _.uniqueId();
         const visible = el.visible ?? true;
-
+        const bias = false
         const circle: number = (graphRadius * 2 * 3.14);
         const result: number = (value * 100 / dataSumm);
         const shadedPart: number = (circle * result / 100);
@@ -51,7 +52,7 @@ const GraphCircle = (props: IGraphProps ) =>  {
         
         const strokeDashoffset: number = i === 0 ? 0 : newData[i-1].circle.strokeDasharray.renderingPart * (-1) - newData[i-1].circle.strokeDashoffset * (-1);
 
-        newData[i] = {id, value, name, visible, color, prochent: {oldValue: 0, newValue:Number(result.toFixed(2))},  style,
+        newData[i] = {id, value, name, visible, bias, color, prochent: {oldValue: 0, newValue:Number(result.toFixed(2))},  style,
           circle: {graphRadius, cx: initX, cy: initY, fill: 'none', stroke: color, strokeWidth, strokeDasharray, strokeDashoffset},
         }
       };
@@ -87,8 +88,14 @@ const GraphCircle = (props: IGraphProps ) =>  {
         resultData[i] = {...el, circle: {...el.circle, cx: initX, cy: initY}, prochent};
       } else {
         const prochent = {oldValue, newValue: Number(result.toFixed(2))}
+        const pxTograd = circle / 360;
+        const ugol = (((shadedPart / 2) + Math.abs(clockwiseShiftAcc)) / pxTograd) * 0.01745329252;
+        const xPointOffset  = 25 * Math.cos(ugol);
+        const YPointOffset = 25 * Math.sin(ugol);
+        const cx = el.bias === false ? initX : initX + xPointOffset;
+        const cy = el.bias === false ? initY : initY + YPointOffset;
         resultData[i] = {...el, prochent, 
-          circle: {graphRadius: el.circle.graphRadius, cx: el.circle.cx, cy: el.circle.cy, fill: 'none', 
+          circle: {graphRadius: el.circle.graphRadius, cx, cy, fill: 'none', 
           stroke: el.color, strokeWidth, strokeDasharray, strokeDashoffset: clockwiseShiftAcc},
         }
         clockwiseShiftAcc += -shadedPart;
@@ -111,11 +118,11 @@ const GraphCircle = (props: IGraphProps ) =>  {
         const newY = Math.round(YPointOffset) + initY;
         el.circle.cx = el.circle.cx === initX ? newX : initX;
         el.circle.cy = el.circle.cy === initY ? newY : initY;
-        return el;
+        el.bias = el.bias === true ? false : true
       }
       return el;
     })
-    setData(newData);
+    return setData(newData);
     };
 
   const hendleOnMouseEnter = (id: string) => () => {
@@ -206,11 +213,11 @@ useEffect(() => {
   //   const cen = data.map((el) => {
   //     const renderingPart = el.circle.strokeDasharray.renderingPart
   //     const strokeDashoffset = el.circle.strokeDashoffset 
-  //     const ugol = (((renderingPart / 2) + Math.abs(strokeDashoffset)) / 1.57) * 0.01745329252
-  //     const x = 90 * Math.cos(ugol)
-  //     const y = 90 * Math.sin(ugol)
+  //     const ugol = (((renderingPart / 2) + Math.abs(strokeDashoffset)) / 3.49) * 0.01745329252
+  //     const x = 200 * Math.cos(ugol)
+  //     const y = 200 * Math.sin(ugol)
   //     if (el.visible === true) {
-  //       return <path d={`M${130} ${350} ${130 + x} ${350 + y} `}  stroke='#696666' stroke-width="0.5"/>
+  //       return <path d={`M${350} ${370} ${350 + x} ${370 + y} `}  stroke='#696666' stroke-width="0.5"/>
   //     }
   //     return null
   //   });
