@@ -2,8 +2,20 @@ import React, { useEffect, useState } from 'react';
 import styles from './GraphCircle.module.css';
 import _ from 'lodash'
 
+interface Ivalues {
+  value: number;
+  name: string;
+  color?: string;
+};
+
+interface IdefaultOptions {
+  graphRadius: number;
+  strokeWidth: number;
+};
+
 interface IGraphProps {
-  values: [number] | Array<{}>,
+  values: Array<Ivalues>
+  options?: IdefaultOptions;
 };
 
 interface IelDate {
@@ -22,12 +34,18 @@ interface IelDate {
   };
 }
 
-const GraphCircle = (props: IGraphProps ) =>  {
-  // начальные параментры 
+const defaultOptions: IdefaultOptions = {graphRadius: 200, strokeWidth: 150}
+
+const GraphCircle = (props: IGraphProps) =>  {
+  
+  const option = {...props.options, ...defaultOptions};
+
   const initX = 350;
   const initY = 370;
-  const graphRadius = 200;
-  const strokeWidth =  150;
+
+
+  const graphRadius = option.graphRadius;
+  const strokeWidth =  option.strokeWidth;
 
   const [render, setRender] = useState(false);
   const [dataSumm,  setDataSumm] = useState(_.sumBy(props.values, 'value'))
@@ -37,13 +55,15 @@ const GraphCircle = (props: IGraphProps ) =>  {
     const colorArr = ['blue', 'red', 'black', 'tomato', 'green', 'MediumOrchid', 'Peru', 'Lime', 'LightCyan'];
     const newData = [];
       for(let i: number = 0; i<= props.values.length - 1; i++) {
-        const el: any = props.values[i];
-        const value = el.value ?? el;
-        const name = el.name ?? `${value}`;
+        const el: Ivalues = props.values[i];
+        const value = el.value;
+        const name = el.name;
         const color = el.color ?? colorArr[i];
+        const visible = true;
+
         const id: string = _.uniqueId();
-        const visible = el.visible ?? true;
-        const bias = false
+        const bias = false;
+
         const circle: number = (graphRadius * 2 * 3.14);
         const result: number = (value * 100 / dataSumm);
         const shadedPart: number = (circle * result / 100);
@@ -91,9 +111,9 @@ const GraphCircle = (props: IGraphProps ) =>  {
         const pxTograd = circle / 360;
         const ugol = (((shadedPart / 2) + Math.abs(clockwiseShiftAcc)) / pxTograd) * 0.01745329252;
         const xPointOffset  = 25 * Math.cos(ugol);
-        const YPointOffset = 25 * Math.sin(ugol);
+        const yPointOffset = 25 * Math.sin(ugol);
         const cx = el.bias === false ? initX : initX + xPointOffset;
-        const cy = el.bias === false ? initY : initY + YPointOffset;
+        const cy = el.bias === false ? initY : initY + yPointOffset;
         resultData[i] = {...el, prochent, 
           circle: {graphRadius: el.circle.graphRadius, cx, cy, fill: 'none', 
           stroke: el.color, strokeWidth, strokeDasharray, strokeDashoffset: clockwiseShiftAcc},
@@ -112,10 +132,10 @@ const GraphCircle = (props: IGraphProps ) =>  {
         const strokeDashoffset = el.circle.strokeDashoffset;
         const pxTograd = el.circle.strokeDasharray.nonDrawingPart / 360;
         const ugol = (((renderingPart / 2) + Math.abs(strokeDashoffset)) / pxTograd) * 0.01745329252;
-        const xPointOffset  = 25 * Math.cos(ugol);
-        const YPointOffset = 25 * Math.sin(ugol);
+        const xPointOffset = 25 * Math.cos(ugol);
+        const yPointOffset = 25 * Math.sin(ugol);
         const newX = Math.round(xPointOffset) + initX;
-        const newY = Math.round(YPointOffset) + initY;
+        const newY = Math.round(yPointOffset) + initY;
         el.circle.cx = el.circle.cx === initX ? newX : initX;
         el.circle.cy = el.circle.cy === initY ? newY : initY;
         el.bias = el.bias === true ? false : true
@@ -130,9 +150,9 @@ const GraphCircle = (props: IGraphProps ) =>  {
       if (el.id === id) {
         if (el.visible === false || el.circle.cx !== initX) {
           return el;
-        }
+        };
         el.circle.strokeWidth = 170;
-      }
+      };
       return el;
     })
     setIdTarget({id: id, visible: true });
@@ -142,12 +162,12 @@ const GraphCircle = (props: IGraphProps ) =>  {
   const hendleOnMouseOut = (id: string) => () => {
     const result = data.map((el) => {
       if (el.id === id) {
-        el.circle.strokeWidth = 150
+        el.circle.strokeWidth = 150;
         return el;
       }
       return el;
     })
-    setIdTarget({id: id, visible: false })
+    setIdTarget({id: id, visible: false });
     setData(result);
   };
 
@@ -169,9 +189,9 @@ const GraphCircle = (props: IGraphProps ) =>  {
     return (<div className={styles.containerInfo}>{infoData}</div>);
   };
 
-useEffect(() => {
- upTableDate()
-}, [data])
+// useEffect(() => {
+//  upTableDate()
+// }, [data])
 
 useEffect(() => {
   setTimeout(() => {
@@ -266,10 +286,18 @@ useEffect(() => {
     const ugol = (((renderingPart / 2) + Math.abs(strokeDashoffset)) / pxTograd) * 0.01745329252;
     const x = 200 * Math.cos(ugol);
     const y = 200 * Math.sin(ugol);
-    return (<rect width="170" height="30" style={myStyle} x={el.circle.cx + x - 85} y={el.circle.cy + y - 15}
-    opacity={idTarget.visible && el.visible ? 1 : 0} fill={el.color} stroke-width='1' stroke="LightCyan"/>)
+    return (<>
+      <rect width="170" height="30" style={myStyle} x={el.circle.cx + x - 85} y={el.circle.cy + y - 35}
+        opacity={idTarget.visible && el.visible ? 1 : 0} fill={el.color} stroke-width='1' stroke="LightCyan" />
+        {/* <circle cx={el.circle.cx + x} cy={el.circle.cy + y} r='2' fill='red' />
+        <circle cx={el.circle.cx + x - 10} cy={el.circle.cy + y - 5} r='2' fill='red' />
+        <circle cx={el.circle.cx + x + 10} cy={el.circle.cy + y - 5} r='2' fill='red' /> */}
+        <path d={`M${el.circle.cx + x} ${el.circle.cy + y} ${el.circle.cx + x - 10} ${el.circle.cy + y - 5} z`} style={myStyle} opacity={idTarget.visible && el.visible ? 1 : 0} stroke="LightCyan"/>
+        <path d={`M${el.circle.cx + x} ${el.circle.cy + y} ${el.circle.cx + x + 10} ${el.circle.cy + y - 5} z`} style={myStyle} opacity={idTarget.visible && el.visible ? 1 : 0} stroke="LightCyan"/>
+      </>
+    )
   };
- 
+
   const textInfo = () => {
     const el = data.filter((el) => el.id === idTarget.id)[0];
     const renderingPart = el.circle.strokeDasharray.renderingPart;
@@ -278,23 +306,21 @@ useEffect(() => {
     const ugol = (((renderingPart / 2) + Math.abs(strokeDashoffset)) / pxTograd) * 0.01745329252;
     const x = 200 * Math.cos(ugol);
     const y = 200 * Math.sin(ugol);
-    const left = el.circle.cx  + x - 880
-    const top = el.circle.cy + y - 360 
+    const left = el.circle.cx  + x - 880;
+    const top = el.circle.cy + y - 380 ;
     const styleClass: {top: string, left: string} = {top: `${top}px`, left: `${left}px`};
     return (
       <div style ={styleClass} className={styles.informationWndowT} >
-        <svg  width="175" height="30">
-          <text x='0' y='28' font-size="16" opacity={idTarget.visible && el.visible ? 1 : 0} fill="Snow">{`${el.name} ${el.prochent.newValue} %`}</text>
+        <svg  width="175" height="45">
+          <text x='0' y='29' opacity={idTarget.visible && el.visible ? 1 : 0} font-size="16" fill="Snow">{`${el.name} ${el.prochent.newValue} %`}</text>
         </svg>
       </div>
     )
   };
- 
 
   return (
     <div className={styles.container} >
       <svg width="800" height="700" cx='10' xmlns="http://www.w3.org/3500/svg">
-        <rect x="0" y="0" width="350" height="350" fill="#c0c0fa"/>
         {creationGraphics()}
         {PopUpWindow()}
       </svg>

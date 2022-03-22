@@ -11,7 +11,7 @@
 .containerInfo {
   width: 150px;
   position: relative;
-  left: -90px;
+  left: -150px;
 }
 
 @keyframes stroke {

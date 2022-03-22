@@ -6,9 +6,7 @@ import GraphCircle from './components/GraphCircle/GraphCircle';
 import VertillePlot from './components/VertillePlot/VertillePlot';
 import './App.css';
 
-function App() {
-
-  //const data: any = [ { value:[6, 7, 8 ,9, 10, 8, 6, 4, 3],  }, {typeGraphics: 'line' ,value:[6, 7, 8 ,9, 10, 8, 6, 4, 3],  }]
+const App = () => {
 
   const res = [
     {value: 2, name: 'Пермь'}, 
@@ -34,13 +32,15 @@ function App() {
     {value: 3345, name: 'Губаха'},
   ];
 
+  const param: any = {graphRadius: 100, strokeWidth: 100}
+
   return ( 
     <div className="App">
       <FieldWithMoveablePoint/>
       <FieldWithPointsGeneration/>
       <Graph values={ [6, 7, 8 ,9, 10, 8, 6, 4, 3] }/>
       <Graph2 values={ data }/>
-      <GraphCircle values={res}/>
+      <GraphCircle values={res} options={param} />
       <VertillePlot values={ res2 }/>
     </div>
   );
