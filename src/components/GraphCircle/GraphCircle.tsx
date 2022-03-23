@@ -117,7 +117,7 @@ const GraphCircle = (props: IGraphProps) =>  {
         resultData[i] = {...el, prochent, 
           circle: {graphRadius: el.circle.graphRadius, cx, cy, fill: 'none', 
           stroke: el.color, strokeWidth, strokeDasharray, strokeDashoffset: clockwiseShiftAcc},
-        }
+        };
         clockwiseShiftAcc += -shadedPart;
       }
     };
@@ -151,7 +151,7 @@ const GraphCircle = (props: IGraphProps) =>  {
         if (el.visible === false || el.circle.cx !== initX) {
           return el;
         };
-        el.circle.strokeWidth = 170;
+        el.circle.strokeWidth = el.circle.strokeWidth + 20;
       };
       return el;
     })
@@ -162,7 +162,7 @@ const GraphCircle = (props: IGraphProps) =>  {
   const hendleOnMouseOut = (id: string) => () => {
     const result = data.map((el) => {
       if (el.id === id) {
-        el.circle.strokeWidth = 150;
+        el.circle.strokeWidth = strokeWidth;
         return el;
       }
       return el;
@@ -189,9 +189,9 @@ const GraphCircle = (props: IGraphProps) =>  {
     return (<div className={styles.containerInfo}>{infoData}</div>);
   };
 
-// useEffect(() => {
-//  upTableDate()
-// }, [data])
+useEffect(() => {
+ upTableDate()
+}, [data])
 
 useEffect(() => {
   setTimeout(() => {
@@ -278,27 +278,6 @@ useEffect(() => {
   };
   
   const PopUpWindow = () => { // окно информации
-    const myStyle = {'transition': '0.5s' , 'pointer-events': 'none'}
-    const el = data.filter((el) => el.id === idTarget.id)[0];
-    const renderingPart = el.circle.strokeDasharray.renderingPart;
-    const strokeDashoffset = el.circle.strokeDashoffset ;
-    const pxTograd = el.circle.strokeDasharray.nonDrawingPart / 360;
-    const ugol = (((renderingPart / 2) + Math.abs(strokeDashoffset)) / pxTograd) * 0.01745329252;
-    const x = 200 * Math.cos(ugol);
-    const y = 200 * Math.sin(ugol);
-    return (<>
-      <rect width="170" height="30" style={myStyle} x={el.circle.cx + x - 85} y={el.circle.cy + y - 35}
-        opacity={idTarget.visible && el.visible ? 1 : 0} fill={el.color} stroke-width='1' stroke="LightCyan" />
-        {/* <circle cx={el.circle.cx + x} cy={el.circle.cy + y} r='2' fill='red' />
-        <circle cx={el.circle.cx + x - 10} cy={el.circle.cy + y - 5} r='2' fill='red' />
-        <circle cx={el.circle.cx + x + 10} cy={el.circle.cy + y - 5} r='2' fill='red' /> */}
-        <path d={`M${el.circle.cx + x} ${el.circle.cy + y} ${el.circle.cx + x - 10} ${el.circle.cy + y - 5} z`} style={myStyle} opacity={idTarget.visible && el.visible ? 1 : 0} stroke="LightCyan"/>
-        <path d={`M${el.circle.cx + x} ${el.circle.cy + y} ${el.circle.cx + x + 10} ${el.circle.cy + y - 5} z`} style={myStyle} opacity={idTarget.visible && el.visible ? 1 : 0} stroke="LightCyan"/>
-      </>
-    )
-  };
-
-  const textInfo = () => {
     const el = data.filter((el) => el.id === idTarget.id)[0];
     const renderingPart = el.circle.strokeDasharray.renderingPart;
     const strokeDashoffset = el.circle.strokeDashoffset;
@@ -306,15 +285,22 @@ useEffect(() => {
     const ugol = (((renderingPart / 2) + Math.abs(strokeDashoffset)) / pxTograd) * 0.01745329252;
     const x = 200 * Math.cos(ugol);
     const y = 200 * Math.sin(ugol);
-    const left = el.circle.cx  + x - 880;
-    const top = el.circle.cy + y - 380 ;
-    const styleClass: {top: string, left: string} = {top: `${top}px`, left: `${left}px`};
-    return (
-      <div style ={styleClass} className={styles.informationWndowT} >
-        <svg  width="175" height="45">
-          <text x='0' y='29' opacity={idTarget.visible && el.visible ? 1 : 0} font-size="16" fill="Snow">{`${el.name} ${el.prochent.newValue} %`}</text>
-        </svg>
-      </div>
+    const text = `${el.name} ${el.prochent.newValue} %`;
+    const width = text.length * 10;
+
+    const cx = el.circle.cx;
+    const cy = el.circle.cy;
+  
+    return (<>
+      <rect width={width} height="30" className={styles.Circle} x={el.circle.cx + x - width /2} y={el.circle.cy + y - 35}
+        fill={el.color} stroke-width='1' stroke="LightCyan" opacity={idTarget.visible && el.visible ? 1 : 0} />
+        <path d={`M${cx + x} ${cy + y} ${cx + x - 10} ${cy + y - 5} `} className={styles.Path} opacity={idTarget.visible && el.visible ? 1 : 0} stroke="LightCyan"/>
+        <path d={`M${cx + x} ${cy + y} ${cx + x + 10} ${cy + y - 5} `} className={styles.Path} opacity={idTarget.visible && el.visible ? 1 : 0} stroke="LightCyan"/>
+        <text font-size="16" fill="LightCyan" className={styles.Text} opacity={idTarget.visible && el.visible ? 1 : 0}
+          style={{transform: `translate(${cx + x - width / 2.3}px, ${cy + y - 15}px)`}}>
+          {text}
+        </text>
+      </>
     )
   };
 
@@ -324,7 +310,6 @@ useEffect(() => {
         {creationGraphics()}
         {PopUpWindow()}
       </svg>
-      {textInfo()}
       {tableDate()}
     </div>
   );

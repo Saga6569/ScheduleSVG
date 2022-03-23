@@ -11,7 +11,7 @@
 .containerInfo {
   width: 150px;
   position: relative;
-  left: -150px;
+  left: -100px;
 }
 
 @keyframes stroke {
@@ -28,10 +28,7 @@
   transition: 0.5s;  
 }
 
-.informationWndowT {
-  position: relative;
-  transition: 0.5s;
-  width: 175px;
-  height: 30px;
+.Text, .Circle, .Path {
   pointer-events: none;
-}
+  transition: 0.5s;
+} 
