@@ -34,7 +34,7 @@ interface IelDate {
   };
 }
 
-const defaultOptions: IdefaultOptions = {graphRadius: 200, strokeWidth: 150}
+const defaultOptions: IdefaultOptions = {graphRadius: 200, strokeWidth: 150};
 
 const GraphCircle = (props: IGraphProps) =>  {
   const option = {...props.options, ...defaultOptions};
@@ -54,14 +54,14 @@ const GraphCircle = (props: IGraphProps) =>  {
       const color = el.color ?? colorArr[i];
       const visible = true;
       const id: string = _.uniqueId();
-      const bias = false;
+      const bias = false; 
       const circle: number = (graphRadius * 2 * 3.14);
-      const result: number = (value * 100 / dataSumm);
-      const shadedPart: number = (circle * result / 100);
+      const percentageValue: number = (value * 100 / dataSumm);
+      const shadedPart: number = (circle * percentageValue / 100);
       const strokeDasharray = {renderingPart: shadedPart, nonDrawingPart: circle};
       const style = {display: visible === true ? 'block' : 'none'};
       const strokeDashoffset: number = i === 0 ? 0 : newData[i-1].circle.strokeDasharray.renderingPart * (-1) - newData[i-1].circle.strokeDashoffset * (-1);
-      newData[i] = {id, value, name, visible, bias, color, prochent: {oldValue: 0, newValue:Number(result.toFixed(2))},  style,
+      newData[i] = {id, value, name, visible, bias, color, prochent: {oldValue: 0, newValue:Number(percentageValue.toFixed(2))},  style,
         circle: {graphRadius, cx: initX, cy: initY, fill: 'none', stroke: color, strokeWidth, strokeDasharray, strokeDashoffset},
       };
     };
@@ -80,7 +80,7 @@ const GraphCircle = (props: IGraphProps) =>  {
     return elData;
   });
    
-  const newSumm = _.sumBy(newData.filter((el: IelDate) => el.visible === true), 'value')
+  const newSumm = _.sumBy(newData.filter((el: IelDate) => el.visible === true), 'value');
     
   let clockwiseShiftAcc = 0;
   const resultData: any = [];
@@ -162,14 +162,39 @@ const GraphCircle = (props: IGraphProps) =>  {
 
   const tableDate = () => {  // Компонент выводит таблицу информации по каждому элементу.
     const infoData = data.map((el: IelDate) => {
-      const circle = <circle cx="20" cy="25" r="15" fill={el.visible === false ? 'Gray' : el.color} />;
+
+    const myStylText: any = { 'transition-property': 'fill', 'transition-duration': '0.5s' }
+
+    const myStyleGradient: any = { 'transition-property': 'stop-color', 'transition-duration': '1s' }
+
+    const color = el.visible === false ? 'Gray' : el.color;
+
+     const defs = <defs>
+     <radialGradient id={`${el.id}-1`} cx="50%" cy="50%">
+       <stop offset="25%" stop-color={color} stop-opacity="1" style={myStyleGradient}>
+       </stop>
+       <stop offset="50%" stop-color={color} stop-opacity='0.1' style={myStyleGradient} >
+       </stop>
+       <stop offset="75%" stop-color={color} stop-opacity='1' style={myStyleGradient} >
+       </stop>
+     </radialGradient>
+   </defs>
+
+    const circle = <circle cx="20" cy="20" r="15" fill={`url(#${el.id}-1)`} />;
+
+   
+     //const rect = <rect x="5" y="5" width="30" height="30" fill={el.color} stroke-width="5"/>
+
       const text = `${el.name} ${el.prochent.oldValue} %`;
-      const textСrcle = <text x="40" y="30" font-size="18" fill="black">{text}</text>;
-      return <svg width="250" height="40" preserveAspectRatio="xMidYMin meet" key={el.id} >
+      const textСrcle = <text x="40" y="25" font-size="18" style={myStylText} fill={color === 'Gray' ? 'Gray' : 'black'}>{text}</text>;
+      
+      return <svg width="auto" height="40" key={el.id}  >
         <g
           onClick={handleClickShowHideElement(el.id)}
           onMouseOut={hendleOnMouseOut(el.id)}
           onMouseEnter={hendleOnMouseEnter(el.id)}>
+          {defs}
+          {/* {rect} */}
           {circle}
           {textСrcle}
         </g>
@@ -193,10 +218,11 @@ useEffect(() => {
       if (elData.visible === false) {
         return null;
       };
+      
       const defs = <defs>
         <radialGradient id={elData.id} cx="50%" cy="50%" r="100%" >
           <stop offset="35%" stop-color={elData.color} stop-opacity="1" />
-          <stop offset="50%" stop-color={elData.color} stop-opacity='0.4'/>
+          <stop offset="50%" stop-color={elData.color} stop-opacity='0.3' />
           <stop offset="65%" stop-color={elData.color} stop-opacity='1' />
         </radialGradient>
       </defs>
