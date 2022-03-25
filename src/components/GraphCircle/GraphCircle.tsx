@@ -171,12 +171,9 @@ const GraphCircle = (props: IGraphProps) =>  {
 
      const defs = <defs>
      <radialGradient id={`${el.id}-1`} cx="50%" cy="50%">
-       <stop offset="25%" stop-color={color} stop-opacity="1" style={myStyleGradient}>
-       </stop>
-       <stop offset="50%" stop-color={color} stop-opacity='0.1' style={myStyleGradient} >
-       </stop>
-       <stop offset="75%" stop-color={color} stop-opacity='1' style={myStyleGradient} >
-       </stop>
+       <stop offset="25%" stop-color={color} stop-opacity="1" style={myStyleGradient}/>
+       <stop offset="50%" stop-color={color} stop-opacity='0.4' style={myStyleGradient} />
+       <stop offset="75%" stop-color={color} stop-opacity='1' style={myStyleGradient} />
      </radialGradient>
    </defs>
 
@@ -213,21 +210,24 @@ useEffect(() => {
   }, 1000)
  }, [])
 
-  const creationGraphics = () => { // Компонент обрисовывает круговой график в соответствии с данные каждого элемента.
+  const creationGraphics = () => { // Компонент обрисовывает круговой график в соответствии с данные каждого элемента.  не знаю как лучше ...
     const result = data.map((elData: IelDate) => {
-      if (elData.visible === false) {
-        return null;
-      };
-      
-      const defs = <defs>
-        <radialGradient id={elData.id} cx="50%" cy="50%" r="100%" >
-          <stop offset="35%" stop-color={elData.color} stop-opacity="1" />
-          <stop offset="50%" stop-color={elData.color} stop-opacity='0.3' />
-          <stop offset="65%" stop-color={elData.color} stop-opacity='1' />
+      // if (elData.visible === false) {
+      //   return null;
+      // };
+  
+      const defs = <defs >
+        <radialGradient id={elData.id} cx="50%" cy="50%" r="100%"  >
+          <stop offset="35%" stop-color={elData.color} stop-opacity="1" >
+          </stop>
+          <stop offset="50%"  stop-color={elData.color} stop-opacity='0.3'>
+          </stop>
+          <stop offset="65%" stop-color={elData.color} stop-opacity='1'>
+          </stop>
         </radialGradient>
       </defs>
-      const strokeDasharray = `${elData.circle.strokeDasharray.renderingPart}, ${elData.circle.strokeDasharray.nonDrawingPart}`
-      const shadedPart  = <circle r={elData.circle.graphRadius} className={render === false ? styles.CircleStart : styles.CircleEnd }
+      const strokeDasharray = `${elData.circle.strokeDasharray.renderingPart}, ${elData.circle.strokeDasharray.nonDrawingPart}` 
+      const shadedPart  = <circle r={elData.circle.graphRadius} className={render === false ? styles.CircleStart : styles.CircleEnd} opacity={elData.visible === false ? 0 : 1}
         cx={elData.circle.cx} cy={elData.circle.cy} fill={elData.circle.fill} stroke={`url(#${elData.id})`}
         stroke-dasharray={strokeDasharray} stroke-dashoffset={elData.circle.strokeDashoffset} stroke-width={elData.circle.strokeWidth}
         onMouseOut={hendleOnMouseOut(elData.id)} 

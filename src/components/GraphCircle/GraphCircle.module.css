@@ -21,11 +21,12 @@
 }
 
 .CircleStart {
-  animation: stroke 1s ease-out forwards;
+  animation: stroke 1s;
 }
 
 .CircleEnd {
   transition: 0.5s;
+  
 }
 
 .Text, .Circle, .Path {
