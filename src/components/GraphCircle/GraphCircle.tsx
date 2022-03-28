@@ -32,7 +32,9 @@ interface IelDate {
     strokeDasharray: {renderingPart: number, nonDrawingPart: number},
     strokeWidth: number, strokeDashoffset: number;
   };
-}
+};
+
+// 0.01745329252 Значение для перевода градусов в радианы
 
 const defaultOptions: IdefaultOptions = {graphRadius: 200, strokeWidth: 150};
 
@@ -67,11 +69,13 @@ const GraphCircle = (props: IGraphProps) =>  {
     };
     return newData;
   };
+
+
   const [data, setData] = useState(upDate());
   const [idTarget, setIdTarget] = useState({id : data[0].id, visible: false});
 
+
   const handleClickShowHideElement = (id: string) => () => { // Убирает элемент из круговой диаграммы и наоборот 
-   
   const newData = data.map((elData: any) => {
     if (elData.id === id) {
       elData.visible = elData.visible === true ? false : true;
@@ -127,7 +131,7 @@ const GraphCircle = (props: IGraphProps) =>  {
         const newY = Math.round(yPointOffset) + initY;
         el.circle.cx = el.circle.cx === initX ? newX : initX;
         el.circle.cy = el.circle.cy === initY ? newY : initY;
-        el.bias = el.bias === true ? false : true
+        el.bias = el.bias === true ? false : true;
       };
     return el;
     })
@@ -160,15 +164,11 @@ const GraphCircle = (props: IGraphProps) =>  {
     setData(result);
   };
 
-  const tableDate = () => {  // Компонент выводит таблицу информации по каждому элементу.
+  const TableDate = () => { // Компонент выводит таблицу информации по каждому элементу.
     const infoData = data.map((el: IelDate) => {
-
-    const myStylText: any = { 'transition-property': 'fill', 'transition-duration': '0.5s' }
-
-    const myStyleGradient: any = { 'transition-property': 'stop-color', 'transition-duration': '1s' }
-
+    const myStylText: any = { 'transition-property': 'fill', 'transition-duration': '0.5s' };
+    const myStyleGradient: any = { 'transition-property': 'stop-color', 'transition-duration': '0.5s' };
     const color = el.visible === false ? 'Gray' : el.color;
-
      const defs = <defs>
      <radialGradient id={`${el.id}-1`} cx="50%" cy="50%">
        <stop offset="25%" stop-color={color} stop-opacity="1" style={myStyleGradient}/>
@@ -176,16 +176,11 @@ const GraphCircle = (props: IGraphProps) =>  {
        <stop offset="75%" stop-color={color} stop-opacity='1' style={myStyleGradient} />
      </radialGradient>
    </defs>
-
     const circle = <circle cx="20" cy="20" r="15" fill={`url(#${el.id}-1)`} />;
-
-   
-     //const rect = <rect x="5" y="5" width="30" height="30" fill={el.color} stroke-width="5"/>
-
+     //const rect = <rect xPointOffset="5" y="5" width="30" height="30" fill={el.color} stroke-width="5"/>
       const text = `${el.name} ${el.prochent.oldValue} %`;
-      const textСrcle = <text x="40" y="25" font-size="18" style={myStylText} fill={color === 'Gray' ? 'Gray' : 'black'}>{text}</text>;
-      
-      return <svg width="auto" height="40" key={el.id}  >
+      const textСrcle = <text x="40" y="25" id={`${el.id}-render`} font-size="18" style={myStylText} fill={color === 'Gray' ? 'Gray' : 'black'}>{text}</text>;
+      return <svg width="auto" height="40" key={el.id}>
         <g
           onClick={handleClickShowHideElement(el.id)}
           onMouseOut={hendleOnMouseOut(el.id)}
@@ -201,7 +196,7 @@ const GraphCircle = (props: IGraphProps) =>  {
   };
 
 useEffect(() => {
- upTableDate()
+  upTableDate()
 }, [data])
 
 useEffect(() => {
@@ -212,21 +207,14 @@ useEffect(() => {
 
   const creationGraphics = () => { // Компонент обрисовывает круговой график в соответствии с данные каждого элемента.  не знаю как лучше ...
     const result = data.map((elData: IelDate) => {
-      // if (elData.visible === false) {
-      //   return null;
-      // };
-  
       const defs = <defs >
         <radialGradient id={elData.id} cx="50%" cy="50%" r="100%"  >
-          <stop offset="35%" stop-color={elData.color} stop-opacity="1" >
-          </stop>
-          <stop offset="50%"  stop-color={elData.color} stop-opacity='0.3'>
-          </stop>
-          <stop offset="65%" stop-color={elData.color} stop-opacity='1'>
-          </stop>
+          <stop offset="35%" stop-color={elData.color} stop-opacity="1"/>
+          <stop offset="50%"  stop-color={elData.color} stop-opacity='0.3'/>
+          <stop offset="65%" stop-color={elData.color} stop-opacity='1'/>
         </radialGradient>
       </defs>
-      const strokeDasharray = `${elData.circle.strokeDasharray.renderingPart}, ${elData.circle.strokeDasharray.nonDrawingPart}` 
+      const strokeDasharray = `${elData.circle.strokeDasharray.renderingPart}, ${elData.circle.strokeDasharray.nonDrawingPart}`;
       const shadedPart  = <circle r={elData.circle.graphRadius} className={render === false ? styles.CircleStart : styles.CircleEnd} opacity={elData.visible === false ? 0 : 1}
         cx={elData.circle.cx} cy={elData.circle.cy} fill={elData.circle.fill} stroke={`url(#${elData.id})`}
         stroke-dasharray={strokeDasharray} stroke-dashoffset={elData.circle.strokeDashoffset} stroke-width={elData.circle.strokeWidth}
@@ -247,10 +235,10 @@ useEffect(() => {
   //     const renderingPart = el.circle.strokeDasharray.renderingPart
   //     const strokeDashoffset = el.circle.strokeDashoffset 
   //     const tiltAngle = (((renderingPart / 2) + Math.abs(strokeDashoffset)) / 3.49) * 0.01745329252
-  //     const x = 200 * Math.cos(tiltAngle)
+  //     const xPointOffset = 200 * Math.cos(tiltAngle)
   //     const y = 200 * Math.sin(tiltAngle)
   //     if (el.visible === true) {
-  //       return <path d={`M${350} ${370} ${350 + x} ${370 + y} `}  stroke='#696666' stroke-width="0.5"/>
+  //       return <path d={`M${350} ${370} ${350 + xPointOffset} ${370 + y} `}  stroke='#696666' stroke-width="0.5"/>
   //     }
   //     return null
   //   });
@@ -266,7 +254,7 @@ useEffect(() => {
     const newDa = data.map((el: IelDate) => {
       if (el.visible === false) {
         if (el.prochent.oldValue > 0 ) {
-          el.prochent.oldValue = Number((el.prochent.oldValue - 0.08).toFixed(2));
+          el.prochent.oldValue = Number((el.prochent.oldValue - 0.15).toFixed(2));
           return el;
         }     
         if (el.prochent.oldValue <= 0 ) {
@@ -275,40 +263,40 @@ useEffect(() => {
         }  
       }
       if (el.prochent.oldValue > el.prochent.newValue) {
-        el.prochent.oldValue = Number((el.prochent.oldValue - 0.08).toFixed(2));
+        el.prochent.oldValue = Number((el.prochent.oldValue - 0.15).toFixed(2));
           if (el.prochent.oldValue < el.prochent.newValue) {
             el.prochent.oldValue = el.prochent.newValue;
           }
         return el
       } if (el.prochent.oldValue < el.prochent.newValue) {
-        el.prochent.oldValue = Number((el.prochent.oldValue + 0.08).toFixed(2));
+        el.prochent.oldValue = Number((el.prochent.oldValue + 0.15).toFixed(2));
         return el;
       }
       return el;
     });
     setData(newDa);
   };
-  
+
   const popUpWindow = () => { // окно информации
     const el = data.filter((el) => el.id === idTarget.id)[0];
     const renderingPart = el.circle.strokeDasharray.renderingPart;
     const strokeDashoffset = el.circle.strokeDashoffset;
     const pxTograd = el.circle.strokeDasharray.nonDrawingPart / 360;
     const tiltAngle = (((renderingPart / 2) + Math.abs(strokeDashoffset)) / pxTograd) * 0.01745329252;
-    const x = 200 * Math.cos(tiltAngle);
-    const y = 200 * Math.sin(tiltAngle);
+    const xPointOffset = 200 * Math.cos(tiltAngle);
+    const yPointOffset = 200 * Math.sin(tiltAngle);
     const text = `${el.name} ${el.prochent.newValue} %`;
     const width = text.length * 10;
     const cx = el.circle.cx;
     const cy = el.circle.cy;
     const opacity = idTarget.visible && el.visible ? 1 : 0;
     return (<>
-      <rect width={width} height="30" className={styles.Circle} x={el.circle.cx + x - width /2} y={el.circle.cy + y - 35}
+      <rect width={width} height="30" className={styles.Circle} x={el.circle.cx + xPointOffset - width /2} y={el.circle.cy + yPointOffset - 35}
         fill={el.color} stroke-width='1' stroke="LightCyan" opacity={opacity} />
-        <path d={`M${cx + x} ${cy + y} ${cx + x - 10} ${cy + y - 5} `} className={styles.Path} opacity={opacity} stroke="LightCyan"/>
-        <path d={`M${cx + x} ${cy + y} ${cx + x + 10} ${cy + y - 5} `} className={styles.Path} opacity={opacity} stroke="LightCyan"/>
+        <path d={`M${cx + xPointOffset} ${cy + yPointOffset} ${cx + xPointOffset - 10} ${cy + yPointOffset - 5} `} className={styles.Path} opacity={opacity} stroke="LightCyan"/>
+        <path d={`M${cx + xPointOffset} ${cy + yPointOffset} ${cx + xPointOffset + 10} ${cy + yPointOffset - 5} `} className={styles.Path} opacity={opacity} stroke="LightCyan"/>
         <text font-size="16" fill="LightCyan" className={styles.Text} opacity={opacity}
-          style={{transform: `translate(${cx + x - width / 2.4}px, ${cy + y - 15}px)`}}>
+          style={{transform: `translate(${cx + xPointOffset - width / 2.4}px, ${cy + yPointOffset - 15}px)`}}>
           {text}
         </text>
       </>
@@ -321,7 +309,7 @@ useEffect(() => {
         {creationGraphics()}
         {popUpWindow()}
       </svg>
-      {tableDate()}
+      {TableDate()}
     </div>
   );
 };
