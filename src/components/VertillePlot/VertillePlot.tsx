@@ -25,23 +25,24 @@ interface IelDate {
   color: string
 };
 
-const textInfo = (option: Ioption) => {
-  const left = option.x - option.count * 50 - 65;
-  const top = option.y - 245;
-  const styleClass: {top: string, left: string} = {top: `${top}px`, left: `${left}px`};
-    return (
-      <div style ={styleClass} className={styles.informationWndowT} > 
-        <svg  width="50" height="25" >
-          <text x='0' y='25' font-size="5" opacity={option.visit === true ? 1 : 0} fill="black">{`${option.name} ${option.value}`}</text>
-        </svg>
-      </div>)
-};
+const PopUpWindow = (option: Ioption) => { // окно информации
 
-const PopUpWindow = (option: Ioption) => {
-  const scr = <rect width="40" className={styles.informationWndow} x={option.x - 20} y={option.y - 20}
-   opacity={option.visit === true ? 1 : 0} height="15" fill={option.color} stroke-width='1'  stroke="none">
-  </rect>
-  return (<svg>{scr}</svg>)
+  const text = `${option.name} ${option.value}`;
+  const width = text.length * 10;
+  const cx = option.x
+  const cy = option.y
+
+  return (<>
+    <rect width={width} height="30" className={styles.informationWndow} x={cx - width /2} y={cy - 35}
+      fill={option.color} stroke-width='1' stroke="LightCyan" opacity={1} />
+      <path d={`M${cx} ${cy} ${cx - 10} ${cy - 5} `} className={styles.informationWndow} opacity={1} stroke="black"/>
+      <path d={`M${cx} ${cy} ${cx + 10} ${cy - 5} `} className={styles.informationWndow} opacity={1} stroke="black"/>
+      <text font-size="16" fill="black" className={styles.informationWndow} opacity={1}
+        style={{transform: `translate(${cx - width / 2.4}px, ${cy - 15}px)`}}>
+        {text}
+      </text>
+    </>
+  );
 };
 
 const VertillePlot = (props: IGraphProps) => {
@@ -62,27 +63,28 @@ const VertillePlot = (props: IGraphProps) => {
 
   const dataSort = upDate().sort().sort((a, b) => b.value - a.value);
 
-  const lengthHorizontalLines = props.values.length * 50; // Длинна горизонтальных линий'
+  const lengthHorizontalLines = props.values.length * 100; // Длинна горизонтальных линий'
 
   const numberHorizontalLines = 10; //  Значение на которое будет делиться область графика
-  const chartHeight = 400;  // высота графика
+  const chartHeight = 800;  // высота графика
   const chartWidth = lengthHorizontalLines; // Ширина графика 
   const startPointBottomPointY = chartHeight + 25; // Начало графика по Y
 
-  const wholeScreenValue = Math.round(chartHeight * dataSort[0].value / 360);  // Получаем значение  400 px    максимальное значение в данных всегда будет 360px 
+  const wholeScreenValue = Math.round(chartHeight * dataSort[0].value / chartHeight - 40);  // Получаем значение 800 px  максимальное значение в данных всегда будет 760 px
+  
 
   const roundedAverage = '0'.repeat(String(wholeScreenValue).length - 1); // Получаем количество нулей для округления среднего значения
 
-  const horizontalLineInterval  = Math.round(wholeScreenValue / numberHorizontalLines / Number(`1${roundedAverage}`)) * Number(`1${roundedAverage}`); // Получаем шаг интервальных линий
+  const horizontalLineInterval  = Math.ceil(wholeScreenValue / numberHorizontalLines / Number(`1${roundedAverage}`)) * Number(`1${roundedAverage}`); // Получаем шаг интервальных линий
 
   const roundedWholeScreenValue = horizontalLineInterval * numberHorizontalLines; // Округленное значение 400 px 
 
-  const verticalLineSpacing = 50; // шаг вертикальных линиий 
+  const verticalLineSpacing = 100; // шаг вертикальных линиий 
 
   const [option, setOption] = useState({x: 0, y: 0 , color: '', name: '', value: 0, visit: false, count: 0});
 
   const createDataForRendering = () => {    // Функция обрисовывает пришедшие данные в график 
-    let initPointX = 70;
+    let initPointX = 90;
     const maxValueEls = roundedWholeScreenValue / chartHeight
     const result = dataSort.map((elDate: IelDate) => {
       const valueY =  elDate.value / maxValueEls;
@@ -95,10 +97,10 @@ const VertillePlot = (props: IGraphProps) => {
       onMouseEnter={() =>  { // Событие наведение курсора на элемент
         setOption({x: x, y: startPointBottomPointY - valueY, color: elDate.color, name: elDate.name, value: elDate.value, visit: true, count: dataSort.length })
       }} 
-      key={elDate.id} d={`M${initPointX} ${startPointBottomPointY} V ${startPointBottomPointY - valueY}`} fill="transparent" stroke={elDate.color} stroke-width="30"/>
+      key={elDate.id} d={`M${initPointX} ${startPointBottomPointY} V ${startPointBottomPointY - valueY}`} fill="transparent" stroke={elDate.color} stroke-width="50"/>
 
       //const circle =  <circle cx={initPointX} cy={startPointBottomPointY - valueY} r="2" fill="red"/>
-      const textStart = <text x={initPointX - 12} y={435} font-size="6" fill="black" >{`${elDate.name}`}</text>
+      const textStart = <text x={initPointX - 25} y={840} font-size="14" fill="black" >{`${elDate.name}`}</text>
     
       const result = (<svg 
         className={option.name === '' ? styles.containerGradient : ''}>
@@ -111,7 +113,7 @@ const VertillePlot = (props: IGraphProps) => {
     });
     return result;
   };
-  const LengthVerticalLines = 42.5 * 10 // Длинна вериткальных линий
+  const LengthVerticalLines = 82.5 * 10 // Длинна вериткальных линий
 
   const creatingVerticalGrid  = () => {  // Функция создает вертикальную линии для графика
     let initPointX = 45;
@@ -133,22 +135,21 @@ const VertillePlot = (props: IGraphProps) => {
            <path d={`M${chartWidth + 45} ${chartHeight + 25 - initPointY} H ${45}Z`} fill="transparent" stroke='#696666' stroke-width="0.5"/>
         </>
         result[i] =  companent;
-        initPointY += 40;
-        acc += horizontalLineInterval; 
+        initPointY += 80;
+        acc += horizontalLineInterval;
       };
     return result;
   };
 
   const ResComp = (
     <div className={styles.container} >
-      <svg width={chartWidth + 50} height={chartHeight + 50} xmlns="http://www.w3.org/2000/svg" >
+      <svg width={chartWidth + 80} height={chartHeight + 50} xmlns="http://www.w3.org/2000/svg" >
         <rect x="45" y="25" width={chartWidth}  height={chartHeight} fill="#E0FFFF"/>
         {PopUpWindow(option)}
         {creatingHorizontalGrid()}
         {creatingVerticalGrid()}
         {createDataForRendering()}
       </svg>
-      {textInfo(option)}
     </div>
   );
 

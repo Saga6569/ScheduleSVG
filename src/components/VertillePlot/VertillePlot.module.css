@@ -37,10 +37,6 @@
 }
 
 .informationWndow {
+  position: relative;
   transition: 0.5s;  
-}
-
-.informationWndowT {
- position: relative;
- transition: 0.5s;  
 }
