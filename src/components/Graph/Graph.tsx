@@ -1,5 +1,6 @@
 import React from 'react';
 import styles from './Graph.module.css';
+import _  from 'lodash'
 
 interface IGraphProps {
   values: Array<number>,
@@ -17,7 +18,8 @@ export class Graph extends React.Component<IGraphProps, IGraphState> {
     const valuesList = this.calcValuesParams(props.values).valuesList;
     
     const valueElements = valuesList.map((el) => (
-      <rect 
+      <rect
+        key={_.uniqueId()}
         rx="5" ry="5"
         x={ el.x} y={ el.y }
         width={ el.width } height={ el.height }
@@ -70,11 +72,11 @@ export class Graph extends React.Component<IGraphProps, IGraphState> {
     const value = Math.abs(y) / 20
     const meaning  = oldvalue === null ? '0%' : this.difference(oldvalue, value)
     oldvalue = value
-    const style = {'transform-origin': `${x}px ${y}px`, 'transform': 'rotateX(180deg)'}
-    return (<>
+    const style = {'transformOrigin': `${x}px ${y}px`, 'transform': 'rotateX(180deg)'}
+    return (<g    key={_.uniqueId()}>
       <circle cx={x} cy={y} r="4" fill="White"/>
-      <text className={styles.Text} x={x} y={y} style={style} font-size="12" text-anchor="middle" fill={meaning.includes('↑') || meaning === '0%' ? 'green' : 'red' }>{meaning}</text>
-      </>
+      <text className={styles.Text} x={x} y={y} style={style} fontSize="12" textAnchor="middle" fill={meaning.includes('↑') || meaning === '0%' ? 'green' : 'red' }>{meaning}</text>
+      </g>
       )
     });
 
@@ -110,7 +112,7 @@ export class Graph extends React.Component<IGraphProps, IGraphState> {
             x1={ this.state.dashLineX } y1="0"
             x2={ this.state.dashLineX } y2="300"
             stroke={ this.state.dashVisibility ? "rgba(149, 165, 166, 1)" : "rgba(149, 165, 166, 0)" }
-            stroke-dasharray="3"
+            strokeDasharray="3"
           />
         </svg>
       

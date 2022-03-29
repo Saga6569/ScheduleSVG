@@ -166,20 +166,20 @@ const GraphCircle = (props: IGraphProps) =>  {
 
   const TableDate = () => { // Компонент выводит таблицу информации по каждому элементу.
     const infoData = data.map((el: IelDate) => {
-    const myStylText: any = { 'transition-property': 'fill', 'transition-duration': '0.5s' };
-    const myStyleGradient: any = { 'transition-property': 'stop-color', 'transition-duration': '1s' };
+    const myStylText: any = { 'transitionProperty': 'fill', 'transitionDuration': '0.5s' };
+    const myStyleGradient: any = { 'transitionProperty': 'stopColor', 'transitionDuration': '1s' };
     const color = el.visible === false ? 'Gray' : el.color;
      const defs = <defs>
      <radialGradient id={`${el.id}-1`} cx="50%" cy="50%">
-       <stop offset="25%" stop-color={color} stop-opacity="1" style={myStyleGradient}/>
-       <stop offset="50%" stop-color={color === 'Gray' ? el.color : color} stop-opacity={color === 'Gray' ? 1 : 0.3} style={myStyleGradient} />
-       <stop offset="75%" stop-color={color} stop-opacity='1' style={myStyleGradient} />
+       <stop offset="25%" stopColor={color} stopOpacity="1" style={myStyleGradient}/>
+       <stop offset="50%" stopColor={color === 'Gray' ? el.color : color} stopOpacity={color === 'Gray' ? 1 : 0.3} style={myStyleGradient} />
+       <stop offset="75%" stopColor={color} stopOpacity='1' style={myStyleGradient} />
      </radialGradient>
    </defs>
     const circle = <circle cx="20" cy="20" r="18" fill={`url(#${el.id}-1)`} />;
-     //const rect = <rect xPointOffset="5" y="5" width="30" height="30" fill={el.color} stroke-width="5"/>
+     //const rect = <rect xPointOffset="5" y="5" width="30" height="30" fill={el.color} strokeWidth="5"/>
       const text = `${el.name} ${el.prochent.oldValue} %`;
-      const textСrcle = <text x="40" y="25" id={`${el.id}-render`} font-size="18" style={myStylText} fill={color === 'Gray' ? 'Gray' : 'black'}>{text}</text>;
+      const textСrcle = <text x="40" y="25" id={`${el.id}-render`} fontSize="18" style={myStylText} fill={color === 'Gray' ? 'Gray' : 'black'}>{text}</text>;
       return <svg width="auto" height="40" key={el.id}>
         <g
           onClick={handleClickShowHideElement(el.id)}
@@ -207,22 +207,22 @@ useEffect(() => {
 
   const creationGraphics = () => { // Компонент обрисовывает круговой график в соответствии с данные каждого элемента.
     const result = data.map((elData: IelDate) => {
-      const defs = <defs >
+      const defs = <defs>
         <radialGradient id={elData.id} cx="50%" cy="50%" r="100%"  >
-          <stop offset="35%" stop-color={elData.color} stop-opacity="1"/>
-          <stop offset="50%"  stop-color={elData.color} stop-opacity='0.3'/>
-          <stop offset="65%" stop-color={elData.color} stop-opacity='1'/>
+          <stop offset="35%" stopColor={elData.color} stopOpacity="1"/>
+          <stop offset="50%"  stopColor={elData.color} stopOpacity='0.3'/>
+          <stop offset="65%" stopColor={elData.color} stopOpacity='1'/>
         </radialGradient>
       </defs>
       const strokeDasharray = `${elData.circle.strokeDasharray.renderingPart}, ${elData.circle.strokeDasharray.nonDrawingPart}`;
       const shadedPart  = <circle r={elData.circle.graphRadius} className={render === false ? styles.CircleStart : styles.CircleEnd} opacity={elData.visible === false ? 0 : 1}
         cx={elData.circle.cx} cy={elData.circle.cy} fill={elData.circle.fill} stroke={`url(#${elData.id})`}
-        stroke-dasharray={strokeDasharray} stroke-dashoffset={elData.circle.strokeDashoffset} stroke-width={elData.circle.strokeWidth}
+        strokeDasharray={strokeDasharray} strokeDashoffset={elData.circle.strokeDashoffset} strokeWidth={elData.circle.strokeWidth}
         onMouseOut={hendleOnMouseOut(elData.id)} 
         onMouseEnter={hendleOnMouseEnter(elData.id)}
         onClick={handleClickBiasElement(elData.id)}
       />
-      return <svg className={styles.containerGradient}>
+      return <svg className={styles.containerGradient} key={elData.id}>
         {defs}
         {shadedPart}
       </svg>
@@ -238,7 +238,7 @@ useEffect(() => {
   //     const xPointOffset = 200 * Math.cos(tiltAngle)
   //     const y = 200 * Math.sin(tiltAngle)
   //     if (el.visible === true) {
-  //       return <path d={`M${350} ${370} ${350 + xPointOffset} ${370 + y} `}  stroke='#696666' stroke-width="0.5"/>
+  //       return <path d={`M${350} ${370} ${350 + xPointOffset} ${370 + y} `}  stroke='#696666' strokeWidth="0.5"/>
   //     }
   //     return null
   //   });
@@ -292,10 +292,10 @@ useEffect(() => {
     const opacity = idTarget.visible && el.visible ? 1 : 0;
     return (<>
       <rect width={width} height="30" className={styles.Circle} x={el.circle.cx + xPointOffset - width /2} y={el.circle.cy + yPointOffset - 35}
-        fill={el.color} stroke-width='1' stroke="LightCyan" opacity={opacity} />
+        fill={el.color} strokeWidth='1' stroke="LightCyan" opacity={opacity} />
         <path d={`M${cx + xPointOffset} ${cy + yPointOffset} ${cx + xPointOffset - 10} ${cy + yPointOffset - 5} `} className={styles.Path} opacity={opacity} stroke="LightCyan"/>
         <path d={`M${cx + xPointOffset} ${cy + yPointOffset} ${cx + xPointOffset + 10} ${cy + yPointOffset - 5} `} className={styles.Path} opacity={opacity} stroke="LightCyan"/>
-        <text font-size="16" fill="LightCyan" className={styles.Text} opacity={opacity}
+        <text fontSize="16" fill="LightCyan" className={styles.Text} opacity={opacity}
           style={{transform: `translate(${cx + xPointOffset - width / 2.4}px, ${cy + yPointOffset - 15}px)`}}>
           {text}
         </text>

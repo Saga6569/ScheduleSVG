@@ -31,13 +31,13 @@ const PopUpWindow = (option: Ioption) => { // окно информации
   const width = text.length * 10;
   const cx = option.x
   const cy = option.y
-
+  const opacity = option.visit === true ? 1 : 0
   return (<>
     <rect width={width} height="30" className={styles.informationWndow} x={cx - width /2} y={cy - 35}
-      fill={option.color} stroke-width='1' stroke="LightCyan" opacity={1} />
-      <path d={`M${cx} ${cy} ${cx - 10} ${cy - 5} `} className={styles.informationWndow} opacity={1} stroke="black"/>
-      <path d={`M${cx} ${cy} ${cx + 10} ${cy - 5} `} className={styles.informationWndow} opacity={1} stroke="black"/>
-      <text font-size="16" fill="black" className={styles.informationWndow} opacity={1}
+      fill={option.color} strokeWidth='1' stroke="LightCyan" opacity={opacity}></rect>
+      <path d={`M${cx} ${cy} ${cx - 10} ${cy - 5} `} className={styles.informationWndow} opacity={opacity} stroke="black"/>
+      <path d={`M${cx} ${cy} ${cx + 10} ${cy - 5} `} className={styles.informationWndow} opacity={opacity} stroke="black"/>
+      <text fontSize="16" fill="black" className={styles.informationWndow} opacity={opacity}
         style={{transform: `translate(${cx - width / 2.4}px, ${cy - 15}px)`}}>
         {text}
       </text>
@@ -84,7 +84,7 @@ const VertillePlot = (props: IGraphProps) => {
   const [option, setOption] = useState({x: 0, y: 0 , color: '', name: '', value: 0, visit: false, count: 0});
 
   const createDataForRendering = () => {    // Функция обрисовывает пришедшие данные в график 
-    let initPointX = 90;
+    let initPointX = 95;
     const maxValueEls = roundedWholeScreenValue / chartHeight
     const result = dataSort.map((elDate: IelDate) => {
       const valueY =  elDate.value / maxValueEls;
@@ -97,12 +97,12 @@ const VertillePlot = (props: IGraphProps) => {
       onMouseEnter={() =>  { // Событие наведение курсора на элемент
         setOption({x: x, y: startPointBottomPointY - valueY, color: elDate.color, name: elDate.name, value: elDate.value, visit: true, count: dataSort.length })
       }} 
-      key={elDate.id} d={`M${initPointX} ${startPointBottomPointY} V ${startPointBottomPointY - valueY}`} fill="transparent" stroke={elDate.color} stroke-width="50"/>
+      d={`M${initPointX} ${startPointBottomPointY} V ${startPointBottomPointY - valueY}`} fill="transparent" stroke={elDate.color} strokeWidth="50"/>
 
       //const circle =  <circle cx={initPointX} cy={startPointBottomPointY - valueY} r="2" fill="red"/>
-      const textStart = <text x={initPointX - 25} y={840} font-size="14" fill="black" >{`${elDate.name}`}</text>
+      const textStart = <text key={_.uniqueId()} x={initPointX - 25} y={840} fontSize="14" fill="black" >{`${elDate.name}`}</text>
     
-      const result = (<svg 
+      const result = (<svg  key={elDate.id}
         className={option.name === '' ? styles.containerGradient : ''}>
           {textStart}
           {graphLine}
@@ -119,7 +119,7 @@ const VertillePlot = (props: IGraphProps) => {
     let initPointX = 45;
     const result = [];
       for(let i = 0; i <= dataSort.length - 1; i++) {
-        result[i] =  <path d={`M${initPointX} ${LengthVerticalLines} V ${25}Z`}  stroke='#696666' stroke-width="0.5"/>
+        result[i] =  <path key={_.uniqueId()} d={`M${initPointX} ${LengthVerticalLines} V ${25}Z`}  stroke='#696666' strokeWidth="0.5"/>
         initPointX += verticalLineSpacing
       };
     return result;
@@ -130,10 +130,10 @@ const VertillePlot = (props: IGraphProps) => {
     let initPointY = 0;
     let acc = 0;
       for(let i = 0; i <= numberHorizontalLines ; i++) {
-        const companent = <>
-          <text x={i === 0 ? 35 : 15} y={chartHeight + 28 - initPointY} font-size="10" fill="black" >{`${acc.toFixed()}`}</text> 
-           <path d={`M${chartWidth + 45} ${chartHeight + 25 - initPointY} H ${45}Z`} fill="transparent" stroke='#696666' stroke-width="0.5"/>
-        </>
+        const companent = <g key={_.uniqueId()}>
+          <text  x={i === 0 ? 35 : 10} y={chartHeight + 28 - initPointY} fontSize="12" fill="black" >{`${acc.toFixed()}`}</text> 
+          <path d={`M${chartWidth + 45} ${chartHeight + 25 - initPointY} H ${45}Z`} fill="transparent" stroke='#696666' strokeWidth="0.5"/>
+        </g>
         result[i] =  companent;
         initPointY += 80;
         acc += horizontalLineInterval;
@@ -145,10 +145,10 @@ const VertillePlot = (props: IGraphProps) => {
     <div className={styles.container} >
       <svg width={chartWidth + 80} height={chartHeight + 50} xmlns="http://www.w3.org/2000/svg" >
         <rect x="45" y="25" width={chartWidth}  height={chartHeight} fill="#E0FFFF"/>
-        {PopUpWindow(option)}
         {creatingHorizontalGrid()}
         {creatingVerticalGrid()}
         {createDataForRendering()}
+        {PopUpWindow(option)}
       </svg>
     </div>
   );
@@ -164,7 +164,7 @@ const VertillePlot = (props: IGraphProps) => {
     </button>
     <button style={{left: '680px', position: 'absolute'}} 
     onClick={() => {
-      exportComponentAsPDF(componentRef,  {pdfOptions: {w: 750, h: 200, y: 5}})
+      exportComponentAsPDF(componentRef,  {pdfOptions: {w: 540, h: 200, y: 2}})
     }}>
       Export As PDF
     </button>

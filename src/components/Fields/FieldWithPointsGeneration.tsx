@@ -24,7 +24,7 @@ export class FieldWithPointsGeneration extends React.Component<any, IFieldWithPo
     const key = this.state.nextPointElementKey;
     const pointsList = [...this.state.pointsList, { x, y }];
     const pointElements = pointsList.map((el: { x: number, y: number, key: number}) => (
-      <circle id="point" key={ el.key} cx={ el.x } cy={ el.y } r="3" fill="#ff0000"/>
+      <circle id="point" key={el.key} cx={el.x} cy={el.y} r="3" fill="#ff0000"/>
     ));
     console.log(this.state)
     this.setState({
@@ -48,11 +48,10 @@ export class FieldWithPointsGeneration extends React.Component<any, IFieldWithPo
       
       const number = el.split(' ');
       const text = Math.abs(Number(number[1]) - 150) / 10
-      return (<>
+      return (<g key={el.toString()}>
       <circle cx={number[0]} cy={number[1]} r="5" fill="green" />
-  
-      <text x={number[0]} y={number[1]} font-size="12" text-anchor="middle" fill="white">{text}</text>
-      </>)
+      <text x={number[0]} y={number[1]} fontSize="12" textAnchor="middle" fill="white">{text}</text>
+      </g>)
     })
     
     return (<>{path}{circle}</>
