@@ -28,7 +28,7 @@ interface IelDate {
   prochent: {oldValue: number, newValue: number};
   bias: boolean,
   circle: {
-    graphRadius: number, cx: number, cy: number, fill: string, stroke: string, 
+    graphRadius: number, cx: number, cy: number, fill: string, stroke: string,
     strokeDasharray: {renderingPart: number, nonDrawingPart: number},
     strokeWidth: number, strokeDashoffset: number;
   };
@@ -167,16 +167,16 @@ const GraphCircle = (props: IGraphProps) =>  {
   const TableDate = () => { // Компонент выводит таблицу информации по каждому элементу.
     const infoData = data.map((el: IelDate) => {
     const myStylText: any = { 'transition-property': 'fill', 'transition-duration': '0.5s' };
-    const myStyleGradient: any = { 'transition-property': 'stop-color', 'transition-duration': '0.5s' };
+    const myStyleGradient: any = { 'transition-property': 'stop-color', 'transition-duration': '1s' };
     const color = el.visible === false ? 'Gray' : el.color;
      const defs = <defs>
      <radialGradient id={`${el.id}-1`} cx="50%" cy="50%">
        <stop offset="25%" stop-color={color} stop-opacity="1" style={myStyleGradient}/>
-       <stop offset="50%" stop-color={color} stop-opacity='0.4' style={myStyleGradient} />
+       <stop offset="50%" stop-color={color === 'Gray' ? el.color : color} stop-opacity={color === 'Gray' ? 1 : 0.3} style={myStyleGradient} />
        <stop offset="75%" stop-color={color} stop-opacity='1' style={myStyleGradient} />
      </radialGradient>
    </defs>
-    const circle = <circle cx="20" cy="20" r="15" fill={`url(#${el.id}-1)`} />;
+    const circle = <circle cx="20" cy="20" r="18" fill={`url(#${el.id}-1)`} />;
      //const rect = <rect xPointOffset="5" y="5" width="30" height="30" fill={el.color} stroke-width="5"/>
       const text = `${el.name} ${el.prochent.oldValue} %`;
       const textСrcle = <text x="40" y="25" id={`${el.id}-render`} font-size="18" style={myStylText} fill={color === 'Gray' ? 'Gray' : 'black'}>{text}</text>;
@@ -196,16 +196,16 @@ const GraphCircle = (props: IGraphProps) =>  {
   };
 
 useEffect(() => {
-  upTableDate()
+  upTableDate();
 }, [data])
 
 useEffect(() => {
   setTimeout(() => {
     setRender(true)
-  }, 1000)
+  }, 1000);
  }, [])
 
-  const creationGraphics = () => { // Компонент обрисовывает круговой график в соответствии с данные каждого элемента.  не знаю как лучше ...
+  const creationGraphics = () => { // Компонент обрисовывает круговой график в соответствии с данные каждого элемента.
     const result = data.map((elData: IelDate) => {
       const defs = <defs >
         <radialGradient id={elData.id} cx="50%" cy="50%" r="100%"  >
@@ -278,7 +278,7 @@ useEffect(() => {
   };
 
   const popUpWindow = () => { // окно информации
-    const el = data.filter((el) => el.id === idTarget.id)[0];
+    const el = data.filter((el: IelDate) => el.id === idTarget.id)[0];
     const renderingPart = el.circle.strokeDasharray.renderingPart;
     const strokeDashoffset = el.circle.strokeDashoffset;
     const pxTograd = el.circle.strokeDasharray.nonDrawingPart / 360;
