@@ -3,7 +3,6 @@ import styles from './VertillePlot.module.css';
 import _  from 'lodash'
 import { exportComponentAsJPEG, exportComponentAsPDF, exportComponentAsPNG } from 'react-component-export-image';
 
-
 interface Ioption {
   x: number; 
   y: number; 
@@ -61,6 +60,20 @@ const VertillePlot = (props: IGraphProps) => {
     return newData;
   };
 
+  const [mune, setMenu] = useState({visible: false, x: NaN, y: NaN})
+
+
+  const showHideMenu = (e: { preventDefault: () => void; clientY: number; clientX: number; }) => {
+    e.preventDefault();
+    setMenu({visible: true, x: e.clientX, y: e.clientY})
+  }
+
+  const ContextMenu = () => {
+    const component = <rect width='150'  className={styles.Context}  height="80" x={mune.x} y={mune.y} fill={'red'} strokeWidth='1'
+      stroke="LightCyan" opacity={mune.visible === true ? 1 : 0}></rect>
+    return component
+  }
+
   const dataSort = upDate().sort().sort((a, b) => b.value - a.value);
 
   const lengthHorizontalLines = props.values.length * 100; // Длинна горизонтальных линий'
@@ -69,18 +82,11 @@ const VertillePlot = (props: IGraphProps) => {
   const chartHeight = 800;  // высота графика
   const chartWidth = lengthHorizontalLines; // Ширина графика 
   const startPointBottomPointY = chartHeight + 25; // Начало графика по Y
-
   const wholeScreenValue = Math.round(chartHeight * dataSort[0].value / chartHeight - 40);  // Получаем значение 800 px  максимальное значение в данных всегда будет 760 px
-  
-
   const roundedAverage = '0'.repeat(String(wholeScreenValue).length - 1); // Получаем количество нулей для округления среднего значения
-
   const horizontalLineInterval  = Math.ceil(wholeScreenValue / numberHorizontalLines / Number(`1${roundedAverage}`)) * Number(`1${roundedAverage}`); // Получаем шаг интервальных линий
-
   const roundedWholeScreenValue = horizontalLineInterval * numberHorizontalLines; // Округленное значение 400 px 
-
   const verticalLineSpacing = 100; // шаг вертикальных линиий 
-
   const [option, setOption] = useState({x: 0, y: 0 , color: '', name: '', value: 0, visit: false, count: 0});
 
   const createDataForRendering = () => {    // Функция обрисовывает пришедшие данные в график 
@@ -144,11 +150,12 @@ const VertillePlot = (props: IGraphProps) => {
   const ResComp = (
     <div className={styles.container} >
       <svg width={chartWidth + 80} height={chartHeight + 50} xmlns="http://www.w3.org/2000/svg" >
-        <rect x="45" y="25" width={chartWidth}  height={chartHeight} fill="#E0FFFF"/>
+        <rect x="45" y="25" width={chartWidth}  height={chartHeight} fill="#E0FFFF" onClick={() => setMenu({...mune ,visible: false})} onContextMenu={showHideMenu}/>
         {creatingHorizontalGrid()}
         {creatingVerticalGrid()}
         {createDataForRendering()}
         {PopUpWindow(option)}
+        {ContextMenu()}
       </svg>
     </div>
   );

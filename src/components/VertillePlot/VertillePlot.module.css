@@ -8,21 +8,9 @@
   background-color: #c0c0fa
 }
 
-.containerPDF {
-  transform-origin: 217px 231px;
-  transform: rotate(90deg);
-  margin: 20px;
-  display: flex;
-  width: max-content;
-  height: max-content;
-  justify-content: center;
-  align-items: center;
-  background-color: #c0c0fa
-}
-
 .containerGradient > path {
   stroke-dasharray: 1000;
-  animation: dash 5s linear;
+  animation: dash 2s linear;
   animation-fill-mode: forwards;
 }
 
@@ -38,5 +26,9 @@
 
 .informationWndow {
   position: relative;
+  transition: 0.5s;  
+}
+
+.Context {
   transition: 0.5s;  
 }
