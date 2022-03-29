@@ -70,10 +70,8 @@ const GraphCircle = (props: IGraphProps) =>  {
     return newData;
   };
 
-
   const [data, setData] = useState(upDate());
   const [idTarget, setIdTarget] = useState({id : data[0].id, visible: false});
-
 
   const handleClickShowHideElement = (id: string) => () => { // Убирает элемент из круговой диаграммы и наоборот 
   const newData = data.map((elData: any) => {
@@ -167,7 +165,7 @@ const GraphCircle = (props: IGraphProps) =>  {
   const TableDate = () => { // Компонент выводит таблицу информации по каждому элементу.
     const infoData = data.map((el: IelDate) => {
     const myStylText: any = { 'transitionProperty': 'fill', 'transitionDuration': '0.5s' };
-    const myStyleGradient: any = { 'transitionProperty': 'stopColor', 'transitionDuration': '1s' };
+    const myStyleGradient: any = { 'transitionProperty': 'stop-color', 'transitionDuration': '1s' };
     const color = el.visible === false ? 'Gray' : el.color;
      const defs = <defs>
      <radialGradient id={`${el.id}-1`} cx="50%" cy="50%">
@@ -196,7 +194,7 @@ const GraphCircle = (props: IGraphProps) =>  {
   };
 
 useEffect(() => {
-  upTableDate();
+  setTimeout(upTableDate, 0)
 }, [data])
 
 useEffect(() => {
@@ -240,7 +238,7 @@ useEffect(() => {
   //     if (el.visible === true) {
   //       return <path d={`M${350} ${370} ${350 + xPointOffset} ${370 + y} `}  stroke='#696666' strokeWidth="0.5"/>
   //     }
-  //     return null
+  //     return null;
   //   });
   //   return cen;
   // }
@@ -276,7 +274,7 @@ useEffect(() => {
     });
     setData(newDa);
   };
-
+ 
   const popUpWindow = () => { // окно информации
     const el = data.filter((el: IelDate) => el.id === idTarget.id)[0];
     const renderingPart = el.circle.strokeDasharray.renderingPart;
