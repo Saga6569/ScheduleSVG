@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import styles from './VertillePlot.module.css';
 import _  from 'lodash'
 import { exportComponentAsJPEG, exportComponentAsPDF, exportComponentAsPNG } from 'react-component-export-image';
@@ -23,6 +23,116 @@ interface IelDate {
   name: string; 
   color: string
 };
+
+const initCirkle = {name: 'circle', r: 25, fill: '#7FFFD4', stroke: '#000000', strokeWidth: 5}
+
+const MenuComp = (props: any, setProps: any) => {
+  
+  const state = props.length === 0 ? false : props.every((el: any) => el.target === true)
+
+  const formAddComent = () => {
+    const targetCompanent = props.filter((el: any) => el.target)[0];
+    if (targetCompanent.r === undefined) {
+      const newProps = props.map((el: any) => {
+        if (el.id === targetCompanent.id) {
+          const newEL = {...el, ...initCirkle};
+          console.log(newEL)
+          return newEL;
+        };
+        return el;
+      })
+      setProps(newProps)
+    }
+
+    const form = (<>
+   
+      <div className={styles.FormS}>
+      <tr>
+      <label>Radius</label>
+      <input name="r" value={targetCompanent.r} type="number"
+      onChange={(e) => {
+        const newProps = props.map((el: any) => {
+          if (el.id === targetCompanent.id) {
+           el.r =  Number(e.target.value)
+            return el;
+          };
+          return el;
+        })
+        setProps(newProps)
+      }} 
+     />
+      </tr>
+      <tr>
+      <label>fill</label>
+      <input name="fill" value={targetCompanent.fill} type="color"  
+        onChange={(e) => {
+          const newProps = props.map((el: any) => {
+            if (el.id === targetCompanent.id) {
+             el.fill =  e.target.value
+              return el;
+            };
+            return el;
+          })
+          setProps(newProps)
+        }} 
+      />
+      </tr>
+      <tr>
+      <label>strokeWidth</label>
+      <input name="strokeWidth" value={targetCompanent.strokeWidth} type="number" 
+        onChange={(e) => {
+          const newProps = props.map((el: any) => {
+            if (el.id === targetCompanent.id) {
+              el.strokeWidth =  Number(e.target.value)
+              return el;
+            };
+            return el;
+        })
+        setProps(newProps)
+      }} 
+      />
+      </tr>
+      <tr>
+      <label>stroke</label>
+      <input name="stroke" type="color" value={targetCompanent.stroke} 
+        onChange={(e) => {
+          const newProps = props.map((el: any) => {
+            if (el.id === targetCompanent.id) {
+              el.stroke =  e.target.value
+              return el;
+            };
+          return el;
+        })
+      setProps(newProps)
+    }} 
+      />
+      </tr>
+    </div>
+    </>
+    );
+    return form;
+  }
+
+  const onClickCloseMenu = () => {
+    const newProps = props.filter((el: any) => el.target !== true);
+    setProps(newProps)
+  }
+
+    const openMenu  = (<div style={{width: '250'}}  >
+     {state === false ? null : formAddComent()}
+     <div className={styles.ButtonMenu}>
+     {state === false ? null :  <button onClick={onClickCloseMenu} >{'Закрыть'}</button>}
+    </div>
+  </div>)
+
+
+  return (<>
+    {openMenu}
+  </>
+  )
+};
+
+
 
 const PopUpWindow = (option: Ioption) => { // окно информации
 
@@ -60,20 +170,6 @@ const VertillePlot = (props: IGraphProps) => {
     return newData;
   };
 
-  const [mune, setMenu] = useState({visible: false, x: NaN, y: NaN})
-
-
-  const showHideMenu = (e: { preventDefault: () => void; clientY: number; clientX: number; }) => {
-    e.preventDefault();
-    setMenu({visible: true, x: e.clientX, y: e.clientY})
-  }
-
-  const ContextMenu = () => {
-    const component = <rect width='150'  className={styles.Context}  height="80" x={mune.x} y={mune.y} fill={'red'} strokeWidth='1'
-      stroke="LightCyan" opacity={mune.visible === true ? 1 : 0}></rect>
-    return component
-  }
-
   const dataSort = upDate().sort().sort((a, b) => b.value - a.value);
 
   const lengthHorizontalLines = props.values.length * 100; // Длинна горизонтальных линий'
@@ -88,6 +184,47 @@ const VertillePlot = (props: IGraphProps) => {
   const roundedWholeScreenValue = horizontalLineInterval * numberHorizontalLines; // Округленное значение 400 px 
   const verticalLineSpacing = 100; // шаг вертикальных линиий 
   const [option, setOption] = useState({x: 0, y: 0 , color: '', name: '', value: 0, visit: false, count: 0});
+
+  const initComent: any = []
+
+  const [coment, setComent] = useState(initComent)
+
+
+//////
+
+  const renderComent = () => {
+    if (coment.length === 0) {
+      return null;
+    }
+
+    return (<>
+      {coment.map((el: any) => {
+        return React.createElement(
+          `${el.name}`,
+          {...el},
+        )
+      })}
+       </>);
+  };
+
+  const hendleonDoubleClick = () => (e: { preventDefault: () => void; clientY: number; clientX: number; }) => {
+    const cx = e.clientX
+    const cy = e.clientY
+    const newComent : any = {visible: true, target: true, id: _.uniqueId(), cx, cy}
+    //console.log(newComent);
+
+    if (coment.every((el: any) => el.target === true) && coment.length !== 0) {
+      console.log('закончети создание коментария  для создания нового')
+      return;
+    }
+    setComent([...coment, newComent]);
+    return;
+  }
+
+//////
+
+
+
 
   const createDataForRendering = () => {    // Функция обрисовывает пришедшие данные в график 
     let initPointX = 95;
@@ -105,14 +242,11 @@ const VertillePlot = (props: IGraphProps) => {
       }} 
       d={`M${initPointX} ${startPointBottomPointY} V ${startPointBottomPointY - valueY}`} fill="transparent" stroke={elDate.color} strokeWidth="50"/>
 
-      //const circle =  <circle cx={initPointX} cy={startPointBottomPointY - valueY} r="2" fill="red"/>
       const textStart = <text key={_.uniqueId()} x={initPointX - 25} y={840} fontSize="14" fill="black" >{`${elDate.name}`}</text>
-    
       const result = (<svg  key={elDate.id}
         className={option.name === '' ? styles.containerGradient : ''}>
           {textStart}
           {graphLine}
-          {/* {circle} */}
       </svg>)
       initPointX += verticalLineSpacing;
       return result;
@@ -147,19 +281,22 @@ const VertillePlot = (props: IGraphProps) => {
     return result;
   };
 
+
+  
+
   const ResComp = (
     <div className={styles.container} >
-      <svg width={chartWidth + 80} height={chartHeight + 50} xmlns="http://www.w3.org/2000/svg" >
-        <rect x="45" y="25" width={chartWidth}  height={chartHeight} fill="#E0FFFF" onClick={() => setMenu({...mune ,visible: false})} onContextMenu={showHideMenu}/>
+      <svg width={chartWidth + 80} height={chartHeight + 50} xmlns="http://www.w3.org/2000/svg" onDoubleClick={hendleonDoubleClick()}>
+        <rect x="45" y="25" width={chartWidth}  height={chartHeight} fill="#E0FFFF"/>
         {creatingHorizontalGrid()}
         {creatingVerticalGrid()}
         {createDataForRendering()}
         {PopUpWindow(option)}
-        {ContextMenu()}
+        {renderComent()}
       </svg>
+     {MenuComp(coment, setComent)}
     </div>
   );
-
   const componentRef = useRef<HTMLDivElement | null>(null)
  
   return (<>

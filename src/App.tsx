@@ -36,11 +36,11 @@ const App = () => {
 
   return ( 
     <div className="App">
-      <FieldWithMoveablePoint/>
+      {/* <FieldWithMoveablePoint/>
       <FieldWithPointsGeneration/>
       <Graph values={ [6, 7, 8 ,9, 10, 8, 6, 4, 3] }/>
       <Graph2 values={ data }/>
-      <GraphCircle values={res} options={param} />
+      <GraphCircle values={res} options={param} /> */}
       <VertillePlot values={ res2 }/>
     </div>
   );

@@ -178,7 +178,7 @@ const GraphCircle = (props: IGraphProps) =>  {
      //const rect = <rect xPointOffset="5" y="5" width="30" height="30" fill={el.color} strokeWidth="5"/>
       const text = `${el.name} ${el.prochent.oldValue} %`;
       const textСrcle = <text x="40" y="25" id={`${el.id}-render`} fontSize="18" style={myStylText} fill={color === 'Gray' ? 'Gray' : 'black'}>{text}</text>;
-      return <svg width="auto" height="40" key={el.id}>
+      return <svg width='235' height="40" key={el.id}>
         <g
           onClick={handleClickShowHideElement(el.id)}
           onMouseOut={hendleOnMouseOut(el.id)}
