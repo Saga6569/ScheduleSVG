@@ -3,9 +3,9 @@ import Rect from './Components/Rect'
 import Ellipse from './Components/Ellipse';
 import styles from './VertillePlot.module.css';
 
-const circleInit = {name: 'circle', r: 25, fill: '#7FFFD4', stroke: '#000000', strokeWidth: 5};
-const rectInit = {name: 'rect', width: 100, height: 150, fill: '#7FFFD4', strokeWidth: 5 };
-const ellipseInit = {name: 'ellipse', rx: 100, ry: 50, fill: '#7FFFD4', stroke: '#000000', strokeWidth: 5};
+const circleInit = {name: 'circle', r: 25, fill: '#7FFFD4', stroke: '#000000', strokeWidth: 5, comment: '1'};
+const rectInit = {name: 'rect', width: 100, height: 150, fill: '#7FFFD4', strokeWidth: 5, comment: '1' };
+const ellipseInit = {name: 'ellipse', rx: 100, ry: 50, fill: '#7FFFD4', stroke: '#000000', strokeWidth: 5, comment: '1'};
 
 const maping: any = {
   circle: Cirkle,
@@ -50,18 +50,6 @@ const AddComent = (props: any, setProps: Function) => {
         }} >ellipse</button>
       </div>)
     };
-    
-    // if (!targetCompanent.hasOwnProperty('r')) {
-    //   const newProps = props.map((el: any) => {
-    //     if (el.id === targetCompanent.id) {
-    //       const newEL = {...el, ...map[el.name]};
-    //       console.log(newEL)
-    //       return newEL;
-    //     };
-    //     return el;
-    //   })
-    //   setProps(newProps)
-    // };
 
     return (<div style={{width: '250'}}  >
       {maping[targetCompanent.name](props, setProps)}

@@ -4,14 +4,14 @@ import _  from 'lodash'
 import { exportComponentAsJPEG, exportComponentAsPDF, exportComponentAsPNG } from 'react-component-export-image';
 import AddComent from './AddComent'
 
-interface Ioption {
+interface IoptionInformGraf {
   x: number; 
   y: number; 
-  color: string, 
+  color?: string, 
   name: string, 
-  value: number, 
+  value?: number, 
   visit: boolean,
-  count: number,
+  count?: number,
 };
 
 interface IGraphProps {
@@ -25,7 +25,26 @@ interface IelDate {
   color: string
 };
 
-const PopUpWindow = (option: Ioption) => { // окно информации
+const PopUpWindow = (option: IoptionInformGraf | any) => { // окно информации
+  
+  if (option.hasOwnProperty('comment')) {
+    const cx = option.x
+    const cy = option.y
+    const width = option.comment.length * 10;
+    const opacity = option.visible === true ? 1 : 0;
+    console.log(option.visible)
+    return (<>
+      <rect width={width} height="30" className={styles.informationWndow} x={cx - width /2} y={cy}
+        fill={option.fill} strokeWidth='1' stroke="LightCyan" opacity={opacity}></rect>
+        <path d={`M${cx } ${cy} ${cx} ${cy} `} className={styles.informationWndow} opacity={opacity} stroke="black"/>
+        <path d={`M${cx} ${cy} ${cx} ${cy} `} className={styles.informationWndow} opacity={opacity} stroke="black"/>
+        <text fontSize="16" fill="black" className={styles.informationWndow} opacity={opacity}
+          style={{transform: `translate(${cx - width / 2.4}px, ${cy}px)`}}>
+          {option.comment}
+        </text>
+      </>
+    );
+  }
 
   const text = `${option.name} ${option.value}`;
   const width = text.length * 10;
@@ -73,7 +92,8 @@ const VertillePlot = (props: IGraphProps) => {
   const roundedAverage = '0'.repeat(String(wholeScreenValue).length - 1); // Получаем количество нулей для округления среднего значения
   const horizontalLineInterval  = Math.ceil(wholeScreenValue / numberHorizontalLines / Number(`1${roundedAverage}`)) * Number(`1${roundedAverage}`); // Получаем шаг интервальных линий
   const roundedWholeScreenValue = horizontalLineInterval * numberHorizontalLines; // Округленное значение 400 px 
-  const verticalLineSpacing = 100; // шаг вертикальных линиий 
+  const verticalLineSpacing = 100; // шаг вертикальных линиий
+  
   const [option, setOption] = useState({x: 0, y: 0 , color: '', name: '', value: 0, visit: false, count: 0});
 
   const initComent: any = []
@@ -93,7 +113,21 @@ const VertillePlot = (props: IGraphProps) => {
         }
         return React.createElement(
           `${el.name}`,
-          {...el},
+          {...el, 
+            onClick: () => console.log('clicked'),
+
+            onMouseEnter: () =>  {
+              const newOption = {...el, visible: true};
+              newOption.visible = true;
+              console.log(newOption, 'навел')
+              setOption(newOption)
+            },
+            onMouseOut: () =>  {
+              const newOption = {...el, visible: false};
+              console.log(newOption, 'убрал')
+              setOption(newOption)
+            }
+        },
         )
       })}
        </>);
@@ -106,7 +140,7 @@ const VertillePlot = (props: IGraphProps) => {
     const cy = e.clientY
     const x = e.clientX;
     const y = e.clientY;
-    const newComent : any = {visible: 1, target: true, id: _.uniqueId(), cx, cy, x, y, name: null}
+    const newComent : any = {visible: false, target: true, id: _.uniqueId(), cx, cy, x, y, name: null}
     console.log(coment)
     
     if (coment.every((el: any) => el.target === true) && coment.length !== 0) {

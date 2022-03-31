@@ -66,6 +66,29 @@ const Cirkle = (props: any, setProps: any) => {
     }} 
       />
       </tr>
+      <tr>
+        <label>Комментарий</label>
+        <textarea name="comment" cols={40} rows={3} value={targetCompanent.comment} onChange={(e) => {
+          const newProps = props.map((el: any) => {
+            if (el.id === targetCompanent.id) {
+              el.comment =  e.target.value
+              return el;
+            };
+          return el;
+        })
+        setProps(newProps)
+        }}></textarea>
+        <input type="reset"  value="Очистить" onClick={() => {
+          const newProps = props.map((el: any) => {
+            if (el.id === targetCompanent.id) {
+              el.comment = ''
+              return el;
+            };
+          return el;
+        })
+        setProps(newProps)
+        }} />
+      </tr>
     </div>
     </>
     );
