@@ -1,7 +1,8 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef  } from 'react';
 import styles from './VertillePlot.module.css';
 import _  from 'lodash'
 import { exportComponentAsJPEG, exportComponentAsPDF, exportComponentAsPNG } from 'react-component-export-image';
+import AddComent from './AddComent'
 
 interface Ioption {
   x: number; 
@@ -23,116 +24,6 @@ interface IelDate {
   name: string; 
   color: string
 };
-
-const initCirkle = {name: 'circle', r: 25, fill: '#7FFFD4', stroke: '#000000', strokeWidth: 5}
-
-const MenuComp = (props: any, setProps: any) => {
-  
-  const state = props.length === 0 ? false : props.every((el: any) => el.target === true)
-
-  const formAddComent = () => {
-    const targetCompanent = props.filter((el: any) => el.target)[0];
-    if (targetCompanent.r === undefined) {
-      const newProps = props.map((el: any) => {
-        if (el.id === targetCompanent.id) {
-          const newEL = {...el, ...initCirkle};
-          console.log(newEL)
-          return newEL;
-        };
-        return el;
-      })
-      setProps(newProps)
-    }
-
-    const form = (<>
-   
-      <div className={styles.FormS}>
-      <tr>
-      <label>Radius</label>
-      <input name="r" value={targetCompanent.r} type="number"
-      onChange={(e) => {
-        const newProps = props.map((el: any) => {
-          if (el.id === targetCompanent.id) {
-           el.r =  Number(e.target.value)
-            return el;
-          };
-          return el;
-        })
-        setProps(newProps)
-      }} 
-     />
-      </tr>
-      <tr>
-      <label>fill</label>
-      <input name="fill" value={targetCompanent.fill} type="color"  
-        onChange={(e) => {
-          const newProps = props.map((el: any) => {
-            if (el.id === targetCompanent.id) {
-             el.fill =  e.target.value
-              return el;
-            };
-            return el;
-          })
-          setProps(newProps)
-        }} 
-      />
-      </tr>
-      <tr>
-      <label>strokeWidth</label>
-      <input name="strokeWidth" value={targetCompanent.strokeWidth} type="number" 
-        onChange={(e) => {
-          const newProps = props.map((el: any) => {
-            if (el.id === targetCompanent.id) {
-              el.strokeWidth =  Number(e.target.value)
-              return el;
-            };
-            return el;
-        })
-        setProps(newProps)
-      }} 
-      />
-      </tr>
-      <tr>
-      <label>stroke</label>
-      <input name="stroke" type="color" value={targetCompanent.stroke} 
-        onChange={(e) => {
-          const newProps = props.map((el: any) => {
-            if (el.id === targetCompanent.id) {
-              el.stroke =  e.target.value
-              return el;
-            };
-          return el;
-        })
-      setProps(newProps)
-    }} 
-      />
-      </tr>
-    </div>
-    </>
-    );
-    return form;
-  }
-
-  const onClickCloseMenu = () => {
-    const newProps = props.filter((el: any) => el.target !== true);
-    setProps(newProps)
-  }
-
-    const openMenu  = (<div style={{width: '250'}}  >
-     {state === false ? null : formAddComent()}
-     <div className={styles.ButtonMenu}>
-     {state === false ? null :  <button onClick={onClickCloseMenu} >{'Закрыть'}</button>}
-    </div>
-  </div>)
-
-
-  return (<>
-    {openMenu}
-  </>
-  )
-};
-
-
 
 const PopUpWindow = (option: Ioption) => { // окно информации
 
@@ -189,9 +80,7 @@ const VertillePlot = (props: IGraphProps) => {
 
   const [coment, setComent] = useState(initComent)
 
-
-//////
-
+  ///////////////////////////////
   const renderComent = () => {
     if (coment.length === 0) {
       return null;
@@ -199,32 +88,37 @@ const VertillePlot = (props: IGraphProps) => {
 
     return (<>
       {coment.map((el: any) => {
+        if (el.name === null) {
+          return null
+        }
         return React.createElement(
           `${el.name}`,
           {...el},
         )
       })}
        </>);
-  };
 
+      
+  };
+/////////////////////////////////////////
   const hendleonDoubleClick = () => (e: { preventDefault: () => void; clientY: number; clientX: number; }) => {
     const cx = e.clientX
     const cy = e.clientY
-    const newComent : any = {visible: true, target: true, id: _.uniqueId(), cx, cy}
-    //console.log(newComent);
-
+    const x = e.clientX;
+    const y = e.clientY;
+    const newComent : any = {visible: 1, target: true, id: _.uniqueId(), cx, cy, x, y, name: null}
+    console.log(coment)
+    
     if (coment.every((el: any) => el.target === true) && coment.length !== 0) {
       console.log('закончети создание коментария  для создания нового')
       return;
     }
+
     setComent([...coment, newComent]);
     return;
   }
 
 //////
-
-
-
 
   const createDataForRendering = () => {    // Функция обрисовывает пришедшие данные в график 
     let initPointX = 95;
@@ -281,9 +175,6 @@ const VertillePlot = (props: IGraphProps) => {
     return result;
   };
 
-
-  
-
   const ResComp = (
     <div className={styles.container} >
       <svg width={chartWidth + 80} height={chartHeight + 50} xmlns="http://www.w3.org/2000/svg" onDoubleClick={hendleonDoubleClick()}>
@@ -294,9 +185,10 @@ const VertillePlot = (props: IGraphProps) => {
         {PopUpWindow(option)}
         {renderComent()}
       </svg>
-     {MenuComp(coment, setComent)}
+    {AddComent(coment, setComent)}
     </div>
   );
+
   const componentRef = useRef<HTMLDivElement | null>(null)
  
   return (<>
