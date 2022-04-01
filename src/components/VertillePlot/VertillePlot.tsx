@@ -1,8 +1,9 @@
-import React, { useState, useRef  } from 'react';
+import React, { useState, useRef, useEffect  } from 'react';
 import styles from './VertillePlot.module.css';
 import _  from 'lodash'
 import { exportComponentAsJPEG, exportComponentAsPDF, exportComponentAsPNG } from 'react-component-export-image';
 import AddComent from './AddComent'
+//import { LocalKey, LocalStorage } from "ts-localstorage";
 
 interface IoptionInformGraf {
   x: number; 
@@ -27,20 +28,21 @@ interface IelDate {
 
 const PopUpWindow = (option: IoptionInformGraf | any) => { // окно информации
   
-  if (option.hasOwnProperty('comment')) {
-    const cx = option.x
-    const cy = option.y
-    const width = option.comment.length * 10;
+  if (option.name === 'circle') {
+    const stateComp = option[option.name]
+    const cx = stateComp.cx
+    const cy = stateComp.cy
+    const width = stateComp.comment.length * 10;
     const opacity = option.visible === true ? 1 : 0;
-    console.log(option.visible)
+    const height = 30
     return (<>
-      <rect width={width} height="30" className={styles.informationWndow} x={cx - width /2} y={cy}
-        fill={option.fill} strokeWidth='1' stroke="LightCyan" opacity={opacity}></rect>
-        <path d={`M${cx } ${cy} ${cx} ${cy} `} className={styles.informationWndow} opacity={opacity} stroke="black"/>
-        <path d={`M${cx} ${cy} ${cx} ${cy} `} className={styles.informationWndow} opacity={opacity} stroke="black"/>
+      <rect width={width} height={height} className={styles.informationWndow} x={cx - width /2} y={cy - stateComp.r - height - 5 - stateComp.strokeWidth/2}
+        fill={stateComp.fill} strokeWidth='1' stroke="LightCyan" opacity={opacity}></rect>
+      <path d={`M${cx} ${cy - stateComp.r - stateComp.strokeWidth/2 } ${cx - 10} ${cy - stateComp.r - 5 - stateComp.strokeWidth/2} `} className={styles.informationWndow} opacity={opacity} stroke="black"/>
+      <path d={`M${cx} ${cy - stateComp.r - stateComp.strokeWidth/2} ${cx + 10} ${cy - stateComp.r - 5 - stateComp.strokeWidth/2 } `} className={styles.informationWndow} opacity={opacity} stroke="black"/>
         <text fontSize="16" fill="black" className={styles.informationWndow} opacity={opacity}
-          style={{transform: `translate(${cx - width / 2.4}px, ${cy}px)`}}>
-          {option.comment}
+          style={{transform: `translate(${cx - width / 2.4}px, ${cy - stateComp.r -  height/2  - stateComp.strokeWidth/2}px)`}}>
+          {stateComp.comment}
         </text>
       </>
     );
@@ -79,9 +81,7 @@ const VertillePlot = (props: IGraphProps) => {
       };
     return newData;
   };
-
   const dataSort = upDate().sort().sort((a, b) => b.value - a.value);
-
   const lengthHorizontalLines = props.values.length * 100; // Длинна горизонтальных линий'
 
   const numberHorizontalLines = 10; //  Значение на которое будет делиться область графика
@@ -96,62 +96,70 @@ const VertillePlot = (props: IGraphProps) => {
   
   const [option, setOption] = useState({x: 0, y: 0 , color: '', name: '', value: 0, visit: false, count: 0});
 
-  const initComent: any = []
+  const initComent: any = [];
 
-  const [coment, setComent] = useState(initComent)
+  const [coments, setComent] = useState(initComent)
 
   ///////////////////////////////
   const renderComent = () => {
-    if (coment.length === 0) {
+    if (coments.length === 0) {
       return null;
     }
 
     return (<>
-      {coment.map((el: any) => {
+      {coments.map((el: any) => {
         if (el.name === null) {
           return null
         }
         return React.createElement(
           `${el.name}`,
-          {...el, 
-            onClick: () => console.log('clicked'),
-
+          {...el[el.name], 
             onMouseEnter: () =>  {
               const newOption = {...el, visible: true};
-              newOption.visible = true;
-              console.log(newOption, 'навел')
-              setOption(newOption)
+              setOption(newOption);
             },
             onMouseOut: () =>  {
               const newOption = {...el, visible: false};
-              console.log(newOption, 'убрал')
-              setOption(newOption)
+              setOption(newOption);
+            },
+            onDoubleClick: (e: { stopPropagation: () => void; }) => {
+              e.stopPropagation();
+              const newComents = coments.map((coment: any) => {
+                if (coment.id === el.id) {
+                  coment.target = true;
+                  return coment;
+                }
+                return coment;
+              })
+              setComent(newComents);
             }
-        },
+          },
         )
       })}
-       </>);
-
-      
+    </>);
   };
-/////////////////////////////////////////
+
+  useEffect(() => {
+    return setComent(JSON.parse(localStorage.getItem('coments') || '{}'));
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("coments", JSON.stringify(coments));
+  }, [coments]);
+
   const hendleonDoubleClick = () => (e: { preventDefault: () => void; clientY: number; clientX: number; }) => {
-    const cx = e.clientX
-    const cy = e.clientY
+    const cx = e.clientX;
+    const cy = e.clientY;
     const x = e.clientX;
     const y = e.clientY;
-    const newComent : any = {visible: false, target: true, id: _.uniqueId(), cx, cy, x, y, name: null}
-    console.log(coment)
-    
-    if (coment.every((el: any) => el.target === true) && coment.length !== 0) {
+    const newComent : any = {visible: false, target: true, id: _.uniqueId(), cx, cy, x, y, name: null};
+    if (coments.every((el: any) => el.target === true) && coments.length !== 0) {
       console.log('закончети создание коментария  для создания нового')
       return;
     }
-
-    setComent([...coment, newComent]);
+    setComent([...coments, newComent]);
     return;
-  }
-
+  };
 //////
 
   const createDataForRendering = () => {    // Функция обрисовывает пришедшие данные в график 
@@ -219,7 +227,7 @@ const VertillePlot = (props: IGraphProps) => {
         {PopUpWindow(option)}
         {renderComent()}
       </svg>
-    {AddComent(coment, setComent)}
+    {AddComent(coments, setComent)}
     </div>
   );
 
