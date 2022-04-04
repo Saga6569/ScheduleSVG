@@ -2,19 +2,53 @@
 import styles from './VertillePlot.module.css';
 import React from 'react';
 
-const circleInit = {name: 'circle', r: 20, fill: '#7FFFD4', stroke: '#000000', strokeWidth: 5, comment: ''};
-const rectInit = {name: 'rect', width: 100, height: 150, fill: '#7FFFD4', stroke: '#000000' ,strokeWidth: 5, comment: '' };
-const ellipseInit = {name: 'ellipse', rx: 100, ry: 50, fill: '#7FFFD4', stroke: '#000000', strokeWidth: 5, comment: ''};
+interface Icircle { name: string; r: number; fill: string; stroke: string; strokeWidth: number; comment: string;};
+interface Irect { name: string; width: number;  height: number; fill: string; stroke: string; strokeWidth: number; comment: string;};
+interface Iellipse { name: string, rx: number, ry: number, fill: string, stroke: string, strokeWidth: number, comment: string};
+interface Ipath { name: string, fill: string, stroke: string, strokeWidth: number, comment: string; d?: string};
+
+const circleInit: Icircle = {name: 'circle', r: 20, fill: '#7FFFD4', stroke: '#000000', strokeWidth: 5, comment: ''};
+const rectInit: Irect = {name: 'rect', width: 100, height: 150, fill: '#7FFFD4', stroke: '#000000' ,strokeWidth: 5, comment: ''};
+const ellipseInit: Iellipse = {name: 'ellipse', rx: 100, ry: 50, fill: '#7FFFD4', stroke: '#000000', strokeWidth: 5, comment: ''};
+const pathInit: Ipath = {name: 'path', fill: 'none',  stroke: '#000000', strokeWidth: 5, comment: ''};
+
 
 const allCompanent = (props: any, setProps: Function) => {
   const targetCompanent = props.filter((el: any) => el.target)[0];
   const stateCompanent = targetCompanent[targetCompanent.name];
   const keysTargetCompanent = Object.keys(stateCompanent);
+  if (targetCompanent.name === 'path' &&  stateCompanent.points.length === 2) {
+   return ( <div>
+     добавь вторую  точку
+   </div>)
+  }
   return (
     <div className={styles.FormS}>
-      {keysTargetCompanent.map((key: any) => {
-        if ( key === 'name') {
+      {keysTargetCompanent.map((key: string) => {
+         if (key === 'name') {
           return;
+        }
+        if (key === 'points') {
+          console.log(stateCompanent)
+          const name = key;
+          const value = `M${stateCompanent[key].join(' ')}`
+          const label = <label>{[key]}</label>
+          const imput = React.createElement(
+           'path' ,
+            {d: value, name: name, type: 'number',
+              onChange: (e: any) => {
+                const newProps = props.map((el: any) => {
+                  if (el.id === targetCompanent.id) {
+                    console.log(el[el.name])
+                    el[el.name][key] =   Number(e.target.value)
+                    return el;
+                  };
+                  return el;
+                })
+              setProps(newProps)}
+            },
+          );
+          return (<tr>{label}{imput}</tr>)
         }
         const name = key;
         const value = stateCompanent[key];
@@ -48,7 +82,6 @@ const AddComent = (props: any, setProps: Function) => {
       return null;
     };
   const targetCompanent: any = props.filter((el: any) => el.target === true)[0];
-  //console.log(targetCompanent)
     if (targetCompanent.name === null) {
       return (<div className={styles.ButtonMenu}>
         <button onClick={() => {
@@ -62,19 +95,32 @@ const AddComent = (props: any, setProps: Function) => {
             }
             return el;
           }))
-        }} >circle</button>
+        }}>circle</button>
+         <button onClick={() => {
+          setProps(props.map((el: any) => {
+            if ( el.id === targetCompanent.id) {
+              el.name = 'path';
+              const centreX = el.x
+              const centreY = el.y - 10
+              const points = [centreX, centreY]
+              const newEl = {...el, [el.name]:{...pathInit, points}}
+              return newEl
+            }
+            return el;
+          }))
+        }}>path</button>
         <button onClick={() => {
           setProps(props.map((el: any) => {
             if ( el.id === targetCompanent.id) {
               el.name = 'rect';
-              const centreX = el.x - circleInit.r
-              const centreY = el.y - circleInit.r
+              const centreX = el.x 
+              const centreY = el.y
               const newEl = {...el, [el.name]:{x: centreX, y: centreY, ...rectInit}}
               return newEl;
             }
             return el;
           }))
-        }} >rect</button>
+        }}>rect</button>
         <button onClick={() => {
           setProps(props.map((el: any) => {
             if ( el.id === targetCompanent.id) {

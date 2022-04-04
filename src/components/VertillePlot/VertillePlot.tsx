@@ -100,7 +100,7 @@ const VertillePlot = (props: IGraphProps) => {
 
   const [coments, setComent] = useState(initComent)
 
-  ///////////////////////////////
+  ////////////////////////////////////////////////////////
   const renderComent = () => {
     if (coments.length === 0) {
       return null;
@@ -108,8 +108,32 @@ const VertillePlot = (props: IGraphProps) => {
 
     return (<>
       {coments.map((el: any) => {
-        if (el.name === null) {
-          return null
+        if (el.name === 'path') {
+          const d = `M${el[el.name].points.join(' ')}`;
+          return React.createElement(
+            `${el.name}`,
+            {...el[el.name], d, 
+              onMouseEnter: () =>  {
+                const newOption = {...el, visible: true};
+                setOption(newOption);
+              },
+              onMouseOut: () =>  {
+                const newOption = {...el, visible: false};
+                setOption(newOption);
+              },
+              onDoubleClick: (e: { stopPropagation: () => void; }) => {
+                e.stopPropagation();
+                const newComents = coments.map((coment: any) => {
+                  if (coment.id === el.id) {
+                    coment.target = true;
+                    return coment;
+                  }
+                  return coment;
+                })
+                setComent(newComents);
+              },
+            },
+          )
         }
         return React.createElement(
           `${el.name}`,
@@ -152,15 +176,32 @@ const VertillePlot = (props: IGraphProps) => {
     const cy = e.clientY;
     const x = e.clientX;
     const y = e.clientY;
-    const newComent : any = {visible: false, target: true, id: _.uniqueId(), cx, cy, x, y, name: null};
-    if (coments.every((el: any) => el.target === true) && coments.length !== 0) {
-      console.log('закончети создание коментария  для создания нового')
+    const newComent: any = {visible: false, target: true, id: _.uniqueId(), cx, cy, x, y, name: null};
+    if (coments.length === 0 || coments.every((el: any) => el.target === false)) {
+      setComent([...coments, newComent]);
+    return;
+    };
+
+    const targetConp = coments.filter((el: any) => el.target === true)[0];
+
+    if (targetConp.name === null) {
+      console.log('выберите фигуру')
       return;
     }
-    setComent([...coments, newComent]);
-    return;
+   
+
+    if (!coments.every((el: any) => el.target === false)) {
+      const newComents = coments.map((el: any) => {
+        if (el.target === true) {
+          el[el.name].points = [el[el.name].points, cx - 20, cy - 20];
+        }
+        return el;
+      })
+      setComent(newComents);
+    }
+  
   };
-//////
+////////////////////////////////////////////////
 
   const createDataForRendering = () => {    // Функция обрисовывает пришедшие данные в график 
     let initPointX = 95;
@@ -173,8 +214,9 @@ const VertillePlot = (props: IGraphProps) => {
       onMouseOut={() => { // Событие покидание курсора элемента 
         setOption({...option, visit: false})
       }}  
-      onMouseEnter={() =>  { // Событие наведение курсора на элемент
-        setOption({x: x, y: startPointBottomPointY - valueY, color: elDate.color, name: elDate.name, value: elDate.value, visit: true, count: dataSort.length })
+      onMouseEnter={() =>  { // Событие наведение курсора на элементs
+        setOption({x: x, y: startPointBottomPointY - valueY, color: elDate.color, 
+          name: elDate.name, value: elDate.value, visit: true, count: dataSort.length })
       }} 
       d={`M${initPointX} ${startPointBottomPointY} V ${startPointBottomPointY - valueY}`} fill="transparent" stroke={elDate.color} strokeWidth="50"/>
 
@@ -224,8 +266,8 @@ const VertillePlot = (props: IGraphProps) => {
         {creatingHorizontalGrid()}
         {creatingVerticalGrid()}
         {createDataForRendering()}
-        {PopUpWindow(option)}
         {renderComent()}
+        {PopUpWindow(option)}
       </svg>
     {AddComent(coments, setComent)}
     </div>
