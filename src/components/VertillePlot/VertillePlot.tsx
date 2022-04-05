@@ -3,17 +3,18 @@ import styles from './VertillePlot.module.css';
 import _  from 'lodash'
 import { exportComponentAsJPEG, exportComponentAsPDF, exportComponentAsPNG } from 'react-component-export-image';
 import AddComent from './AddComent'
-//import { LocalKey, LocalStorage } from "ts-localstorage";
 
-interface IoptionInformGraf {
-  x: number; 
-  y: number; 
-  color?: string, 
-  name: string, 
-  value?: number, 
-  visit: boolean,
-  count?: number,
-};
+interface Icircle { name: string; r: number; fill: string; stroke: string; strokeWidth: number; comment: string;};
+interface Irect { name: string; width: number;  height: number; fill: string; stroke: string; strokeWidth: number; comment: string;};
+interface Iellipse { name: string, rx: number, ry: number, fill: string, stroke: string, strokeWidth: number, comment: string};
+interface Ipath { name: string, fill: string, stroke?: string, strokeWidth: number, comment: string; d?: string};
+
+
+interface IpointComent {visible: boolean, target: boolean, id: string, 
+  cx: number, cy: number, x: number, y: number, name?: string | null, circle?: Icircle, rect?: Irect, ellipse?: Iellipse, Ipath?: Ipath }
+
+
+interface IoptionInformGraf { x: number; y: number; color?: string; name: string; value?: number; visit: boolean;};
 
 interface IGraphProps {
   values: number[] | object[],
@@ -26,8 +27,46 @@ interface IelDate {
   color: string
 };
 
-const PopUpWindow = (option: IoptionInformGraf | any) => { // окно информации
-  
+const PopUpWindow = (option: IoptionInformGraf | IpointComent | any) => { // окно информации
+  if (option.name === 'rect') {
+    const stateComp = option[option.name]
+    const cx = stateComp.x;
+    const cy = stateComp.y;
+    const width = stateComp.comment.length * 12;
+    const opacity = option.visible === true ? 1 : 0;
+    const height = 30;
+    return (<>
+      <rect width={width} height={height} className={styles.informationWndow} x={cx + stateComp.width/2 - width/2 } y={cy - height - 8}
+        fill={'red'} strokeWidth='1' stroke="LightCyan" opacity={opacity}></rect>
+      <path d={`M${cx + stateComp.width/2} ${cy -  stateComp.strokeWidth/2 } ${cx + stateComp.width/2 + 10} ${cy - 6 - stateComp.strokeWidth/2} `} className={styles.informationWndow} opacity={opacity} stroke="black"/>
+      <path d={`M${cx + stateComp.width/2} ${cy - stateComp.strokeWidth/2} ${cx + stateComp.width/2 - 10} ${cy -  6 - stateComp.strokeWidth/2 } `} className={styles.informationWndow} opacity={opacity} stroke="black"/>
+        <text fontSize="16" fill="black" className={styles.informationWndow} opacity={opacity}
+          style={{transform: `translate(${cx + stateComp.width/2 - width/2.2 }px, ${cy -  height/2.4  - stateComp.strokeWidth/2}px)`}}>
+          {stateComp.comment}
+        </text>
+      </>
+    );
+  };
+  if (option.name === 'path') {
+    const stateComp = option[option.name]
+    const points = stateComp.points
+    const cx = points[points.length - 2]
+    const cy = points[points.length - 1]
+    const width = stateComp.comment.length * 11;
+    const opacity = option.visible === true ? 1 : 0;
+    const height = 30;
+    return (<>
+      <rect width={width} height={height} className={styles.informationWndow} x={cx - width/2} y={cy - height - 5 - stateComp.strokeWidth/2}
+        fill={'red'} strokeWidth='1' stroke="LightCyan" opacity={opacity}></rect>
+      <path d={`M${cx} ${cy -  stateComp.strokeWidth/2 } ${cx - 10} ${cy - 5 - stateComp.strokeWidth/2} `} className={styles.informationWndow} opacity={opacity} stroke="black"/>
+      <path d={`M${cx} ${cy - stateComp.strokeWidth/2} ${cx + 10} ${cy -  5 - stateComp.strokeWidth/2 } `} className={styles.informationWndow} opacity={opacity} stroke="black"/>
+        <text fontSize="16" fill="black" className={styles.informationWndow} opacity={opacity}
+          style={{transform: `translate(${cx - width / 2.4}px, ${cy -  height/2  - stateComp.strokeWidth/2}px)`}}>
+          {stateComp.comment}
+        </text>
+      </>
+    );
+  };
   if (option.name === 'circle') {
     const stateComp = option[option.name]
     const cx = stateComp.cx
@@ -39,14 +78,33 @@ const PopUpWindow = (option: IoptionInformGraf | any) => { // окно инфо�
       <rect width={width} height={height} className={styles.informationWndow} x={cx - width /2} y={cy - stateComp.r - height - 5 - stateComp.strokeWidth/2}
         fill={stateComp.fill} strokeWidth='1' stroke="LightCyan" opacity={opacity}></rect>
       <path d={`M${cx} ${cy - stateComp.r - stateComp.strokeWidth/2 } ${cx - 10} ${cy - stateComp.r - 5 - stateComp.strokeWidth/2} `} className={styles.informationWndow} opacity={opacity} stroke="black"/>
-      <path d={`M${cx} ${cy - stateComp.r - stateComp.strokeWidth/2} ${cx + 10} ${cy - stateComp.r - 5 - stateComp.strokeWidth/2 } `} className={styles.informationWndow} opacity={opacity} stroke="black"/>
+      <path d={`M${cx} ${cy - stateComp.r- stateComp.strokeWidth/2} ${cx + 10} ${cy - stateComp.r - 5 - stateComp.strokeWidth/2 } `} className={styles.informationWndow} opacity={opacity} stroke="black"/>
         <text fontSize="16" fill="black" className={styles.informationWndow} opacity={opacity}
           style={{transform: `translate(${cx - width / 2.4}px, ${cy - stateComp.r -  height/2  - stateComp.strokeWidth/2}px)`}}>
           {stateComp.comment}
         </text>
       </>
     );
-  }
+  };
+  if (option.name === 'ellipse') {
+    const stateComp = option[option.name]
+    const cx = stateComp.cx
+    const cy = stateComp.cy
+    const width = stateComp.comment.length * 10;
+    const opacity = option.visible === true ? 1 : 0;
+    const height = 30
+    return (<>
+      <rect width={width} height={height} className={styles.informationWndow} x={cx - width /2} y={cy - stateComp.ry - height - 5 - stateComp.strokeWidth/2}
+        fill={stateComp.fill} strokeWidth='1' stroke="LightCyan" opacity={opacity}></rect>
+      <path d={`M${cx} ${cy - stateComp.ry - stateComp.strokeWidth/2 } ${cx - 10} ${cy - stateComp.ry - 5 - stateComp.strokeWidth/2} `} className={styles.informationWndow} opacity={opacity} stroke="black"/>
+      <path d={`M${cx} ${cy - stateComp.ry - stateComp.strokeWidth/2} ${cx + 10} ${cy - stateComp.ry - 5 - stateComp.strokeWidth/2 } `} className={styles.informationWndow} opacity={opacity} stroke="black"/>
+        <text fontSize="16" fill="black" className={styles.informationWndow} opacity={opacity}
+          style={{transform: `translate(${cx - width / 2.4}px, ${cy - stateComp.ry -  height/2  - stateComp.strokeWidth/2}px)`}}>
+          {stateComp.comment}
+        </text>
+      </>
+    );
+  };
 
   const text = `${option.name} ${option.value}`;
   const width = text.length * 10;
@@ -176,24 +234,23 @@ const VertillePlot = (props: IGraphProps) => {
     const cy = e.clientY;
     const x = e.clientX;
     const y = e.clientY;
-    const newComent: any = {visible: false, target: true, id: _.uniqueId(), cx, cy, x, y, name: null};
+    const newComent: IpointComent = {visible: false, target: true, id: _.uniqueId(), cx, cy, x, y, name: null};
+
     if (coments.length === 0 || coments.every((el: any) => el.target === false)) {
       setComent([...coments, newComent]);
     return;
     };
 
     const targetConp = coments.filter((el: any) => el.target === true)[0];
-
     if (targetConp.name === null) {
       console.log('выберите фигуру')
       return;
     }
-   
 
-    if (!coments.every((el: any) => el.target === false)) {
+    if (!coments.every((el: any) => el.target === false) && targetConp.name === 'path') {
       const newComents = coments.map((el: any) => {
         if (el.target === true) {
-          el[el.name].points = [el[el.name].points, cx - 20, cy - 20];
+          el[el.name].points = [...el[el.name].points, cx - 20, cy - 20];
         }
         return el;
       })
