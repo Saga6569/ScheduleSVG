@@ -17,7 +17,7 @@ interface IpointComent {visible: boolean, target: boolean, id: string,
 interface IoptionInformGraf { x: number; y: number; color?: string; name: string; value?: number; visit: boolean;};
 
 interface IGraphProps {
-  values: number[] | object[],
+  values: Array<{name: string, value: number}>,
 };
 
 interface IelDate {
@@ -48,10 +48,10 @@ const PopUpWindow = (option: IoptionInformGraf | IpointComent | any) => { // о�
     );
   };
   if (option.name === 'path') {
-    const stateComp = option[option.name]
-    const points = stateComp.points
-    const cx = points[points.length - 2]
-    const cy = points[points.length - 1]
+    const stateComp = option[option.name];
+    const points = stateComp.points;
+    const cx = points[points.length - 2];
+    const cy = points[points.length - 1];
     const width = stateComp.comment.length * 11;
     const opacity = option.visible === true ? 1 : 0;
     const height = 30;
@@ -152,7 +152,7 @@ const VertillePlot = (props: IGraphProps) => {
   const roundedWholeScreenValue = horizontalLineInterval * numberHorizontalLines; // Округленное значение 400 px 
   const verticalLineSpacing = 100; // шаг вертикальных линиий
   
-  const [option, setOption] = useState({x: 0, y: 0 , color: '', name: '', value: 0, visit: false, count: 0});
+  const [option, setOption] = useState({x: 0, y: 0 , color: '', name: '', value: 0, visit: false});
 
   const initComent: any = [];
 
@@ -162,10 +162,10 @@ const VertillePlot = (props: IGraphProps) => {
   const renderComent = () => {
     if (coments.length === 0) {
       return null;
-    }
+    };
 
     return (<>
-      {coments.map((el: any) => {
+      {coments.map((el: IpointComent | any) => {
         if (el.name === 'path') {
           const d = `M${el[el.name].points.join(' ')}`;
           return React.createElement(
@@ -181,7 +181,7 @@ const VertillePlot = (props: IGraphProps) => {
               },
               onDoubleClick: (e: { stopPropagation: () => void; }) => {
                 e.stopPropagation();
-                const newComents = coments.map((coment: any) => {
+                const newComents = coments.map((coment: IpointComent) => {
                   if (coment.id === el.id) {
                     coment.target = true;
                     return coment;
@@ -206,13 +206,14 @@ const VertillePlot = (props: IGraphProps) => {
             },
             onDoubleClick: (e: { stopPropagation: () => void; }) => {
               e.stopPropagation();
-              const newComents = coments.map((coment: any) => {
+              const newComents = coments.map((coment: IpointComent) => {
                 if (coment.id === el.id) {
                   coment.target = true;
                   return coment;
-                }
+                };
+                coment.target = false;
                 return coment;
-              })
+              });
               setComent(newComents);
             }
           },
@@ -236,19 +237,19 @@ const VertillePlot = (props: IGraphProps) => {
     const y = e.clientY;
     const newComent: IpointComent = {visible: false, target: true, id: _.uniqueId(), cx, cy, x, y, name: null};
 
-    if (coments.length === 0 || coments.every((el: any) => el.target === false)) {
+    if (coments.length === 0 || coments.every((el: IpointComent) => el.target === false)) {
       setComent([...coments, newComent]);
     return;
     };
 
-    const targetConp = coments.filter((el: any) => el.target === true)[0];
+    const targetConp = coments.filter((el: IpointComent) => el.target === true)[0];
     if (targetConp.name === null) {
       console.log('выберите фигуру')
       return;
     }
 
-    if (!coments.every((el: any) => el.target === false) && targetConp.name === 'path') {
-      const newComents = coments.map((el: any) => {
+    if (!coments.every((el: IpointComent) => el.target === false) && targetConp.name === 'path') {
+      const newComents = coments.map((el: IpointComent | any) => {
         if (el.target === true) {
           el[el.name].points = [...el[el.name].points, cx - 20, cy - 20];
         }
@@ -256,7 +257,6 @@ const VertillePlot = (props: IGraphProps) => {
       })
       setComent(newComents);
     }
-  
   };
 ////////////////////////////////////////////////
 
@@ -273,7 +273,7 @@ const VertillePlot = (props: IGraphProps) => {
       }}  
       onMouseEnter={() =>  { // Событие наведение курсора на элементs
         setOption({x: x, y: startPointBottomPointY - valueY, color: elDate.color, 
-          name: elDate.name, value: elDate.value, visit: true, count: dataSort.length })
+          name: elDate.name, value: elDate.value, visit: true})
       }} 
       d={`M${initPointX} ${startPointBottomPointY} V ${startPointBottomPointY - valueY}`} fill="transparent" stroke={elDate.color} strokeWidth="50"/>
 

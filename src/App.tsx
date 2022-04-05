@@ -6,6 +6,10 @@ import GraphCircle from './components/GraphCircle/GraphCircle';
 import VertillePlot from './components/VertillePlot/VertillePlot';
 import './App.css';
 
+interface IGraphProps {
+  values: [{name: string, value: number}],
+};
+
 const App = () => {
 
   const res = [
