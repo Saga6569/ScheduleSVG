@@ -20,9 +20,9 @@ const allCompanent = (props: any, setProps: Function) => {
   const stateCompanent = targetCompanent[targetCompanent.name];
   const keysTargetCompanent = Object.keys(stateCompanent);
   if (targetCompanent.name === 'path' &&  stateCompanent.points.length === 2) {
-   return ( <div>
-     добавь вторую  точку
-   </div>)
+    return ( <div>
+      зажмите левую кнопку мыши
+    </div>)
   }
   return (
     <div className={styles.FormS}>
@@ -101,7 +101,7 @@ const AddComent = (props: any, setProps: Function) => {
               el.name = 'path';
               const centreX = el.x
               const centreY = el.y - 10
-              const points = [centreX, centreY]
+              const points: [] = []
               const newEl = {...el, [el.name]:{...pathInit, points}}
               return newEl
             }

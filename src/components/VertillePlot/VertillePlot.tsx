@@ -1,8 +1,8 @@
-import React, { useState, useRef, useEffect  } from 'react';
+import React, { useState, useRef } from 'react';
 import styles from './VertillePlot.module.css';
 import _  from 'lodash'
 import { exportComponentAsJPEG, exportComponentAsPDF, exportComponentAsPNG } from 'react-component-export-image';
-import AddComent from './AddComent'
+import Canvos from './Canvos'
 
 interface Icircle { name: string; r: number; fill: string; stroke: string; strokeWidth: number; comment: string;};
 interface Irect { name: string; width: number;  height: number; fill: string; stroke: string; strokeWidth: number; comment: string;};
@@ -11,7 +11,7 @@ interface Ipath { name: string, fill: string, stroke?: string, strokeWidth: numb
 
 
 interface IpointComent {visible: boolean, target: boolean, id: string, 
-  cx: number, cy: number, x: number, y: number, name?: string | null, circle?: Icircle, rect?: Irect, ellipse?: Iellipse, Ipath?: Ipath }
+  cx: number, cy: number, x: number, y: number, name?: string | null, circle?: Icircle, rect?: Irect, ellipse?: Iellipse, Ipath?: Ipath; }
 
 
 interface IoptionInformGraf { x: number; y: number; color?: string; name: string; value?: number; visit: boolean;};
@@ -154,112 +154,6 @@ const VertillePlot = (props: IGraphProps) => {
   
   const [option, setOption] = useState({x: 0, y: 0 , color: '', name: '', value: 0, visit: false});
 
-  const initComent: any = [];
-
-  const [coments, setComent] = useState(initComent)
-
-  ////////////////////////////////////////////////////////
-  const renderComent = () => {
-    if (coments.length === 0) {
-      return null;
-    };
-
-    return (<>
-      {coments.map((el: IpointComent | any) => {
-        if (el.name === 'path') {
-          const d = `M${el[el.name].points.join(' ')}`;
-          return React.createElement(
-            `${el.name}`,
-            {...el[el.name], d, 
-              onMouseEnter: () =>  {
-                const newOption = {...el, visible: true};
-                setOption(newOption);
-              },
-              onMouseOut: () =>  {
-                const newOption = {...el, visible: false};
-                setOption(newOption);
-              },
-              onDoubleClick: (e: { stopPropagation: () => void; }) => {
-                e.stopPropagation();
-                const newComents = coments.map((coment: IpointComent) => {
-                  if (coment.id === el.id) {
-                    coment.target = true;
-                    return coment;
-                  }
-                  return coment;
-                })
-                setComent(newComents);
-              },
-            },
-          )
-        }
-        return React.createElement(
-          `${el.name}`,
-          {...el[el.name], 
-            onMouseEnter: () =>  {
-              const newOption = {...el, visible: true};
-              setOption(newOption);
-            },
-            onMouseOut: () =>  {
-              const newOption = {...el, visible: false};
-              setOption(newOption);
-            },
-            onDoubleClick: (e: { stopPropagation: () => void; }) => {
-              e.stopPropagation();
-              const newComents = coments.map((coment: IpointComent) => {
-                if (coment.id === el.id) {
-                  coment.target = true;
-                  return coment;
-                };
-                coment.target = false;
-                return coment;
-              });
-              setComent(newComents);
-            }
-          },
-        )
-      })}
-    </>);
-  };
-
-  useEffect(() => {
-    return setComent(JSON.parse(localStorage.getItem('coments') || '{}'));
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem("coments", JSON.stringify(coments));
-  }, [coments]);
-
-  const hendleonDoubleClick = () => (e: { preventDefault: () => void; clientY: number; clientX: number; }) => {
-    const cx = e.clientX;
-    const cy = e.clientY;
-    const x = e.clientX;
-    const y = e.clientY;
-    const newComent: IpointComent = {visible: false, target: true, id: _.uniqueId(), cx, cy, x, y, name: null};
-
-    if (coments.length === 0 || coments.every((el: IpointComent) => el.target === false)) {
-      setComent([...coments, newComent]);
-    return;
-    };
-
-    const targetConp = coments.filter((el: IpointComent) => el.target === true)[0];
-    if (targetConp.name === null) {
-      console.log('выберите фигуру')
-      return;
-    }
-
-    if (!coments.every((el: IpointComent) => el.target === false) && targetConp.name === 'path') {
-      const newComents = coments.map((el: IpointComent | any) => {
-        if (el.target === true) {
-          el[el.name].points = [...el[el.name].points, cx - 20, cy - 20];
-        }
-        return el;
-      })
-      setComent(newComents);
-    }
-  };
-////////////////////////////////////////////////
-
   const createDataForRendering = () => {    // Функция обрисовывает пришедшие данные в график 
     let initPointX = 95;
     const maxValueEls = roundedWholeScreenValue / chartHeight
@@ -316,17 +210,19 @@ const VertillePlot = (props: IGraphProps) => {
     return result;
   };
 
+//onMouseMove={handleMouseMove} onDoubleClick={hendleonDoubleClick()}
+
   const ResComp = (
     <div className={styles.container} >
-      <svg width={chartWidth + 80} height={chartHeight + 50} xmlns="http://www.w3.org/2000/svg" onDoubleClick={hendleonDoubleClick()}>
+      <svg width={chartWidth + 350} height={chartHeight + 100} xmlns="http://www.w3.org/2000/svg" >
+      <rect x="0" y="0" width={chartWidth + 80}  height={chartHeight + 50} fill="#c0c0fa"/> 
         <rect x="45" y="25" width={chartWidth}  height={chartHeight} fill="#E0FFFF"/>
         {creatingHorizontalGrid()}
         {creatingVerticalGrid()}
-        {createDataForRendering()}
-        {renderComent()}
         {PopUpWindow(option)}
+        <Canvos x={45} y={25} width={chartWidth}  height={chartHeight} />
+        {createDataForRendering()}
       </svg>
-    {AddComent(coments, setComent)}
     </div>
   );
 
@@ -359,4 +255,3 @@ const VertillePlot = (props: IGraphProps) => {
 };
 
 export default VertillePlot;
-
