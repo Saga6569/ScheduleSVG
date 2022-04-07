@@ -27,85 +27,7 @@ interface IelDate {
   color: string
 };
 
-const PopUpWindow = (option: IoptionInformGraf | IpointComent | any) => { // окно информации
-  if (option.name === 'rect') {
-    const stateComp = option[option.name]
-    const cx = stateComp.x;
-    const cy = stateComp.y;
-    const width = stateComp.comment.length * 12;
-    const opacity = option.visible === true ? 1 : 0;
-    const height = 30;
-    return (<>
-      <rect width={width} height={height} className={styles.informationWndow} x={cx + stateComp.width/2 - width/2 } y={cy - height - 8}
-        fill={'red'} strokeWidth='1' stroke="LightCyan" opacity={opacity}></rect>
-      <path d={`M${cx + stateComp.width/2} ${cy -  stateComp.strokeWidth/2 } ${cx + stateComp.width/2 + 10} ${cy - 6 - stateComp.strokeWidth/2} `} className={styles.informationWndow} opacity={opacity} stroke="black"/>
-      <path d={`M${cx + stateComp.width/2} ${cy - stateComp.strokeWidth/2} ${cx + stateComp.width/2 - 10} ${cy -  6 - stateComp.strokeWidth/2 } `} className={styles.informationWndow} opacity={opacity} stroke="black"/>
-        <text fontSize="16" fill="black" className={styles.informationWndow} opacity={opacity}
-          style={{transform: `translate(${cx + stateComp.width/2 - width/2.2 }px, ${cy -  height/2.4  - stateComp.strokeWidth/2}px)`}}>
-          {stateComp.comment}
-        </text>
-      </>
-    );
-  };
-  if (option.name === 'path') {
-    const stateComp = option[option.name];
-    const points = stateComp.points;
-    const cx = points[points.length - 2];
-    const cy = points[points.length - 1];
-    const width = stateComp.comment.length * 11;
-    const opacity = option.visible === true ? 1 : 0;
-    const height = 30;
-    return (<>
-      <rect width={width} height={height} className={styles.informationWndow} x={cx - width/2} y={cy - height - 5 - stateComp.strokeWidth/2}
-        fill={'red'} strokeWidth='1' stroke="LightCyan" opacity={opacity}></rect>
-      <path d={`M${cx} ${cy -  stateComp.strokeWidth/2 } ${cx - 10} ${cy - 5 - stateComp.strokeWidth/2} `} className={styles.informationWndow} opacity={opacity} stroke="black"/>
-      <path d={`M${cx} ${cy - stateComp.strokeWidth/2} ${cx + 10} ${cy -  5 - stateComp.strokeWidth/2 } `} className={styles.informationWndow} opacity={opacity} stroke="black"/>
-        <text fontSize="16" fill="black" className={styles.informationWndow} opacity={opacity}
-          style={{transform: `translate(${cx - width / 2.4}px, ${cy -  height/2  - stateComp.strokeWidth/2}px)`}}>
-          {stateComp.comment}
-        </text>
-      </>
-    );
-  };
-  if (option.name === 'circle') {
-    const stateComp = option[option.name]
-    const cx = stateComp.cx
-    const cy = stateComp.cy
-    const width = stateComp.comment.length * 10;
-    const opacity = option.visible === true ? 1 : 0;
-    const height = 30
-    return (<>
-      <rect width={width} height={height} className={styles.informationWndow} x={cx - width /2} y={cy - stateComp.r - height - 5 - stateComp.strokeWidth/2}
-        fill={stateComp.fill} strokeWidth='1' stroke="LightCyan" opacity={opacity}></rect>
-      <path d={`M${cx} ${cy - stateComp.r - stateComp.strokeWidth/2 } ${cx - 10} ${cy - stateComp.r - 5 - stateComp.strokeWidth/2} `} className={styles.informationWndow} opacity={opacity} stroke="black"/>
-      <path d={`M${cx} ${cy - stateComp.r- stateComp.strokeWidth/2} ${cx + 10} ${cy - stateComp.r - 5 - stateComp.strokeWidth/2 } `} className={styles.informationWndow} opacity={opacity} stroke="black"/>
-        <text fontSize="16" fill="black" className={styles.informationWndow} opacity={opacity}
-          style={{transform: `translate(${cx - width / 2.4}px, ${cy - stateComp.r -  height/2  - stateComp.strokeWidth/2}px)`}}>
-          {stateComp.comment}
-        </text>
-      </>
-    );
-  };
-  if (option.name === 'ellipse') {
-    const stateComp = option[option.name]
-    const cx = stateComp.cx
-    const cy = stateComp.cy
-    const width = stateComp.comment.length * 10;
-    const opacity = option.visible === true ? 1 : 0;
-    const height = 30
-    return (<>
-      <rect width={width} height={height} className={styles.informationWndow} x={cx - width /2} y={cy - stateComp.ry - height - 5 - stateComp.strokeWidth/2}
-        fill={stateComp.fill} strokeWidth='1' stroke="LightCyan" opacity={opacity}></rect>
-      <path d={`M${cx} ${cy - stateComp.ry - stateComp.strokeWidth/2 } ${cx - 10} ${cy - stateComp.ry - 5 - stateComp.strokeWidth/2} `} className={styles.informationWndow} opacity={opacity} stroke="black"/>
-      <path d={`M${cx} ${cy - stateComp.ry - stateComp.strokeWidth/2} ${cx + 10} ${cy - stateComp.ry - 5 - stateComp.strokeWidth/2 } `} className={styles.informationWndow} opacity={opacity} stroke="black"/>
-        <text fontSize="16" fill="black" className={styles.informationWndow} opacity={opacity}
-          style={{transform: `translate(${cx - width / 2.4}px, ${cy - stateComp.ry -  height/2  - stateComp.strokeWidth/2}px)`}}>
-          {stateComp.comment}
-        </text>
-      </>
-    );
-  };
-
+const PopUpWindow = (option: IoptionInformGraf) => { // окно информации
   const text = `${option.name} ${option.value}`;
   const width = text.length * 10;
   const cx = option.x
@@ -211,10 +133,10 @@ const VertillePlot = (props: IGraphProps) => {
   };
 
 //onMouseMove={handleMouseMove} onDoubleClick={hendleonDoubleClick()}
-
+  const countMune = 300; // значение для  добавления меню  
   const ResComp = (
     <div className={styles.container} >
-      <svg width={chartWidth + 350} height={chartHeight + 100} xmlns="http://www.w3.org/2000/svg" >
+      <svg width={chartWidth + 80 + countMune} height={chartHeight + 50} xmlns="http://www.w3.org/2000/svg" >
       <rect x="0" y="0" width={chartWidth + 80}  height={chartHeight + 50} fill="#c0c0fa"/> 
         <rect x="45" y="25" width={chartWidth}  height={chartHeight} fill="#E0FFFF"/>
         {creatingHorizontalGrid()}

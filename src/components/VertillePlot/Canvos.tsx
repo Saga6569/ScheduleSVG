@@ -1,7 +1,7 @@
 import React, { useState, useEffect  } from 'react';
 import AddComent from './AddComent'
-import styles from './VertillePlot.module.css';
 import _  from 'lodash'
+import styles from './VertillePlot.module.css';
 
 interface Icanvos {
     width: number; 
@@ -18,20 +18,105 @@ interface Ipath { name: string, fill: string, stroke?: string, strokeWidth: numb
   interface IpointComent {visible: boolean, target: boolean, id: string, 
     cx: number, cy: number, x: number, y: number, name?: string | null, circle?: Icircle, rect?: Irect, ellipse?: Iellipse, Ipath?: Ipath; 
   };
+  
+  const PopUpWindow = (option: IpointComent | any) => { // окно информации
+    const name = option.name
+    const state = option[option.name];
+    if (name === 'rect') {
+      const cx = state.x;
+      const cy = state.y;
+      const width = state.comment.length * 12;
+      const opacity = option.visible === true ? 1 : 0;
+      const height = 30;
+      return (<>
+        <rect width={width} height={height} className={styles.informationWndow} x={cx + state.width/2 - width/2 } y={cy - height - 8}
+          fill={'red'} strokeWidth='1' stroke="LightCyan" opacity={opacity}></rect>
+        <path d={`M${cx + state.width/2} ${cy -  state.strokeWidth/2 } ${cx + state.width/2 + 10} ${cy - 6 - state.strokeWidth/2} `} className={styles.informationWndow} opacity={opacity} stroke="black"/>
+        <path d={`M${cx + state.width/2} ${cy - state.strokeWidth/2} ${cx + state.width/2 - 10} ${cy -  6 - state.strokeWidth/2 } `} className={styles.informationWndow} opacity={opacity} stroke="black"/>
+          <text fontSize="16" fill="black" className={styles.informationWndow} opacity={opacity}
+            style={{transform: `translate(${cx + state.width/2 - width/2.2 }px, ${cy -  height/2.4  - state.strokeWidth/2}px)`}}>
+            {state.comment}
+          </text>
+        </>
+      );
+    };
+    if (name === 'path') {
+      const points = state.points;
+      const cx = points[points.length - 2];
+      const cy = points[points.length - 1];
+      const width = state.comment.length * 11;
+      const opacity = option.visible === true ? 1 : 0;
+      const height = 30;
+      return (<>
+        <rect width={width} height={height} className={styles.informationWndow} x={cx - width/2} y={cy - height - 5 - state.strokeWidth/2}
+          fill={'red'} strokeWidth='1' stroke="LightCyan" opacity={opacity}></rect>
+        <path d={`M${cx} ${cy -  state.strokeWidth/2 } ${cx - 10} ${cy - 5 - state.strokeWidth/2} `} className={styles.informationWndow} opacity={opacity} stroke="black"/>
+        <path d={`M${cx} ${cy - state.strokeWidth/2} ${cx + 10} ${cy -  5 - state.strokeWidth/2 } `} className={styles.informationWndow} opacity={opacity} stroke="black"/>
+          <text fontSize="16" fill="black" className={styles.informationWndow} opacity={opacity}
+            style={{transform: `translate(${cx - width / 2.4}px, ${cy -  height/2  - state.strokeWidth/2}px)`}}>
+            {state.comment}
+          </text>
+        </>
+      );
+    };
+    if (name === 'circle') {
+      const cx = state.cx
+      const cy = state.cy
+      const width = state.comment.length * 10;
+      const opacity = option.visible === true ? 1 : 0;
+      const height = 30
+      return (<>
+        <rect width={width} height={height} className={styles.informationWndow} x={cx - width /2} y={cy - state.r - height - 5 - state.strokeWidth/2}
+          fill={state.fill} strokeWidth='1' stroke="LightCyan" opacity={opacity}></rect>
+        <path d={`M${cx} ${cy - state.r - state.strokeWidth/2 } ${cx - 10} ${cy - state.r - 5 - state.strokeWidth/2} `} className={styles.informationWndow} opacity={opacity} stroke="black"/>
+        <path d={`M${cx} ${cy - state.r- state.strokeWidth/2} ${cx + 10} ${cy - state.r - 5 - state.strokeWidth/2 } `} className={styles.informationWndow} opacity={opacity} stroke="black"/>
+          <text fontSize="16" fill="black" className={styles.informationWndow} opacity={opacity}
+            style={{transform: `translate(${cx - width / 2.4}px, ${cy - state.r -  height/2  - state.strokeWidth/2}px)`}}>
+            {state.comment}
+          </text>
+        </>
+      );
+    };
+    if (name === 'ellipse') {
+      const cx = state.cx
+      const cy = state.cy
+      const width = state.comment.length * 10;
+      const opacity = option.visible === true ? 1 : 0;
+      const height = 30
+      return (<>
+        <rect width={width} height={height} className={styles.informationWndow} x={cx - width /2} y={cy - state.ry - height - 5 - state.strokeWidth/2}
+          fill={state.fill} strokeWidth='1' stroke="LightCyan" opacity={opacity}></rect>
+        <path d={`M${cx} ${cy - state.ry - state.strokeWidth/2 } ${cx - 10} ${cy - state.ry - 5 - state.strokeWidth/2} `} className={styles.informationWndow} opacity={opacity} stroke="black"/>
+        <path d={`M${cx} ${cy - state.ry - state.strokeWidth/2} ${cx + 10} ${cy - state.ry - 5 - state.strokeWidth/2 } `} className={styles.informationWndow} opacity={opacity} stroke="black"/>
+          <text fontSize="16" fill="black" className={styles.informationWndow} opacity={opacity}
+            style={{transform: `translate(${cx - width / 2.4}px, ${cy - state.ry -  height/2  - state.strokeWidth/2}px)`}}>
+            {state.comment}
+          </text>
+        </>
+      );
+    };
+  };
 
 
   const Canvos = (props: Icanvos) => {
 
-  const s: any = []
-  const [coments, setComent] = useState(s);
+  const arr: any = []
+  const [coments, setComent] = useState(arr);
+
+  const [rendered, setRendered] = useState({});
 
     const drawingCanvasElements = () => {
      
       if (coments.length === 0) {
-        console.log('пустой комент')
         return null;
       };
-  
+      // const elementComents = coments.map((el: IpointComent) => {
+      //   if (el.name === 'path'){
+      //     console.log(el)
+      //   }
+      // })
+
+
       return (<>
         {coments.map((el: IpointComent | any) => {
           if (el.name === 'path') {
@@ -41,11 +126,11 @@ interface Ipath { name: string, fill: string, stroke?: string, strokeWidth: numb
               {...el[el.name], d, 
                 onMouseEnter: () =>  {
                   const newOption = {...el, visible: true};
-                  //setOption(newOption);
+                  setRendered(newOption);
                 },
                 onMouseOut: () =>  {
                   const newOption = {...el, visible: false};
-                  //setOption(newOption);
+                  setRendered(newOption);
                 },
                 onDoubleClick: (e: { stopPropagation: () => void; }) => {
                   e.stopPropagation();
@@ -66,11 +151,11 @@ interface Ipath { name: string, fill: string, stroke?: string, strokeWidth: numb
             {...el[el.name], 
               onMouseEnter: () =>  {
                 const newOption = {...el, visible: true};
-                //setOption(newOption);
+                setRendered(newOption);
               },
               onMouseOut: () =>  {
                 const newOption = {...el, visible: false};
-                //setOption(newOption);
+                setRendered(newOption);
               },
               onDoubleClick: (e: { stopPropagation: () => void; }) => {
                 e.stopPropagation();
@@ -106,16 +191,19 @@ interface Ipath { name: string, fill: string, stroke?: string, strokeWidth: numb
       const comentTarget = coments.filter((el: IpointComent) => el.target === true)[0];
       if (comentTarget.name === null) {
         return;
-      }
+      };
       const x = e.nativeEvent.offsetX;
       const y = e.nativeEvent.offsetY
-      if (comentTarget.name === 'path' && e.nativeEvent.buttons === 1) {
-        comentTarget[comentTarget.name].points = [...comentTarget[comentTarget.name].points, x, y];
-        const newComents = coments.map((el: IpointComent) => el.id === comentTarget.id ? comentTarget: el);
-        setComent(newComents)
+      if (comentTarget.name === 'path') {
+        const points = comentTarget[comentTarget.name].points;
+        if (e.nativeEvent.buttons === 1) {
+          comentTarget[comentTarget.name].points = [...points, x, y];
+          const newComents = coments.map((el: IpointComent) => el.id === comentTarget.id ? comentTarget: el);
+          setComent(newComents);
+          return;
+        }
       }
-      return;
-    }
+    };
   
     const hendleonDoubleClick = () => (e: { preventDefault: () => void; clientY: number; clientX: number; }) => {
       const cx = e.clientX;
@@ -135,30 +223,18 @@ interface Ipath { name: string, fill: string, stroke?: string, strokeWidth: numb
         console.log('выберите фигуру')
         return;
       }
-  
-      if (!coments.every((el: IpointComent) => el.target === false) && targetConp.name === 'path') {
-        const newComents = coments.map((el: IpointComent | any) => {
-          if (el.target === true) {
-            el[el.name].points = [...el[el.name].points, cx - 20, cy - 20];
-          }
-          return el;
-        })
-        setComent(newComents);
-      }
     };
-    
+
     return (
       <>
-      <rect width={props.width + props.x} height={props.height + props.y} opacity={0} 
+      <rect width={props.width + props.x * 2} height={props.height + props.y * 2} fill="red" opacity={0} 
         onDoubleClick={hendleonDoubleClick()} onMouseMove={handleMouseMove}
       />
-      <svg x={700} y={props.y + 100} width="250" height="350">
-
-      </svg>
       {drawingCanvasElements()}
-      {<foreignObject x={975} y={props.y + 100} width="250" height="380">
+      {<foreignObject x={props.width + props.x * 2} y={props.y + 100} width="250" height="380">
       {AddComent(coments, setComent)}
       </foreignObject>}
+      {PopUpWindow(rendered)}
       </>
     )
   };

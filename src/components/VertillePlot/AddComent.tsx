@@ -31,7 +31,6 @@ const allCompanent = (props: any, setProps: Function) => {
           return;
         }
         if (key === 'points') {
-          console.log(stateCompanent)
           const name = key;
           const value = `M${stateCompanent[key].join(' ')}`
           const label = <label>{[key]}</label>
@@ -99,8 +98,6 @@ const AddComent = (props: any, setProps: Function) => {
           setProps(props.map((el: IpointComent) => {
             if ( el.id === targetCompanent.id) {
               el.name = 'path';
-              const centreX = el.x
-              const centreY = el.y - 10
               const points: [] = []
               const newEl = {...el, [el.name]:{...pathInit, points}}
               return newEl
