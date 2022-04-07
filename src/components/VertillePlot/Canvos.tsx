@@ -136,7 +136,6 @@ interface Ipath { name: string, fill: string, stroke?: string, strokeWidth: numb
                   })
                   setComent(newComents);
                 },
-
               },
             )
           }
@@ -246,7 +245,7 @@ interface Ipath { name: string, fill: string, stroke?: string, strokeWidth: numb
         onDoubleClick={hendleonDoubleClick()} onMouseMove={handleMouseMove}
       />
       {drawingCanvasElements()}
-      {<foreignObject x={props.width + props.x * 2} y={props.y + 100} width="250" height="380">
+      {<foreignObject x={props.width + props.x * 2} y={20} width="320" height="750">
       {AddComent(coments, setComent)}
       </foreignObject>}
       {PopUpWindow(rendered)}

@@ -70,6 +70,24 @@ const allCompanent = (props: any, setProps: Function) => {
         );
         return (<tr>{label}{imput}</tr>)
       })}
+        {<button onClick={() => {
+          setProps(props.filter((el: IpointComent) => el.target !== true))
+        }} >{'Удалить'}</button>}
+      
+        <button onClick={() => {
+          const newProps = props.map((el: IpointComent) => {
+            if (el.id === targetCompanent.id){
+              el.target = false;
+              console.log(el)
+              return el;
+            }
+            return el;
+          });
+          console.log(newProps)
+          setProps(newProps)
+        }}>{'Сохранить'}
+        </button>
+        
     </div>
   )
 };
@@ -132,27 +150,8 @@ const AddComent = (props: any, setProps: Function) => {
       </div>)
     };
 
-    return (<div style={{width: '250'}}>
-      {allCompanent(props, setProps)}
-      <div className={styles.ButtonMenu}>
-        {<button onClick={() => {
-          setProps(props.filter((el: IpointComent) => el.target !== true))
-        }} >{'Удалить'}</button>}
-        <button onClick={() => {
-          const newProps = props.map((el: IpointComent) => {
-            if (el.id === targetCompanent.id){
-              el.target = false;
-              console.log(el)
-              return el;
-            }
-            return el;
-          });
-          console.log(newProps)
-          setProps(newProps)
-        }}>{'Сохранить'}
-        </button>
-      </div>
-    </div>)
+    return allCompanent(props, setProps)
+    
 };
 
 export default AddComent;

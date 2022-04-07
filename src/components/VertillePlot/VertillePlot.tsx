@@ -133,7 +133,7 @@ const VertillePlot = (props: IGraphProps) => {
   };
 
 //onMouseMove={handleMouseMove} onDoubleClick={hendleonDoubleClick()}
-  const countMune = 300; // значение для  добавления меню  
+  const countMune = 350; // значение для  добавления меню  
   const ResComp = (
     <div className={styles.container} >
       <svg width={chartWidth + 80 + countMune} height={chartHeight + 50} xmlns="http://www.w3.org/2000/svg" >
