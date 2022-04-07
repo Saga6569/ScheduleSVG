@@ -109,9 +109,9 @@ const AddComent = (props: any, setProps: Function) => {
           setProps(props.map((el: IpointComent) => {
             if ( el.id === targetCompanent.id) {
               el.name = 'rect';
-              const centreX = el.x - 17 - rectInit.width/2;
-              const centreY = el.y - 19 - rectInit.height/2;
-              const newEl = {...el, [el.name]:{x: centreX, y: centreY, ...rectInit}}
+              const centreX = el.x - 20 - rectInit.width/2 - rectInit.strokeWidth/2;
+              const centreY = el.y - 18 - rectInit.height/2 - rectInit.strokeWidth/2;
+              const newEl = {...el, [el.name]:{x: centreX, y: centreY, ...rectInit}};
               return newEl;
             }
             return el;

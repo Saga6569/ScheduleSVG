@@ -110,13 +110,6 @@ interface Ipath { name: string, fill: string, stroke?: string, strokeWidth: numb
       if (coments.length === 0) {
         return null;
       };
-      // const elementComents = coments.map((el: IpointComent) => {
-      //   if (el.name === 'path'){
-      //     console.log(el)
-      //   }
-      // })
-
-
       return (<>
         {coments.map((el: IpointComent | any) => {
           if (el.name === 'path') {
@@ -143,6 +136,7 @@ interface Ipath { name: string, fill: string, stroke?: string, strokeWidth: numb
                   })
                   setComent(newComents);
                 },
+
               },
             )
           }
@@ -168,7 +162,28 @@ interface Ipath { name: string, fill: string, stroke?: string, strokeWidth: numb
                   return coment;
                 });
                 setComent(newComents);
-              }
+              },
+              onMouseMove: (e: any) => {
+                if (e.nativeEvent.buttons === 1) {
+                  const newComents = coments.map((coment: IpointComent | any) => {
+                    if (coment.id === el.id) {
+                      const x = e.nativeEvent.offsetX;
+                      const y = e.nativeEvent.offsetY;
+                      if (coment[coment.name].hasOwnProperty('cx')) {
+                        coment[coment.name].cx = x;
+                        coment[coment.name].cy = y;
+                        return coment
+                      }
+                      coment[coment.name].x = x - 50;
+                      coment[coment.name].y = y - 50;
+                      return coment
+                    }
+                    return coment
+                  });
+                  setComent(newComents);
+                  return;
+                }
+              },
             },
           )
         })}
@@ -183,7 +198,7 @@ interface Ipath { name: string, fill: string, stroke?: string, strokeWidth: numb
       localStorage.setItem("coments", JSON.stringify(coments));
     }, [coments]);
 
-    const handleMouseMove = (e: any) => {
+    const handleMouseMove = (e: { preventDefault: () => void; nativeEvent: { offsetX: any; offsetY: any; buttons: number; }; }) => {
       e.preventDefault();
       if (coments.length === 0 || coments.every((el: IpointComent) => el.target === false)) {
         return;
@@ -201,8 +216,8 @@ interface Ipath { name: string, fill: string, stroke?: string, strokeWidth: numb
           const newComents = coments.map((el: IpointComent) => el.id === comentTarget.id ? comentTarget: el);
           setComent(newComents);
           return;
-        }
-      }
+        };
+      };
     };
   
     const hendleonDoubleClick = () => (e: { preventDefault: () => void; clientY: number; clientX: number; }) => {
