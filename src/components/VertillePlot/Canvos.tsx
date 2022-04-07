@@ -163,7 +163,7 @@ interface Ipath { name: string, fill: string, stroke?: string, strokeWidth: numb
                 setComent(newComents);
               },
               onMouseMove: (e: any) => {
-                if (e.nativeEvent.buttons === 1) {
+                if (e.nativeEvent.buttons === 1 && el.target === true) {
                   const newComents = coments.map((coment: IpointComent | any) => {
                     if (coment.id === el.id) {
                       const x = e.nativeEvent.offsetX;
@@ -173,8 +173,8 @@ interface Ipath { name: string, fill: string, stroke?: string, strokeWidth: numb
                         coment[coment.name].cy = y;
                         return coment
                       }
-                      coment[coment.name].x = x - 50;
-                      coment[coment.name].y = y - 50;
+                      coment[coment.name].x = x - 10;
+                      coment[coment.name].y = y - 10;
                       return coment
                     }
                     return coment
@@ -245,7 +245,7 @@ interface Ipath { name: string, fill: string, stroke?: string, strokeWidth: numb
         onDoubleClick={hendleonDoubleClick()} onMouseMove={handleMouseMove}
       />
       {drawingCanvasElements()}
-      {<foreignObject x={props.width + props.x * 2} y={20} width="320" height="750">
+      {<foreignObject x={props.width + props.x * 2} y={20} width="350" height="750">
       {AddComent(coments, setComent)}
       </foreignObject>}
       {PopUpWindow(rendered)}
