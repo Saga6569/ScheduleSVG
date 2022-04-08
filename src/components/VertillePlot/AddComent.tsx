@@ -5,50 +5,25 @@ import React from 'react';
 interface Icircle { name: string; r: number; fill: string; stroke: string; strokeWidth: number; comment: string;};
 interface Irect { name: string; width: number;  height: number; fill: string; stroke: string; strokeWidth: number; comment: string;};
 interface Iellipse { name: string, rx: number, ry: number, fill: string, stroke: string, strokeWidth: number, comment: string};
-interface Ipath { name: string, fill: string, stroke: string, strokeWidth: number, comment: string; d?: string};
+interface Ipath { name: string, fill: string, stroke?: string, strokeWidth: number, comment: string; d?: string};
 
 interface IpointComent {visible: boolean; target: boolean; id: string; 
-  cx: number; cy: number; x: number; y: number; name?: any; circle?: Icircle; rect?: Irect; ellipse?: Iellipse; Ipath: Ipath; }
+  cx: number; cy: number; x: number; y: number; name?: any; circle?: Icircle; rect?: Irect; ellipse?: Iellipse; Ipath?: Ipath; }
 
 const circleInit: Icircle = {name: 'circle', r: 20, fill: '#7FFFD4', stroke: '#000000', strokeWidth: 5, comment: ''};
 const rectInit: Irect = {name: 'rect', width: 100, height: 150, fill: '#7FFFD4', stroke: '#000000' ,strokeWidth: 5, comment: ''};
 const ellipseInit: Iellipse = {name: 'ellipse', rx: 100, ry: 50, fill: '#7FFFD4', stroke: '#000000', strokeWidth: 5, comment: ''};
-const pathInit: Ipath = {name: 'path', fill: 'none',  stroke: '#000000', strokeWidth: 5, comment: ''};
+const pathInit: Ipath = {name: 'path', fill: 'none',  stroke: '#000000', strokeWidth: 5, comment: '', };
 
 const allCompanent = (props: any, setProps: Function) => {
   const targetCompanent = props.filter((el: IpointComent) => el.target)[0];
   const stateCompanent = targetCompanent[targetCompanent.name];
   const keysTargetCompanent = Object.keys(stateCompanent);
-  if (targetCompanent.name === 'path' &&  stateCompanent.points.length === 2) {
-    return ( <div>
-      зажмите левую кнопку мыши
-    </div>)
-  }
   return (
     <div className={styles.FormS}>
       {keysTargetCompanent.map((key: string) => {
-         if (key === 'name') {
-          return;
-        }
-        if (key === 'points') {
-          const name = key;
-          const value = `M${stateCompanent[key].join(' ')}`
-          const label = <label>{[key]}</label>
-          const imput = React.createElement(
-           'path' ,
-            {d: value, name: name, type: 'number',
-              onChange: (e: { target: { value: string}}) => {
-                const newProps = props.map((el: IpointComent | any) => {
-                  if (el.id === targetCompanent.id) {
-                    el[el.name][key] =   Number(e.target.value)
-                    return el;
-                  };
-                  return el;
-                })
-              setProps(newProps)}
-            },
-          );
-          return (<tr>{label}{imput}</tr>)
+        if ( key === 'name') {
+          return null;
         }
         const name = key;
         const value = stateCompanent[key];
@@ -73,21 +48,17 @@ const allCompanent = (props: any, setProps: Function) => {
         {<button onClick={() => {
           setProps(props.filter((el: IpointComent) => el.target !== true))
         }} >{'Удалить'}</button>}
-      
         <button onClick={() => {
           const newProps = props.map((el: IpointComent) => {
-            if (el.id === targetCompanent.id){
+            if (el.id === targetCompanent.id) {
               el.target = false;
-              console.log(el)
               return el;
             }
             return el;
           });
-          console.log(newProps)
           setProps(newProps)
         }}>{'Сохранить'}
         </button>
-        
     </div>
   )
 };
@@ -117,7 +88,7 @@ const AddComent = (props: any, setProps: Function) => {
             if ( el.id === targetCompanent.id) {
               el.name = 'path';
               const points: [] = []
-              const newEl = {...el, [el.name]:{...pathInit, points}}
+              const newEl = {...el, points, [el.name]:{...pathInit}}
               return newEl
             }
             return el;

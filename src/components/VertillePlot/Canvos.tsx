@@ -20,7 +20,7 @@ interface Ipath { name: string, fill: string, stroke?: string, strokeWidth: numb
   };
   
   const PopUpWindow = (option: IpointComent | any) => { // окно информации
-    const name = option.name
+    const name = option.name;
     const state = option[option.name];
     if (name === 'rect') {
       const cx = state.x;
@@ -41,7 +41,7 @@ interface Ipath { name: string, fill: string, stroke?: string, strokeWidth: numb
       );
     };
     if (name === 'path') {
-      const points = state.points;
+      const points = option.points;
       const cx = points[points.length - 2];
       const cy = points[points.length - 1];
       const width = state.comment.length * 11;
@@ -110,38 +110,13 @@ interface Ipath { name: string, fill: string, stroke?: string, strokeWidth: numb
       if (coments.length === 0) {
         return null;
       };
-      return (<>
-        {coments.map((el: IpointComent | any) => {
-          if (el.name === 'path') {
-            const d = `M${el[el.name].points.join(' ')}`;
-            return React.createElement(
-              `${el.name}`,
-              {...el[el.name], d, 
-                onMouseEnter: () =>  {
-                  const newOption = {...el, visible: true};
-                  setRendered(newOption);
-                },
-                onMouseOut: () =>  {
-                  const newOption = {...el, visible: false};
-                  setRendered(newOption);
-                },
-                onDoubleClick: (e: { stopPropagation: () => void; }) => {
-                  e.stopPropagation();
-                  const newComents = coments.map((coment: IpointComent) => {
-                    if (coment.id === el.id) {
-                      coment.target = true;
-                      return coment;
-                    }
-                    return coment;
-                  })
-                  setComent(newComents);
-                },
-              },
-            )
-          }
-          return React.createElement(
-            `${el.name}`,
-            {...el[el.name], 
+
+      const comentsElemets = coments.map((el: IpointComent | any) => {
+        if (el.name === 'path') {
+          const d = `M${el.points.join(' ')}`;
+          const renderEl = React.createElement(
+            `${'path'}`,
+            {...el[el.name], d, 
               onMouseEnter: () =>  {
                 const newOption = {...el, visible: true};
                 setRendered(newOption);
@@ -156,37 +131,64 @@ interface Ipath { name: string, fill: string, stroke?: string, strokeWidth: numb
                   if (coment.id === el.id) {
                     coment.target = true;
                     return coment;
-                  };
-                  coment.target = false;
+                  }
                   return coment;
-                });
+                })
                 setComent(newComents);
-              },
-              onMouseMove: (e: any) => {
-                if (e.nativeEvent.buttons === 1 && el.target === true) {
-                  const newComents = coments.map((coment: IpointComent | any) => {
-                    if (coment.id === el.id) {
-                      const x = e.nativeEvent.offsetX;
-                      const y = e.nativeEvent.offsetY;
-                      if (coment[coment.name].hasOwnProperty('cx')) {
-                        coment[coment.name].cx = x;
-                        coment[coment.name].cy = y;
-                        return coment
-                      }
-                      coment[coment.name].x = x - 10;
-                      coment[coment.name].y = y - 10;
-                      return coment
-                    }
-                    return coment
-                  });
-                  setComent(newComents);
-                  return;
-                }
               },
             },
           )
-        })}
-      </>);
+          return renderEl;
+        };
+        return React.createElement(
+          `${el.name}`,
+          {...el[el.name], 
+            onMouseEnter: () =>  {
+              const newOption = {...el, visible: true};
+              setRendered(newOption);
+            },
+            onMouseOut: () =>  {
+              const newOption = {...el, visible: false};
+              setRendered(newOption);
+            },
+            onDoubleClick: (e: { stopPropagation: () => void; }) => {
+              e.stopPropagation();
+              const newComents = coments.map((coment: IpointComent) => {
+                if (coment.id === el.id) {
+                  coment.target = true;
+                  return coment;
+                };
+                coment.target = false;
+                return coment;
+              });
+              setComent(newComents);
+            },
+            onMouseMove: (e: any) => {
+              if (e.nativeEvent.buttons === 1 && el.target === true) {
+                const newComents = coments.map((coment: IpointComent | any) => {
+                  if (coment.id === el.id) {
+                    const x = e.nativeEvent.offsetX;
+                    const y = e.nativeEvent.offsetY;
+                    if (coment[coment.name].hasOwnProperty('cx')) {
+                      coment[coment.name].cx = x;
+                      coment[coment.name].cy = y;
+                      return coment
+                    }
+                    coment[coment.name].x = x - 10;
+                    coment[coment.name].y = y - 10;
+                    return coment
+                  }
+                  return coment
+                });
+                setComent(newComents);
+                return;
+              }
+            },
+          },
+        )
+      });
+
+      return (comentsElemets)
     };
   
     useEffect(() => {
@@ -209,9 +211,9 @@ interface Ipath { name: string, fill: string, stroke?: string, strokeWidth: numb
       const x = e.nativeEvent.offsetX;
       const y = e.nativeEvent.offsetY
       if (comentTarget.name === 'path') {
-        const points = comentTarget[comentTarget.name].points;
+        const points = comentTarget.points;
         if (e.nativeEvent.buttons === 1) {
-          comentTarget[comentTarget.name].points = [...points, x, y];
+          comentTarget.points = [...points, x, y];
           const newComents = coments.map((el: IpointComent) => el.id === comentTarget.id ? comentTarget: el);
           setComent(newComents);
           return;
