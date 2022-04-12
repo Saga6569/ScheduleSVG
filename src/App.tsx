@@ -6,10 +6,6 @@ import GraphCircle from './components/GraphCircle/GraphCircle';
 import VertillePlot from './components/VertillePlot/VertillePlot';
 import './App.css';
 
-interface IGraphProps {
-  values: [{name: string, value: number}],
-};
-
 const App = () => {
 
   const res = [
@@ -40,11 +36,11 @@ const App = () => {
 
   return ( 
     <div className="App">
-      {/* <FieldWithMoveablePoint/>
+      <FieldWithMoveablePoint/>
       <FieldWithPointsGeneration/>
       <Graph values={ [6, 7, 8 ,9, 10, 8, 6, 4, 3] }/>
       <Graph2 values={ data }/>
-      <GraphCircle values={res} options={param} /> */}
+      <GraphCircle values={res} options={param} />
       <VertillePlot values={ res2 }/>
     </div>
   );
