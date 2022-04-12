@@ -205,6 +205,9 @@ useEffect(() => {
 
   const creationGraphics = () => { // Компонент обрисовывает круговой график в соответствии с данные каждого элемента.
     const result = data.map((elData: IelDate) => {
+      if (!elData.visible) {
+        return null;
+      }
       const defs = <defs>
         <radialGradient id={elData.id} cx="50%" cy="50%" r="100%"  >
           <stop offset="35%" stopColor={elData.color} stopOpacity="1"/>
@@ -213,7 +216,7 @@ useEffect(() => {
         </radialGradient>
       </defs>
       const strokeDasharray = `${elData.circle.strokeDasharray.renderingPart}, ${elData.circle.strokeDasharray.nonDrawingPart}`;
-      const shadedPart  = <circle r={elData.circle.graphRadius} className={render === false ? styles.CircleStart : styles.CircleEnd} opacity={elData.visible === false ? 0 : 1}
+      const shadedPart  = <circle r={elData.circle.graphRadius} className={render === false ? styles.CircleStart : styles.CircleEnd} opacity={1}
         cx={elData.circle.cx} cy={elData.circle.cy} fill={elData.circle.fill} stroke={`url(#${elData.id})`}
         strokeDasharray={strokeDasharray} strokeDashoffset={elData.circle.strokeDashoffset} strokeWidth={elData.circle.strokeWidth}
         onMouseOut={hendleOnMouseOut(elData.id)} 
