@@ -274,7 +274,7 @@ useEffect(() => {
     });
     setData(newDa);
   };
- 
+
   const popUpWindow = () => { // окно информации
     const el = data.filter((el: IelDate) => el.id === idTarget.id)[0];
     const renderingPart = el.circle.strokeDasharray.renderingPart;
