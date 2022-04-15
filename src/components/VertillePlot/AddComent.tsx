@@ -8,21 +8,21 @@ interface Iellipse { name: string, rx: number, ry: number, fill: string, stroke:
 interface Ipath { name: string, fill: string, stroke?: string, strokeWidth: number, comment: string; d?: string};
 
 interface IpointComent {visible: boolean; target: boolean; id: string; 
-  cx: number; cy: number; x: number; y: number; name?: any; circle?: Icircle; rect?: Irect; ellipse?: Iellipse; Ipath?: Ipath; }
+  cx: number; cy: number; x: number; y: number; name?: any; circle?: Icircle; rect?: Irect; ellipse?: Iellipse; Ipath?: Ipath;}
 
 const circleInit: Icircle = {name: 'circle', r: 20, fill: '#7FFFD4', stroke: '#000000', strokeWidth: 5, comment: ''};
 const rectInit: Irect = {name: 'rect', width: 100, height: 150, fill: '#7FFFD4', stroke: '#000000' ,strokeWidth: 5, comment: ''};
 const ellipseInit: Iellipse = {name: 'ellipse', rx: 100, ry: 50, fill: '#7FFFD4', stroke: '#000000', strokeWidth: 5, comment: ''};
 const pathInit: Ipath = {name: 'path', fill: 'none',  stroke: '#000000', strokeWidth: 5, comment: '', };
 
-const allCompanent = (props: any, setProps: Function) => {
+const allCompanent = (props: IpointComent | any, setProps: Function) => {
   const targetCompanent = props.filter((el: IpointComent) => el.target)[0];
   const stateCompanent = targetCompanent[targetCompanent.name];
   const keysTargetCompanent = Object.keys(stateCompanent);
   return (
     <div className={styles.FormS}>
       {keysTargetCompanent.map((key: string) => {
-        if ( key === 'name') {
+        if (key === 'name') {
           return null;
         }
         const name = key;
@@ -36,7 +36,6 @@ const allCompanent = (props: any, setProps: Function) => {
               const newProps = props.map((el: IpointComent | any) => {
                 if (el.id === targetCompanent.id) {
                   el[el.name][key] =  type === 'number' ? Number(e.target.value) : e.target.value
-                  return el;
                 };
                 return el;
               })
@@ -52,7 +51,6 @@ const allCompanent = (props: any, setProps: Function) => {
           const newProps = props.map((el: IpointComent) => {
             if (el.id === targetCompanent.id) {
               el.target = false;
-              return el;
             }
             return el;
           });
@@ -63,7 +61,7 @@ const allCompanent = (props: any, setProps: Function) => {
   )
 };
 
-const AddComent = (props: any, setProps: Function) => {
+const AddComent = (props: IpointComent | any, setProps: Function) => {
   const state = props.length === 0 ? false : props.filter((el: IpointComent) => el.target === true)[0] === undefined ? false : true;
     if (!state) {
       return null;
@@ -75,10 +73,10 @@ const AddComent = (props: any, setProps: Function) => {
           setProps(props.map((el: IpointComent) => {
             if ( el.id === targetCompanent.id) {
               el.name = 'circle';
-              const centreX = el.x - circleInit.r
-              const centreY = el.y - circleInit.r
-              const newEl: IpointComent = {...el, [el.name]:{cx: centreX, cy: centreY, ...circleInit}}
-              return newEl
+              const centreX = el.x - circleInit.r;
+              const centreY = el.y - circleInit.r;
+              const newEl: IpointComent = {...el, [el.name]:{cx: centreX, cy: centreY, ...circleInit}};
+              return newEl;
             }
             return el;
           }))
@@ -87,9 +85,9 @@ const AddComent = (props: any, setProps: Function) => {
           setProps(props.map((el: IpointComent) => {
             if ( el.id === targetCompanent.id) {
               el.name = 'path';
-              const points: [] = []
-              const newEl = {...el, points, [el.name]:{...pathInit}}
-              return newEl
+              const points: [] = [];
+              const newEl = {...el, points, [el.name]:{...pathInit}};
+              return newEl;
             }
             return el;
           }))
@@ -112,17 +110,15 @@ const AddComent = (props: any, setProps: Function) => {
               el.name = 'ellipse';
               const centreX = el.x;
               const centreY = el.y;
-              const newEl = {...el, [el.name]:{cx: centreX, cy: centreY, ...ellipseInit}}
-              return newEl
+              const newEl = {...el, [el.name]:{cx: centreX, cy: centreY, ...ellipseInit}};
+              return newEl;
             }
             return el;
           }))
         }}>ellipse</button>
       </div>)
     };
-
-    return allCompanent(props, setProps)
-    
+  return allCompanent(props, setProps);
 };
 
 export default AddComent;

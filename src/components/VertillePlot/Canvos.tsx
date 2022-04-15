@@ -99,18 +99,13 @@ interface Ipath { name: string, fill: string, stroke?: string, strokeWidth: numb
 
 
   const Canvos = (props: Icanvos) => {
-
-  const arr: any = []
+  const arr: any = [];
   const [coments, setComent] = useState(arr);
-
   const [rendered, setRendered] = useState({});
-
     const drawingCanvasElements = () => {
-     
       if (coments.length === 0) {
         return null;
       };
-
       const comentsElemets = coments.map((el: IpointComent | any) => {
         if (el.name === 'path') {
           const d = `M${el.points.join(' ')}`;
@@ -126,7 +121,6 @@ interface Ipath { name: string, fill: string, stroke?: string, strokeWidth: numb
                 setRendered(newOption);
               },
               onDoubleClick: (e: { stopPropagation: () => void; }) => {
-                e.stopPropagation();
                 const newComents = coments.map((coment: IpointComent) => {
                   if (coment.id === el.id) {
                     coment.target = true;
@@ -164,7 +158,10 @@ interface Ipath { name: string, fill: string, stroke?: string, strokeWidth: numb
               setComent(newComents);
             },
             onMouseMove: (e: any) => {
-              if (e.nativeEvent.buttons === 1 && el.target === true) {
+              if (e.nativeEvent.buttons !== 1 ) {
+                return;
+              }
+              if (el.target === true) {
                 const newComents = coments.map((coment: IpointComent | any) => {
                   if (coment.id === el.id) {
                     const x = e.nativeEvent.offsetX;
@@ -174,8 +171,8 @@ interface Ipath { name: string, fill: string, stroke?: string, strokeWidth: numb
                       coment[coment.name].cy = y;
                       return coment
                     }
-                    coment[coment.name].x = x - 10;
-                    coment[coment.name].y = y - 10;
+                    coment[coment.name].x = x - coment[coment.name].width/2;
+                    coment[coment.name].y = y - coment[coment.name].height/2;
                     return coment
                   }
                   return coment
@@ -187,8 +184,7 @@ interface Ipath { name: string, fill: string, stroke?: string, strokeWidth: numb
           },
         )
       });
-
-      return (comentsElemets)
+      return (comentsElemets);
     };
   
     useEffect(() => {
@@ -199,8 +195,10 @@ interface Ipath { name: string, fill: string, stroke?: string, strokeWidth: numb
       localStorage.setItem("coments", JSON.stringify(coments));
     }, [coments]);
 
-    const handleMouseMove = (e: { preventDefault: () => void; nativeEvent: { offsetX: any; offsetY: any; buttons: number; }; }) => {
-      e.preventDefault();
+    const handleMouseMove = (e: {nativeEvent: { offsetX: any; offsetY: any; buttons: number; }; }) => {
+      if (e.nativeEvent.buttons !== 1) {
+        return;
+      };
       if (coments.length === 0 || coments.every((el: IpointComent) => el.target === false)) {
         return;
       };
@@ -209,38 +207,32 @@ interface Ipath { name: string, fill: string, stroke?: string, strokeWidth: numb
         return;
       };
       const x = e.nativeEvent.offsetX;
-      const y = e.nativeEvent.offsetY
+      const y = e.nativeEvent.offsetY;
       if (comentTarget.name === 'path') {
         const points = comentTarget.points;
-        if (e.nativeEvent.buttons === 1) {
-          comentTarget.points = [...points, x, y];
-          const newComents = coments.map((el: IpointComent) => el.id === comentTarget.id ? comentTarget: el);
-          setComent(newComents);
-          return;
-        };
+        comentTarget.points = [...points, x, y];
+        const newComents = coments.map((el: IpointComent) => el.id === comentTarget.id ? comentTarget: el);
+        setComent(newComents);
       };
     };
   
-    const hendleonDoubleClick = () => (e: { preventDefault: () => void; clientY: number; clientX: number; }) => {
+    const hendleonDoubleClick = () => (e: {clientY: number; clientX: number; }) => {
       const cx = e.clientX;
       const cy = e.clientY;
       const x = e.clientX;
       const y = e.clientY;
       const newComent: IpointComent = {visible: false, target: true, id: _.uniqueId(), cx, cy, x, y, name: null};
-  
       if (coments.length === 0 || coments.every((el: IpointComent) => el.target === false)) {
-        console.log('добавил')
+        console.log('добавил');
         setComent([...coments, newComent]);
-      return;
+        return;
       };
-  
       const targetConp = coments.filter((el: IpointComent) => el.target === true)[0];
       if (targetConp.name === null) {
-        console.log('выберите фигуру')
+        console.log('выберите фигуру');
         return;
       }
     };
-
     return (
       <>
       <rect width={props.width + props.x * 2} height={props.height + props.y * 2} fill="red" opacity={0} 
