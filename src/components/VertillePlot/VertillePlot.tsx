@@ -4,16 +4,6 @@ import _  from 'lodash'
 import { exportComponentAsJPEG, exportComponentAsPDF, exportComponentAsPNG } from 'react-component-export-image';
 import Canvos from './Canvos'
 
-interface Icircle { name: string; r: number; fill: string; stroke: string; strokeWidth: number; comment: string;};
-interface Irect { name: string; width: number;  height: number; fill: string; stroke: string; strokeWidth: number; comment: string;};
-interface Iellipse { name: string, rx: number, ry: number, fill: string, stroke: string, strokeWidth: number, comment: string};
-interface Ipath { name: string, fill: string, stroke?: string, strokeWidth: number, comment: string; d?: string};
-
-
-interface IpointComent {visible: boolean, target: boolean, id: string, 
-  cx: number, cy: number, x: number, y: number, name?: string | null, circle?: Icircle, rect?: Irect, ellipse?: Iellipse, Ipath?: Ipath; }
-
-
 interface IoptionInformGraf { x: number; y: number; color?: string; name: string; value?: number; visit: boolean;};
 
 interface IGraphProps {
@@ -21,10 +11,10 @@ interface IGraphProps {
 };
 
 interface IelDate {
-  id: string; 
+  id?: string; 
   value: number; 
   name: string; 
-  color: string
+  color?: string
 };
 
 const PopUpWindow = (option: IoptionInformGraf) => { // окно информации
@@ -52,7 +42,7 @@ const VertillePlot = (props: IGraphProps) => {
     const colors = ['blue', 'red', '#5aa5c4', 'tomato', 'green', 'MediumOrchid', 'Yellow', 'Lime', 'Fuchsia'];
     const newData = [];
       for(let i = 0; i<= props.values.length - 1; i++) {
-        const el: any = props.values[i];
+        const el: IelDate = props.values[i];
         const value = el.value ?? el;
         const name = el.name ?? `${value}`;
         const color = el.color ?? colors[i];
@@ -88,6 +78,9 @@ const VertillePlot = (props: IGraphProps) => {
         setOption({...option, visit: false})
       }}  
       onMouseEnter={() =>  { // Событие наведение курсора на элементs
+        if (elDate.color === undefined ) {
+          return null
+        }
         setOption({x: x, y: startPointBottomPointY - valueY, color: elDate.color, 
           name: elDate.name, value: elDate.value, visit: true})
       }} 

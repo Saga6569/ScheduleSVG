@@ -8,16 +8,21 @@ interface Iellipse { name: string, rx: number, ry: number, fill: string, stroke:
 interface Ipath { name: string, fill: string, stroke?: string, strokeWidth: number, comment: string; d?: string};
 
 interface IpointComent {visible: boolean; target: boolean; id: string; 
-  cx: number; cy: number; x: number; y: number; name?: any; circle?: Icircle; rect?: Irect; ellipse?: Iellipse; Ipath?: Ipath;}
+  cx: number; cy: number; x: number; y: number; 
+  name: string;
+  circle?: Icircle; rect?: Irect; ellipse?: Iellipse; Ipath?: Ipath;
+  [name: string]: any
+}
 
 const circleInit: Icircle = {name: 'circle', r: 20, fill: '#7FFFD4', stroke: '#000000', strokeWidth: 5, comment: ''};
 const rectInit: Irect = {name: 'rect', width: 100, height: 150, fill: '#7FFFD4', stroke: '#000000' ,strokeWidth: 5, comment: ''};
 const ellipseInit: Iellipse = {name: 'ellipse', rx: 100, ry: 50, fill: '#7FFFD4', stroke: '#000000', strokeWidth: 5, comment: ''};
 const pathInit: Ipath = {name: 'path', fill: 'none',  stroke: '#000000', strokeWidth: 5, comment: '', };
 
-const allCompanent = (props: IpointComent | any, setProps: Function) => {
+const allCompanent = (props: IpointComent, setProps: Function) => {
+  console.log(props)
   const targetCompanent = props.filter((el: IpointComent) => el.target)[0];
-  const stateCompanent = targetCompanent[targetCompanent.name];
+  const stateCompanent = targetCompanent[targetCompanent.name];    // $$##Aristov  как правильно ? 
   const keysTargetCompanent = Object.keys(stateCompanent);
   return (
     <div className={styles.FormS}>
@@ -33,7 +38,7 @@ const allCompanent = (props: IpointComent | any, setProps: Function) => {
           `${key === 'comment' ? 'textarea' : 'input'}`,
           {value: value, name: name, type: key === 'fill' || key === 'stroke' ? 'color' : typeof value,
             onChange: (e: {target: { value: string }, } ) => {
-              const newProps = props.map((el: IpointComent | any) => {
+              const newProps = props.map((el: IpointComent) => {
                 if (el.id === targetCompanent.id) {
                   el[el.name][key] =  type === 'number' ? Number(e.target.value) : e.target.value
                 };
@@ -61,7 +66,7 @@ const allCompanent = (props: IpointComent | any, setProps: Function) => {
   )
 };
 
-const AddComent = (props: IpointComent | any, setProps: Function) => {
+const AddComent = (props: IpointComent, setProps: Function) => {
   const state = props.length === 0 ? false : props.filter((el: IpointComent) => el.target === true)[0] === undefined ? false : true;
     if (!state) {
       return null;

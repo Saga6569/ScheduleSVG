@@ -16,12 +16,16 @@ interface Iellipse { name: string, rx: number, ry: number, fill: string, stroke:
 interface Ipath { name: string, fill: string, stroke?: string, strokeWidth: number, comment: string; d?: string};
 
   interface IpointComent {visible: boolean, target: boolean, id: string, 
-    cx: number, cy: number, x: number, y: number, name?: string | null, circle?: Icircle, rect?: Irect, ellipse?: Iellipse, Ipath?: Ipath; 
-  };
+    cx: number, cy: number, x: number, y: number, name?: string, circle?: Icircle, rect?: Irect, ellipse?: Iellipse, Ipath?: Ipath;
+    [name: string]: any;
+  } 
   
-  const PopUpWindow = (option: IpointComent | any) => { // окно информации
+  const PopUpWindow = (option: IpointComent) => { // окно информации
     const name = option.name;
-    const state = option[option.name];
+    if (option.name === undefined) {
+      return null;
+    }
+    const state = option[option.name]; // // $$##Aristov 
     if (name === 'rect') {
       const cx = state.x;
       const cy = state.y;
@@ -99,14 +103,18 @@ interface Ipath { name: string, fill: string, stroke?: string, strokeWidth: numb
 
 
   const Canvos = (props: Icanvos) => {
-  const arr: any = [];
-  const [coments, setComent] = useState(arr);
-  const [rendered, setRendered] = useState({});
+  const initComents: any = [];
+  const initRender: any = {}
+  const [coments, setComent] = useState(initComents);
+  const [rendered, setRendered] = useState(initRender);
     const drawingCanvasElements = () => {
       if (coments.length === 0) {
         return null;
       };
-      const comentsElemets = coments.map((el: IpointComent | any) => {
+      const comentsElemets = coments.map((el: IpointComent) => {
+        if (el.name === undefined) {
+          return null;
+        }
         if (el.name === 'path') {
           const d = `M${el.points.join(' ')}`;
           const renderEl = React.createElement(
@@ -120,7 +128,7 @@ interface Ipath { name: string, fill: string, stroke?: string, strokeWidth: numb
                 const newOption = {...el, visible: false};
                 setRendered(newOption);
               },
-              onDoubleClick: (e: { stopPropagation: () => void; }) => {
+              onDoubleClick: () => {
                 const newComents = coments.map((coment: IpointComent) => {
                   if (coment.id === el.id) {
                     coment.target = true;
@@ -157,12 +165,15 @@ interface Ipath { name: string, fill: string, stroke?: string, strokeWidth: numb
               });
               setComent(newComents);
             },
-            onMouseMove: (e: any) => {
+            onMouseMove: (e: { nativeEvent: { buttons: number; offsetX: any; offsetY: any; }; }) => {
               if (e.nativeEvent.buttons !== 1 ) {
                 return;
               }
               if (el.target === true) {
-                const newComents = coments.map((coment: IpointComent | any) => {
+                const newComents = coments.map((coment: IpointComent) => {
+                  if (coment.name === undefined) {
+                    return null;
+                  }
                   if (coment.id === el.id) {
                     const x = e.nativeEvent.offsetX;
                     const y = e.nativeEvent.offsetY;
@@ -195,7 +206,7 @@ interface Ipath { name: string, fill: string, stroke?: string, strokeWidth: numb
       localStorage.setItem("coments", JSON.stringify(coments));
     }, [coments]);
 
-    const handleMouseMove = (e: {nativeEvent: { offsetX: any; offsetY: any; buttons: number; }; }) => {
+    const handleMouseMove = (e: {nativeEvent: { offsetX: number; offsetY: number; buttons: number; }; }) => {
       if (e.nativeEvent.buttons !== 1) {
         return;
       };
@@ -221,7 +232,7 @@ interface Ipath { name: string, fill: string, stroke?: string, strokeWidth: numb
       const cy = e.clientY;
       const x = e.clientX;
       const y = e.clientY;
-      const newComent: IpointComent = {visible: false, target: true, id: _.uniqueId(), cx, cy, x, y, name: null};
+      const newComent: IpointComent = {visible: false, target: true, id: _.uniqueId(), cx, cy, x, y, name: undefined};
       if (coments.length === 0 || coments.every((el: IpointComent) => el.target === false)) {
         console.log('добавил');
         setComent([...coments, newComent]);
