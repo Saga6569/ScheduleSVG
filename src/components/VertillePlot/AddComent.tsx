@@ -19,10 +19,13 @@ const rectInit: Irect = {name: 'rect', width: 100, height: 150, fill: '#7FFFD4',
 const ellipseInit: Iellipse = {name: 'ellipse', rx: 100, ry: 50, fill: '#7FFFD4', stroke: '#000000', strokeWidth: 5, comment: ''};
 const pathInit: Ipath = {name: 'path', fill: 'none',  stroke: '#000000', strokeWidth: 5, comment: '', };
 
+
+
+// Компонент принимает пропс с комментариями и находит комментарий на котором таргет и через свойство  
+// name оно же является ключом к характеристикам для отображения комментария (круг овал квадрат и тд.)
 const allCompanent = (props: IpointComent, setProps: Function) => {
-  console.log(props)
   const targetCompanent = props.filter((el: IpointComent) => el.target)[0];
-  const stateCompanent = targetCompanent[targetCompanent.name];    // $$##Aristov  как правильно ? 
+  const stateCompanent = targetCompanent[targetCompanent.name];    // $$##Aristov  как правильно ?
   const keysTargetCompanent = Object.keys(stateCompanent);
   return (
     <div className={styles.FormS}>
@@ -66,13 +69,15 @@ const allCompanent = (props: IpointComent, setProps: Function) => {
   )
 };
 
+//Компонент принимает пропс с комментариями находит на котором, лежит таргет. 
+// Если у свойства не указано имя, то он отображает меню  выбора, если указана, то  передает в компонент отрисовки свойств 
 const AddComent = (props: IpointComent, setProps: Function) => {
   const state = props.length === 0 ? false : props.filter((el: IpointComent) => el.target === true)[0] === undefined ? false : true;
     if (!state) {
       return null;
     };
   const targetCompanent: IpointComent = props.filter((el: IpointComent) => el.target === true)[0];
-    if (targetCompanent.name === null) {
+    if (targetCompanent.name === undefined) {
       return (<div className={styles.ButtonMenu}>
         <button onClick={() => {
           setProps(props.map((el: IpointComent) => {

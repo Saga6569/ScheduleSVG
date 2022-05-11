@@ -231,21 +231,6 @@ useEffect(() => {
     return (<>{result}</>);
   };
 
-  // const centerLine = () => {  // отладка центра окружности для смещения
-  //   const cen = data.map((el) => {
-  //     const renderingPart = el.circle.strokeDasharray.renderingPart
-  //     const strokeDashoffset = el.circle.strokeDashoffset 
-  //     const tiltAngle = (((renderingPart / 2) + Math.abs(strokeDashoffset)) / 3.49) * 0.01745329252
-  //     const xPointOffset = 200 * Math.cos(tiltAngle)
-  //     const y = 200 * Math.sin(tiltAngle)
-  //     if (el.visible === true) {
-  //       return <path d={`M${350} ${370} ${350 + xPointOffset} ${370 + y} `}  stroke='#696666' strokeWidth="0.5"/>
-  //     }
-  //     return null;
-  //   });
-  //   return cen;
-  // }
-
   const upTableDate = () => {  // обновлаем значение информации графика
     const condition1 = data.filter((el) => el.visible === true).every((el) =>  el.prochent.oldValue === el.prochent.newValue);
     const condition2 = data.filter((el) => el.visible === false).every((el) =>  el.prochent.oldValue === 0);
