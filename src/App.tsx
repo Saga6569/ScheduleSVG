@@ -2,6 +2,7 @@ import { FieldWithMoveablePoint } from './components/Fields/FieldWithMoveablePoi
 import { FieldWithPointsGeneration } from './components/Fields/FieldWithPointsGeneration';
 import { Graph } from './components/Graph/Graph';
 import { Graph2 } from './components/Graph/Graph2';
+import LineGraph from './components/LineGraph/LineGraph';
 import GraphCircle from './components/GraphCircle/GraphCircle';
 import VertillePlot from './components/VertillePlot/VertillePlot';
 import './App.css';
@@ -18,8 +19,6 @@ const App = () => {
     {value: 5, name: 'Губаха'} 
   ];
 
-  const data: any = {value: [6, 7, 8 ,9, 10, 8, 6, 4, 3], collors: {backgroundColor: '#c0c0fa', dotColor: '#000080', } };
-
   const res2 = [
     {value: 1665, name: 'Пермь'}, 
     {value: 4516, name: 'Москва'}, 
@@ -32,14 +31,17 @@ const App = () => {
     {value: 3345, name: 'Губаха'},
   ];
 
-  const param: any = {graphRadius: 100, strokeWidth: 100}
+  const param: any = {graphRadius: 200, strokeWidth: 150}
+
+  const datas = [
+    {name: 'shop1', values: [ 1, 0, 3 ,0, 5, 0 ]},
+    {name: 'shop2', values: [ 10, 9, 8 ,7, 6, 5, 4, 3, 2 ]},
+    {name: 'shop3', values: [ 7, 7, 8 ,9, 10, 5, 3, 4, 3 ]},
+  ];
 
   return (
     <div className="App">
-      <FieldWithMoveablePoint/>
-      <FieldWithPointsGeneration/>
-      <Graph values={ [6, 7, 8 ,9, 10, 8, 6, 4, 3] }/>
-      <Graph2 values={ data }/>
+      <LineGraph data={datas} />
       <GraphCircle values={res} options={param} />
       <VertillePlot values={ res2 }/>
     </div>

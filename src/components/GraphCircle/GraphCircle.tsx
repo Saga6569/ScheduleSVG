@@ -11,6 +11,7 @@ interface Ivalues {
 interface IdefaultOptions {
   graphRadius: number;
   strokeWidth: number;
+  background: string; 
 };
 
 interface IGraphProps {
@@ -36,10 +37,10 @@ interface IelDate {
 
 // 0.01745329252 Значение для перевода градусов в радианы
 
-const defaultOptions: IdefaultOptions = {graphRadius: 200, strokeWidth: 150};
+const defaultOptions: IdefaultOptions = {graphRadius: 200, strokeWidth: 150, background: '#c0c0fa'};
 
 const GraphCircle = (props: IGraphProps) =>  {
-  const option = {...props.options, ...defaultOptions};
+  const option = {...defaultOptions, ...props.options};
   const initX = 350;
   const initY = 370;
   const graphRadius = option.graphRadius;
@@ -175,7 +176,6 @@ const GraphCircle = (props: IGraphProps) =>  {
      </radialGradient>
    </defs>
     const circle = <circle cx="20" cy="20" r="18" fill={`url(#${el.id}-1)`} />;
-     //const rect = <rect xPointOffset="5" y="5" width="30" height="30" fill={el.color} strokeWidth="5"/>
       const text = `${el.name} ${el.prochent.oldValue} %`;
       const textСrcle = <text x="40" y="25" id={`${el.id}-render`} fontSize="18" style={myStylText} fill={color === 'Gray' ? 'Gray' : 'black'}>{text}</text>;
       return <svg width='235' height="40" key={el.id}>
@@ -184,7 +184,6 @@ const GraphCircle = (props: IGraphProps) =>  {
           onMouseOut={hendleOnMouseOut(el.id)}
           onMouseEnter={hendleOnMouseEnter(el.id)}>
           {defs}
-          {/* {rect} */}
           {circle}
           {textСrcle}
         </g>
@@ -290,7 +289,7 @@ useEffect(() => {
   };
 
   return (
-    <div className={styles.container} >
+    <div className={styles.container} style={{backgroundColor: option.background}} >
       <svg width="800" height="700" cx='10' xmlns="http://www.w3.org/3500/svg">
         {creationGraphics()}
         {popUpWindow()}
