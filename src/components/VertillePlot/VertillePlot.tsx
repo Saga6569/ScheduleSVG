@@ -97,6 +97,7 @@ const VertillePlot = (props: IGraphProps) => {
     });
     return result;
   };
+  
   const LengthVerticalLines = 82.5 * 10 // Длинна вериткальных линий
 
   const creatingVerticalGrid  = () => {  // Функция создает вертикальную линии для графика
