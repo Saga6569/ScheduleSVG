@@ -1,12 +1,13 @@
-import React, { useState  } from 'react';
-import styles from './LineGraph.module.css';
+//import React, { useState } from 'react';
+import styles from './VertillePlot.module.css';
 import _  from 'lodash'
+import { useState } from 'react';
 
 //interface IoptionInformGraf { x: number; y: number; color?: string; name: string; value?: number; visit: boolean;};
 
 interface IpropsDataEl {
   name: string;
-  values: number[];
+  value: number[];
   color?: string;
   coment?: string;
 };
@@ -16,132 +17,246 @@ interface IGraphProps {
   option?: { backgroundColor: string }
 };
 
-interface IElData {
-  name: string;
+interface IelState {
   value: number[];
+  name: string;
   color: string;
+  id: string; 
   coment: string;
-  id: string;
+  maxValue: number;
+  minValue: number;
+  sumValue: number;
+  VectorGraphics: number
+  vizible: boolean;
+  opacity: number;
+  strokeWidth: number;
+  target: boolean;
 };
+
 
 const creatingGraph = (arrValue: number[], pxOfValue: number, chartStep: number) => {
-    let step = 25;
-    const points: any = arrValue.flatMap((el: number) => {
-      const x = step;
-      const y = (700) - (el * pxOfValue);
-      step += chartStep;
-      return [x, y];
-    });
-   return points;
+  let step = 45;
+  const points: any = arrValue.flatMap((el: number) => {
+    const x = step;
+    const y = (825) - (el / pxOfValue);
+    step += chartStep;
+    return [x, y];
+  });
+ return points;
 };
 
-
-const upDate = (datas: IpropsDataEl[]) => {
-  const colors = ['blue', 'red', 'tomato', 'green', 'MediumOrchid', 'Yellow', 'Lime', 'Fuchsia'];
+const upDate = (props: IGraphProps) => {
+  const colors = ['blue', 'red', 'Peru', 'SlateGrey', 'green', 'MediumOrchid', 'Yellow', 'Lime', 'Fuchsia'];
   const newData = [];
-    for(let i = 0; i<= datas.length - 1; i++) {
-      const el: IpropsDataEl = datas[i];
-      const value = el.values;
+    for(let i = 0; i<= props.data.length - 1; i++) {
+      const el: IpropsDataEl = props.data[i];
+      const value = el.value;
       const name = el.name;
       const color = el.color ?? colors[i];
-      const id: string = _.uniqueId();
       const coment = el.coment ?? '';
+      const id = _.uniqueId();
       const maxValue = Math.max(...value);
       const minValue = Math.min(...value);
       const sumValue = _.sum(value);
       const VectorGraphics = Math.round(sumValue/value.length);
-      newData[i] = {id, value, name, color, coment, maxValue, minValue, VectorGraphics, sumValue};
+      const vizible = true;
+      const opacity = 1;
+      const strokeWidth = 4;
+      const target = false;
+      newData[i] = {id, value, name, color, coment, maxValue, minValue, VectorGraphics, sumValue, vizible, opacity, strokeWidth, target};
     };
-
-    const numberOfSectors = Math.max(...newData.map((el: IElData) => el.value.length)); // максимально массива с данными
-    const chartStep = Math.round(950/numberOfSectors); // Растояние между значениями графика
-    const allValuesDatas = Array.from(new Set(newData.flatMap((el: IElData) => el.value)));
-    const maxValueDatas = Math.max(...allValuesDatas);
-    const minValueDatas = Math.min(...allValuesDatas);
-
-    const pxOfValue = 700/maxValueDatas;
-    const result = newData.map((el: any) => {
-      const points = creatingGraph(el.value, pxOfValue, chartStep);
-
-      const path = <path  d={`M${points.join(', ')}`} stroke={el.color} strokeWidth={4} fill='none'/>
-      const cirklesChunk = _.chunk(points, 2);
-      const arrCircle = cirklesChunk.map((el: any) => <circle cx={el[0]} cy={el[1]} r="5" stroke="black" stroke-width="3" fill="red" /> )
-      return {...el, points, path, arrCircle}
-    });
-  return result;
+  return newData;
 };
 
-
-const drawingInformation = (arrData: any) => {
-  const stateInformation = arrData.map((el: any) => {
-    const textNameEl =  <text x="40" y="25" fontSize="18" fill={el.color}>{el.name}</text>;
-    const ValueMax = <text x="40" y="45" fontSize="18" fill={'black'}>{`Максимально значение ${el.maxValue}`}</text>;
-    const ValueMin = <text x="40" y="65" fontSize="18" fill={'black'}>{`Минимально значение ${el.minValue}`}</text>;
-    const ValueSred = <text x="40" y="85" fontSize="18" fill={'black'}>{`Среднее значение ${el.VectorGraphics}`}</text>;
-    return (<svg  style={{ left: '-124px',position: 'relative'}} >
+const drawingInformation = (state: IelState[], setState: Function) => {
+  const stateInformation = state.map((elRender: IelState) => {
+    const textColor = elRender.vizible === true ? elRender.color : 'DarkGrey'
+    const textNameEl =  <text x="40" y="25" fontSize="18" fill={textColor}
+    onMouseEnter={() =>  { // Событие наведение курсора на элементs
+      if (elRender.vizible === false) {
+        return;
+      };
+      const newState = state.map((el: IelState) => {
+        if (elRender.id === el.id) {
+          el.strokeWidth = 6;
+          el.opacity = 1;
+          el.target = true;
+          return el;
+        };
+        el.target = false;
+        el.strokeWidth = 3;
+        el.opacity = 0.2;
+        return el;
+      })
+      setState(newState);
+    }}
+    onMouseOut={() => { // Событие покидание курсора элемента
+      if (elRender.vizible === false) {
+        return;
+      };
+      const newState = state.map((el: IelState) => {
+        el.strokeWidth = 5;
+        el.opacity = 1;
+        el.target = false;
+        return el;
+      })
+      setState(newState);
+    }}
+    onClick={() => {
+      const newState = state.map((el: IelState) => {
+        if (el.id === elRender.id) {
+          el.vizible = el.vizible === false ? true : false;
+        }
+        el.strokeWidth = 6;
+        el.opacity = 1;
+       
+        return el;
+      })
+      setState(newState)
+    }}
+    >{elRender.name}</text>;
+    const ValueMax = <text x="40" y="45" fontSize="18" fill={'black'}>{`Максимально значение ${elRender.maxValue}`}</text>;
+    const ValueMin = <text x="40" y="65" fontSize="18" fill={'black'}>{`Минимально значение ${elRender.minValue}`}</text>;
+    const ValueSred = <text x="40" y="85" fontSize="18" fill={'black'}>{`Среднее значение ${elRender.VectorGraphics}`}</text>;
+    return (<svg>
       {textNameEl}
-      {ValueMax}
+      {/* {ValueMax}
       {ValueMin}
-      {ValueSred}
+      {ValueSred} */}
       </svg>)
   })
-
   return (
      <div className={styles.information}>
      {stateInformation}
      </div>
-  )
+  );
 };
 
+const backgroundColorCell = (state: IelState[], el: IelState | any, key: string) => {
+  if (key === 'name') {
+    return
+  }
+  const arrValue = state.map((el: IelState | any) => el[key]);
+  if (Math.max(...arrValue) === el[key]) {
+    return {backgroundColor: 'Green'};
+  };
+  if (Math.min(...arrValue) === el[key] ) {
+    return {backgroundColor: 'red'};
+  };
+  return {backgroundColor: 'none'};
+};
+
+const drawingInformationСomparison = (state: IelState[], setState: Function) => {
+  const keysRender = ['name', 'maxValue', 'minValue',	'VectorGraphics',	'sumValue'];
+  const NameCell = keysRender.map((el: string) => {
+    return <th>{el}</th>
+  });
+  const table = state.map((elRender: IelState | any) => {
+    if (elRender.vizible === false) {
+      return;
+    }
+    const tegsTd = keysRender.map((key: string) => {
+    const myStyle = (backgroundColorCell(state, elRender, key));
+      return (<td style={myStyle} >{elRender[key]}</td>)
+    });
+    const styleTArget = elRender.target === true ? {border: "4px solid black"} : {border: '1px solid black'}
+    return (<tr style={styleTArget} >{tegsTd}</tr>);
+  })
+  return (
+    <table style={{width: "100%"}}>
+      <tr>
+        {NameCell}
+      </tr>
+      {table}
+    </table>
+  );
+};
+
+
 const LineGraph = (props: IGraphProps) => {
- 
-  const chartWidth = 950; // Ширина графика
-  const chartHeight = 700; // высота графика
-  const data = upDate(props.data);
-  const numberOfSectors = Math.max(...data.map((el: IElData) => el.value.length)); // максимально массива с данными
-  const chartStep = Math.round(chartWidth/numberOfSectors); // Растояние между значениями графика
+  const [state, setState] = useState(upDate(props))
 
-  const min =  <path d="M10 700 940 700" stroke='blue' strokeWidth={2}/>
-  const max =  <path d="M10 0 940 0" stroke='blue' strokeWidth={2}/>
-  
+  const numberOfSectors = Math.max(...state.map((el: any) => el.value.length - 1));
+  const lengthHorizontalLines = numberOfSectors * 100; // Длинна горизонтальных линий'
+  const allValuesDatas = Array.from(new Set(state.flatMap((el: any) => el.value)));
+  const maxValueDatas = Math.max(...allValuesDatas);
 
-  const creatingGraphVertikalLine = () => {
-    const result = [];
-    let step = 25;
-    for (let i = 0; i <= numberOfSectors; i++) {
-      const path = <path d={`M${step} 0 ${step} 950`} stroke='Silver' strokeWidth={1}/>
-      step += chartStep;
-      result[i] = path;    
-    };
+  const numberHorizontalLines = 10; //  Значение на которое будет делиться область графика
+  const chartHeight = 800;  // высота графика
+  const chartWidth = lengthHorizontalLines; // Ширина графика 
+  const wholeScreenValue = Math.round(chartHeight * maxValueDatas / chartHeight - 40);  // Получаем значение 800 px  максимальное значение в данных всегда будет 760 px
+  const roundedAverage = '0'.repeat(String(wholeScreenValue).length - 1); // Получаем количество нулей для округления среднего значения
+  const horizontalLineInterval  = Math.ceil(wholeScreenValue / numberHorizontalLines / Number(`1${roundedAverage}`)) * Number(`1${roundedAverage}`); // Получаем шаг интервальных линий
+  const roundedWholeScreenValue = horizontalLineInterval * numberHorizontalLines; // Округленное значение 400 px 
+  const verticalLineSpacing = 100; // шаг вертикальных линиий
+
+
+  const createDataForRendering = () => {    // Функция обрисовывает пришедшие данные в график 
+    const result = state.map((el: IelState) => {
+      if (el.vizible !== true) {
+        return;
+      }
+      const px = (roundedWholeScreenValue / chartHeight);
+      const points = creatingGraph(el.value, px, 100);
+      const cirklesChunk = _.chunk(points, 2);
+      const arrCircle = cirklesChunk.map((elChunk: any) => <circle cx={elChunk[0]} cy={elChunk[1]} r="6" opacity={el.opacity} stroke="black" strokeWidth={el.strokeWidth} fill={el.color} /> )
+      const y1 = (825) - (el.value[2] / px);
+      const y2 = (800) - (el.VectorGraphics / px);
+      const vPath = <path d={`M45, ${y1} ${lengthHorizontalLines + 45} ${y2}`} stroke={el.color} opacity={el.opacity} strokeWidth={el.strokeWidth} fill='none'/>
+      return (<g className={styles.containerGradient} >
+        {el.target === true ? vPath : null}
+        <path style={{'transitionProperty': 'stroke-width, opacity' , 'transitionDuration': '0.5s'}} d={`M${points.join(', ')}`} stroke={el.color} opacity={el.opacity} strokeWidth={el.strokeWidth} fill='none'/>
+        {arrCircle}
+      </g>);
+    });
     return result;
   };
 
-  const creatingGraph = (arrValue: any) => {
-    const paths = arrValue.map((el: any) => {
-      return el.path
-    })
-    const cirkles = arrValue.map((el: any) => {
-      return el.arrCircle
-    });
-    return (<>
-    <g className={styles.Animation}>{paths}</g>
-    {cirkles}
-    </> );
+  
+  const LengthVerticalLines = 82.5 * 10; // Длинна вериткальных линий
+
+  const creatingVerticalGrid  = () => {  // Функция создает вертикальную линии для графика
+    let initPointX = 45;
+    const numberOfSectors = Math.max(...state.map((el: IelState) => el.value.length));
+    const result = [];
+      for(let i = 0; i <= numberOfSectors; i++) {
+        result[i] =  <path key={_.uniqueId()} d={`M${initPointX} ${LengthVerticalLines} V ${25}Z`}  stroke='#696666' strokeWidth="0.5"/>
+        initPointX += verticalLineSpacing;
+      };
+    return result;
   };
 
- 
+  const creatingHorizontalGrid = () => { // Функция создает горизонтальные линии для графика со значением для каждой линии
+    const result = [];
+    let initPointY = 0;
+    let acc = 0;
+      for(let i = 0; i <= numberHorizontalLines ; i++) {
+        const companent = <g key={_.uniqueId()}>
+          <text  x={i === 0 ? 35 : 10} y={chartHeight + 28 - initPointY} fontSize="12" fill="black" >{`${acc.toFixed()}`}</text> 
+          <path d={`M${chartWidth + 45} ${chartHeight + 25 - initPointY} H ${45}Z`} fill="transparent" stroke='#696666' strokeWidth="0.5"/>
+        </g>
+        result[i] = companent;
+        initPointY += 80;
+        acc += horizontalLineInterval;
+      };
+    return result;
+  };
+
   return (
     <div className={styles.container} >
-      <svg width={chartWidth} height={chartHeight} xmlns="http://www.w3.org/2000/svg" style={{backgroundColor: 'rgb(157, 157, 214'}} >
-        {creatingGraph(data)}
-        {creatingGraphVertikalLine()}
-       {max}
-       {min}
+      <svg width={chartWidth + 80} height={chartHeight + 50} xmlns="http://www.w3.org/2000/svg" >
+      <rect x="0" y="0" width={chartWidth + 80}  height={chartHeight + 50} fill="#c0c0fa"/> 
+        <rect x="45" y="25" width={chartWidth}  height={chartHeight} fill="#E0FFFF"/>
+        {creatingHorizontalGrid()}
+        {creatingVerticalGrid()}
+        {createDataForRendering()}
       </svg>
-      {drawingInformation(data)}
+      <div>
+      {drawingInformation(state, setState)}
+      {drawingInformationСomparison(state, setState)}
+      </div>
     </div>
   );
-
 };
 
 export default LineGraph;
