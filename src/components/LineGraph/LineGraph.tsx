@@ -68,48 +68,51 @@ const upDate = (props: IGraphProps) => {
   return newData;
 };
 
+const hendleonMouseEnterElState = (collectionEl: IelState, state: IelState[], setState: Function) => {
+  if (collectionEl.vizible === false) {
+    return;
+  };
+  const newState = state.map((el: IelState) => {
+    if (collectionEl.id === el.id) {
+      el.strokeWidth = 6;
+      el.opacity = 1;
+      el.target = true;
+      return el;
+    };
+    el.target = false;
+    el.strokeWidth = 3;
+    el.opacity = 0.2;
+    return el;
+  });
+  setState(newState);
+};
+
+const hendleonMouseOutElState = (collectionEl: IelState, state: IelState[], setState: Function) => {
+  if (collectionEl.vizible === false) {
+    return;
+  };
+  const newState = state.map((el: IelState) => {
+    el.strokeWidth = 5;
+    el.opacity = 1;
+    el.target = false;
+    return el;
+  })
+  setState(newState);
+};
+
 const drawingInformation = (state: IelState[], setState: Function) => {
   const stateInformation = state.map((elRender: IelState) => {
     const textColor = elRender.vizible === true ? elRender.color : 'DarkGrey'
-    const textNameEl =  <text x="40" y="25" fontSize="18" fill={textColor}
-    onMouseEnter={() =>  { // Событие наведение курсора на элементs
-      if (elRender.vizible === false) {
-        return;
-      };
-      const newState = state.map((el: IelState) => {
-        if (elRender.id === el.id) {
-          el.strokeWidth = 6;
-          el.opacity = 1;
-          el.target = true;
-          return el;
-        };
-        el.target = false;
-        el.strokeWidth = 3;
-        el.opacity = 0.2;
-        return el;
-      })
-      setState(newState);
-    }}
-    onMouseOut={() => { // Событие покидание курсора элемента
-      if (elRender.vizible === false) {
-        return;
-      };
-      const newState = state.map((el: IelState) => {
-        el.strokeWidth = 5;
-        el.opacity = 1;
-        el.target = false;
-        return el;
-      })
-      setState(newState);
-    }}
+    const textNameEl = <text style={{'transitionProperty': 'fill' , 'transitionDuration': '0.5s'}} x="40" y="25" fontSize="18" fill={textColor}
+    onMouseEnter={() => hendleonMouseEnterElState(elRender, state, setState)}
+    onMouseOut={() =>  hendleonMouseOutElState(elRender, state, setState)}
     onClick={() => {
       const newState = state.map((el: IelState) => {
         if (el.id === elRender.id) {
           el.vizible = el.vizible === false ? true : false;
-        }
+        };
         el.strokeWidth = 6;
         el.opacity = 1;
-       
         return el;
       })
       setState(newState)
@@ -187,7 +190,7 @@ const LineGraph = (props: IGraphProps) => {
   const wholeScreenValue = Math.round(chartHeight * maxValueDatas / chartHeight - 40);  // Получаем значение 800 px  максимальное значение в данных всегда будет 760 px
   const roundedAverage = '0'.repeat(String(wholeScreenValue).length - 1); // Получаем количество нулей для округления среднего значения
   const horizontalLineInterval  = Math.ceil(wholeScreenValue / numberHorizontalLines / Number(`1${roundedAverage}`)) * Number(`1${roundedAverage}`); // Получаем шаг интервальных линий
-  const roundedWholeScreenValue = horizontalLineInterval * numberHorizontalLines; // Округленное значение 400 px 
+  const roundedWholeScreenValue = horizontalLineInterval * numberHorizontalLines; // Округленное значение 800 px 
   const verticalLineSpacing = 100; // шаг вертикальных линиий
 
 
@@ -197,9 +200,16 @@ const LineGraph = (props: IGraphProps) => {
         return;
       }
       const px = (roundedWholeScreenValue / chartHeight);
+      console.log(roundedWholeScreenValue)
       const points = creatingGraph(el.value, px, 100);
       const cirklesChunk = _.chunk(points, 2);
-      const arrCircle = cirklesChunk.map((elChunk: any) => <circle cx={elChunk[0]} cy={elChunk[1]} r="6" opacity={el.opacity} stroke="black" strokeWidth={el.strokeWidth} fill={el.color} /> )
+      let index = 0;
+      const arrCircle = cirklesChunk.map((elChunk: any) => {
+        const cirkle = <circle cx={elChunk[0]} cy={elChunk[1] } r="6" opacity={el.opacity} stroke="black" strokeWidth={el.strokeWidth} fill={el.color} />
+        const textPoint = <text style={{'transitionProperty': 'opacity' , 'transitionDuration': '0.8s'}} x={elChunk[0] - 10} y={elChunk[1] - 10} fontSize="14" opacity={el.target === true ? 1 : 0} fill={'black'}>{el.value[index]}</text>;
+        index += 1
+        return (<>{cirkle}{textPoint}</>)
+      })
       const y1 = (825) - (el.value[2] / px);
       const y2 = (800) - (el.VectorGraphics / px);
       const vPath = <path d={`M45, ${y1} ${lengthHorizontalLines + 45} ${y2}`} stroke={el.color} opacity={el.opacity} strokeWidth={el.strokeWidth} fill='none'/>
@@ -212,7 +222,6 @@ const LineGraph = (props: IGraphProps) => {
     return result;
   };
 
-  
   const LengthVerticalLines = 82.5 * 10; // Длинна вериткальных линий
 
   const creatingVerticalGrid  = () => {  // Функция создает вертикальную линии для графика
