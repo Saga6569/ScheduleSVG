@@ -36,6 +36,30 @@ interface IelDate {
 
 // 0.01745329252 Значение для перевода градусов в радианы
 
+const updatingData = (props: IGraphProps, dataSumm: number, graphRadius: number, initX: number, initY: number, strokeWidth: number) => { // Функция создает коллекцию элементов со свойствами для отрисовки
+  const colorArr = ['blue', 'red', 'black', 'tomato', 'green', 'MediumOrchid', 'Peru', 'Lime', 'LightCyan'];
+  const newData = [];
+  for(let i: number = 0; i<= props.values.length - 1; i++) {
+    const el: Ivalues = props.values[i];
+    const value = el.value;
+    const name = el.name;
+    const color = el.color ?? colorArr[i];
+    const visible = value === 0 ? false : true;
+    const id: string = _.uniqueId();
+    const bias = false; 
+    const circle: number = (graphRadius * 2 * 3.14);
+    const percentageValue: number = (value * 100 / dataSumm);
+    const shadedPart: number = (circle * percentageValue / 100);
+    const strokeDasharray = {renderingPart: shadedPart, nonDrawingPart: circle};
+    const style = {display: visible === true ? 'block' : 'none'};
+    const strokeDashoffset: number = i === 0 ? 0 : newData[i-1].circle.strokeDasharray.renderingPart * (-1) - newData[i-1].circle.strokeDashoffset * (-1);
+    newData[i] = {id, value, name, visible, bias, color, prochent: {oldValue: 0, newValue:Number(percentageValue.toFixed(2))}, style,
+      circle: {graphRadius, cx: initX, cy: initY, fill: 'none', stroke: color, strokeWidth, strokeDasharray, strokeDashoffset},
+    };
+  };
+  return newData;
+};
+
 const defaultOptions: IdefaultOptions = {graphRadius: 200, strokeWidth: 150};
 
 const GraphCircle = (props: IGraphProps) =>  {
@@ -46,74 +70,51 @@ const GraphCircle = (props: IGraphProps) =>  {
   const strokeWidth =  option.strokeWidth;
   const [render, setRender] = useState(false);
   const [dataSumm,  setDataSumm] = useState(_.sumBy(props.values, 'value'))
-  const upDate = () => {
-    const colorArr = ['blue', 'red', 'black', 'tomato', 'green', 'MediumOrchid', 'Peru', 'Lime', 'LightCyan'];
-    const newData = [];
-    for(let i: number = 0; i<= props.values.length - 1; i++) {
-      const el: Ivalues = props.values[i];
-      const value = el.value;
-      const name = el.name;
-      const color = el.color ?? colorArr[i];
-      const visible = true;
-      const id: string = _.uniqueId();
-      const bias = false; 
-      const circle: number = (graphRadius * 2 * 3.14);
-      const percentageValue: number = (value * 100 / dataSumm);
-      const shadedPart: number = (circle * percentageValue / 100);
-      const strokeDasharray = {renderingPart: shadedPart, nonDrawingPart: circle};
-      const style = {display: visible === true ? 'block' : 'none'};
-      const strokeDashoffset: number = i === 0 ? 0 : newData[i-1].circle.strokeDasharray.renderingPart * (-1) - newData[i-1].circle.strokeDashoffset * (-1);
-      newData[i] = {id, value, name, visible, bias, color, prochent: {oldValue: 0, newValue:Number(percentageValue.toFixed(2))},  style,
-        circle: {graphRadius, cx: initX, cy: initY, fill: 'none', stroke: color, strokeWidth, strokeDasharray, strokeDashoffset},
-      };
-    };
-    return newData;
-  };
-
-  const [data, setData] = useState(upDate());
+  
+  const [data, setData] = useState(updatingData(props, dataSumm, graphRadius, initX, initY, strokeWidth));
   const [idTarget, setIdTarget] = useState({id : data[0].id, visible: false});
 
   const handleClickShowHideElement = (id: string) => () => { // Убирает элемент из круговой диаграммы и наоборот 
-  const newData = data.map((elData: any) => {
-    if (elData.id === id) {
-      elData.visible = elData.visible === true ? false : true;
-      return elData;
-    };
-    return elData;
-  });
-   
-  const newSumm = _.sumBy(newData.filter((el: IelDate) => el.visible === true), 'value');
-    
-  let clockwiseShiftAcc = 0;
-  const resultData: any = [];
-    
-  for(let i = 0; i<= newData.length - 1; i++) {
-    const el: IelDate = newData[i];
-    const circle: number = (el.circle.graphRadius * 2 * 3.14);
-    const result: number = (el.value * 100 / newSumm);
-    const shadedPart: number = (circle * result / 100);
-    const strokeDasharray = {renderingPart: shadedPart, nonDrawingPart: circle};
-    const oldValue = el.prochent.oldValue;
-    if (el.visible === false) {
-      const prochent = {oldValue, newValue: 0};
-      resultData[i] = {...el, circle: {...el.circle, cx: initX, cy: initY}, prochent};
-    } else {
-      const prochent = {oldValue, newValue: Number(result.toFixed(2))}
-      const pxTograd = circle / 360;
-      const tiltAngle = (((shadedPart / 2) + Math.abs(clockwiseShiftAcc)) / pxTograd) * 0.01745329252;
-      const xPointOffset  = 25 * Math.cos(tiltAngle);
-      const yPointOffset = 25 * Math.sin(tiltAngle);
-      const cx = el.bias === false ? initX : initX + xPointOffset;
-      const cy = el.bias === false ? initY : initY + yPointOffset;
-      resultData[i] = {...el, prochent, 
-        circle: {graphRadius: el.circle.graphRadius, cx, cy, fill: 'none', 
-        stroke: el.color, strokeWidth, strokeDasharray, strokeDashoffset: clockwiseShiftAcc},
+    const newData = data.map((elData: any) => {
+      if (elData.id === id) {
+        elData.visible = elData.visible === true ? false : true;
+        return elData;
       };
-      clockwiseShiftAcc += -shadedPart;
-    }
-  };
-  setDataSumm(newSumm);
-  setData(resultData);
+      return elData;
+    });
+  
+    const newSumm = _.sumBy(newData.filter((el: IelDate) => el.visible === true), 'value');
+    
+    let clockwiseShiftAcc = 0;
+    const resultData: IelDate[] = [];
+    
+    for(let i = 0; i<= newData.length - 1; i++) {
+      const el: IelDate = newData[i];
+      const circle: number = (el.circle.graphRadius * 2 * 3.14);
+      const result: number = (el.value * 100 / newSumm);
+      const shadedPart: number = (circle * result / 100);
+      const strokeDasharray = {renderingPart: shadedPart, nonDrawingPart: circle};
+      const oldValue = el.prochent.oldValue;
+      if (el.visible === false) {
+        const prochent = {oldValue, newValue: 0};
+        resultData[i] = {...el, circle: {...el.circle, cx: initX, cy: initY}, prochent};
+      } else {
+        const prochent = {oldValue, newValue: Number(result.toFixed(2))};
+        const pxTograd = circle / 360;
+        const tiltAngle = (((shadedPart / 2) + Math.abs(clockwiseShiftAcc)) / pxTograd) * 0.01745329252;
+        const xPointOffset  = 25 * Math.cos(tiltAngle);
+        const yPointOffset = 25 * Math.sin(tiltAngle);
+        const cx = el.bias === false ? initX : initX + xPointOffset;
+        const cy = el.bias === false ? initY : initY + yPointOffset;
+        resultData[i] = {...el, prochent, 
+          circle: {graphRadius: el.circle.graphRadius, cx, cy, fill: 'none', 
+          stroke: el.color, strokeWidth, strokeDasharray, strokeDashoffset: clockwiseShiftAcc},
+        };
+        clockwiseShiftAcc += -shadedPart;
+      };
+    };
+    setDataSumm(newSumm);
+    setData(resultData);
   };
 
   const handleClickBiasElement = (id: string) => () => { // Событие по элементу круговой диаграммы смещает его часть относительно центра и обратно. 
@@ -132,7 +133,7 @@ const GraphCircle = (props: IGraphProps) =>  {
         el.bias = el.bias === true ? false : true;
       };
     return el;
-    })
+    });
     return setData(newData);
   };
 
@@ -155,9 +156,9 @@ const GraphCircle = (props: IGraphProps) =>  {
       if (el.id === id) {
         el.circle.strokeWidth = strokeWidth;
         return el;
-      }
+      };
       return el;
-    })
+    });
     setIdTarget({id: id, visible: false });
     setData(result);
   };
@@ -175,16 +176,14 @@ const GraphCircle = (props: IGraphProps) =>  {
      </radialGradient>
    </defs>
     const circle = <circle cx="20" cy="20" r="18" fill={`url(#${el.id}-1)`} />;
-     //const rect = <rect xPointOffset="5" y="5" width="30" height="30" fill={el.color} strokeWidth="5"/>
       const text = `${el.name} ${el.prochent.oldValue} %`;
       const textСrcle = <text x="40" y="25" id={`${el.id}-render`} fontSize="18" style={myStylText} fill={color === 'Gray' ? 'Gray' : 'black'}>{text}</text>;
-      return <svg width="auto" height="40" key={el.id}>
+      return <svg width="250" height="40" key={el.id}>
         <g
           onClick={handleClickShowHideElement(el.id)}
           onMouseOut={hendleOnMouseOut(el.id)}
           onMouseEnter={hendleOnMouseEnter(el.id)}>
           {defs}
-          {/* {rect} */}
           {circle}
           {textСrcle}
         </g>
@@ -194,14 +193,14 @@ const GraphCircle = (props: IGraphProps) =>  {
   };
 
 useEffect(() => {
-  setTimeout(upTableDate, 0)
-}, [data])
+  setTimeout(() => upTableDate(data), 0);
+}, [data]);
 
 useEffect(() => {
   setTimeout(() => {
-    setRender(true)
+    setRender(true);
   }, 1000);
- }, [])
+ }, []);
 
   const creationGraphics = () => { // Компонент обрисовывает круговой график в соответствии с данные каждого элемента.
     const result = data.map((elData: IelDate) => {
@@ -231,51 +230,37 @@ useEffect(() => {
     return (<>{result}</>);
   };
 
-  // const centerLine = () => {  // отладка центра окружности для смещения
-  //   const cen = data.map((el) => {
-  //     const renderingPart = el.circle.strokeDasharray.renderingPart
-  //     const strokeDashoffset = el.circle.strokeDashoffset 
-  //     const tiltAngle = (((renderingPart / 2) + Math.abs(strokeDashoffset)) / 3.49) * 0.01745329252
-  //     const xPointOffset = 200 * Math.cos(tiltAngle)
-  //     const y = 200 * Math.sin(tiltAngle)
-  //     if (el.visible === true) {
-  //       return <path d={`M${350} ${370} ${350 + xPointOffset} ${370 + y} `}  stroke='#696666' strokeWidth="0.5"/>
-  //     }
-  //     return null;
-  //   });
-  //   return cen;
-  // }
-
-  const upTableDate = () => {  // обновлаем значение информации графика
-    const condition1 = data.filter((el) => el.visible === true).every((el) =>  el.prochent.oldValue === el.prochent.newValue);
-    const condition2 = data.filter((el) => el.visible === false).every((el) =>  el.prochent.oldValue === 0);
+  const upTableDate = (state = data) => {  // обновлаем значение информации графика
+    const condition1 = state.filter((el) => el.visible === true).every((el) =>  el.prochent.oldValue === el.prochent.newValue);
+    const condition2 = state.filter((el) => el.visible === false).every((el) =>  el.prochent.oldValue === 0);
       if (condition1 && condition2) {
         return; 
       };
-    const newDa = data.map((el: IelDate) => {
+      const newState = state.map((el: IelDate) => {
       if (el.visible === false) {
         if (el.prochent.oldValue > 0 ) {
-          el.prochent.oldValue = Number((el.prochent.oldValue - 0.15).toFixed(2));
+          el.prochent.oldValue = Number((el.prochent.oldValue - 0.2).toFixed(2));
           return el;
-        }     
+        };
         if (el.prochent.oldValue <= 0 ) {
           el.prochent.oldValue = 0;
           return el;
-        }  
+        }; 
       }
       if (el.prochent.oldValue > el.prochent.newValue) {
-        el.prochent.oldValue = Number((el.prochent.oldValue - 0.15).toFixed(2));
+        el.prochent.oldValue = Number((el.prochent.oldValue - 0.2).toFixed(2));
           if (el.prochent.oldValue < el.prochent.newValue) {
             el.prochent.oldValue = el.prochent.newValue;
-          }
-        return el
-      } if (el.prochent.oldValue < el.prochent.newValue) {
-        el.prochent.oldValue = Number((el.prochent.oldValue + 0.15).toFixed(2));
+          };
         return el;
       }
+      if (el.prochent.oldValue < el.prochent.newValue) {
+        el.prochent.oldValue = Number((el.prochent.oldValue + 0.2).toFixed(2));
+        return el;
+      };
       return el;
     });
-    setData(newDa);
+    setData(newState);
   };
 
   const popUpWindow = () => { // окно информации
