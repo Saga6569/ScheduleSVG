@@ -9,9 +9,11 @@
 }
 
 .containerInfo {
-  width: 250px;
   position: relative;
-  left: -100px;
+}
+
+.containerInfo > * {
+  pointer-events: none;
 }
 
 @keyframes stroke {
@@ -30,5 +32,5 @@
 
 .Text, .Circle, .Path {
   pointer-events: none;
-  transition: 0.5s;
+  transition: 0.5s
 } 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import styles from './GraphCircle.module.css';
 import _ from 'lodash'
 
@@ -14,7 +14,7 @@ interface IdefaultOptions {
 };
 
 interface IGraphProps {
-  values: Array<Ivalues>
+  values: Ivalues[]
   options?: IdefaultOptions;
 };
 
@@ -25,13 +25,31 @@ interface IelDate {
   visible: boolean;
   color: string;
   style: {display: string};
-  prochent: {oldValue: number, newValue: number};
+  newValue: number;
   bias: boolean,
   circle: {
     graphRadius: number, cx: number, cy: number, fill: string, stroke: string,
     strokeDasharray: {renderingPart: number, nonDrawingPart: number},
     strokeWidth: number, strokeDashoffset: number;
   };
+};
+
+const diff = (el: IelDate, value: number) => { // Функция сравнивает новое значение со старым и в зависимости от условий увеличивает или уменьшает
+    if (el.visible === false) {
+      if (value > 0 ) {
+        return Number((value - 0.15).toFixed(2));
+      };
+      if (value <= 0 ) {
+        return el.newValue;
+      };
+    };
+    if (value > el.newValue && (value - 0.15) > el.newValue) {
+      return Number((value - 0.15).toFixed(2));
+    }
+    if (value < el.newValue && value + 0.15 < el.newValue) {
+      return Number((value + 0.15).toFixed(2));
+    };
+    return el.newValue;
 };
 
 // 0.01745329252 Значение для перевода градусов в радианы
@@ -53,7 +71,7 @@ const updatingData = (props: IGraphProps, dataSumm: number, graphRadius: number,
     const strokeDasharray = {renderingPart: shadedPart, nonDrawingPart: circle};
     const style = {display: visible === true ? 'block' : 'none'};
     const strokeDashoffset: number = i === 0 ? 0 : newData[i-1].circle.strokeDasharray.renderingPart * (-1) - newData[i-1].circle.strokeDashoffset * (-1);
-    newData[i] = {id, value, name, visible, bias, color, prochent: {oldValue: 0, newValue:Number(percentageValue.toFixed(2))}, style,
+    newData[i] = {id, value, name, visible, bias, color,  newValue:Number(percentageValue.toFixed(2)), style,
       circle: {graphRadius, cx: initX, cy: initY, fill: 'none', stroke: color, strokeWidth, strokeDasharray, strokeDashoffset},
     };
   };
@@ -61,6 +79,37 @@ const updatingData = (props: IGraphProps, dataSumm: number, graphRadius: number,
 };
 
 const defaultOptions: IdefaultOptions = {graphRadius: 200, strokeWidth: 150};
+
+const InformationEl = (el: IelDate) => {
+  const [value, setValue] = useState<number>(0);
+  
+  useEffect(() => {
+    const newValue = diff(el, value);
+    setTimeout(() =>setValue(newValue), 0);
+  },[value, el]);
+
+    const myStylText: {transitionProperty: string, transitionDuration: string} = { 'transitionProperty': 'fill', 'transitionDuration': '0.5s' };
+    const myStyleGradient: {transitionProperty: string, transitionDuration: string} = { 'transitionProperty': 'stop-color', 'transitionDuration': '1s' };
+    const color = el.visible === false ? 'Gray' : el.color;
+     const defs = <defs>
+     <radialGradient id={`${el.id}-1`} cx="50%" cy="50%">
+       <stop offset="25%" stopColor={color} stopOpacity="1" style={myStyleGradient}/>
+       <stop offset="50%" stopColor={color === 'Gray' ? el.color : color} stopOpacity={color === 'Gray' ? 1 : 0.2} style={myStyleGradient} />
+       <stop offset="75%" stopColor={color} stopOpacity='1' style={myStyleGradient} />
+     </radialGradient>
+   </defs>
+    const circle = <circle cx="20" cy="20" r="18" fill={`url(#${el.id}-1)`} />;
+      const text = `${el.name} ${value} %`;
+      const textСrcle = <text x="40" y="25" id={`${el.id}-render`} fontSize="18" style={myStylText} fill={color === 'Gray' ? 'Gray' : 'black'}>{text}</text>;
+      const result = <svg width="250" height="40" key={el.id}>
+        <g>
+          {defs}
+          {circle}
+          {textСrcle}
+        </g>
+      </svg>
+      return result;
+};
 
 const GraphCircle = (props: IGraphProps) =>  {
   const option = {...props.options, ...defaultOptions};
@@ -94,19 +143,18 @@ const GraphCircle = (props: IGraphProps) =>  {
       const result: number = (el.value * 100 / newSumm);
       const shadedPart: number = (circle * result / 100);
       const strokeDasharray = {renderingPart: shadedPart, nonDrawingPart: circle};
-      const oldValue = el.prochent.oldValue;
       if (el.visible === false) {
-        const prochent = {oldValue, newValue: 0};
-        resultData[i] = {...el, circle: {...el.circle, cx: initX, cy: initY}, prochent};
+        const newValue = 0
+        resultData[i] = {...el, circle: {...el.circle, cx: initX, cy: initY}, newValue};
       } else {
-        const prochent = {oldValue, newValue: Number(result.toFixed(2))};
+        const newValue = Number(result.toFixed(2))
         const pxTograd = circle / 360;
         const tiltAngle = (((shadedPart / 2) + Math.abs(clockwiseShiftAcc)) / pxTograd) * 0.01745329252;
         const xPointOffset  = 25 * Math.cos(tiltAngle);
         const yPointOffset = 25 * Math.sin(tiltAngle);
         const cx = el.bias === false ? initX : initX + xPointOffset;
         const cy = el.bias === false ? initY : initY + yPointOffset;
-        resultData[i] = {...el, prochent, 
+        resultData[i] = {...el, newValue, 
           circle: {graphRadius: el.circle.graphRadius, cx, cy, fill: 'none', 
           stroke: el.color, strokeWidth, strokeDasharray, strokeDashoffset: clockwiseShiftAcc},
         };
@@ -163,39 +211,6 @@ const GraphCircle = (props: IGraphProps) =>  {
     setData(result);
   };
 
-  const TableDate = () => { // Компонент выводит таблицу информации по каждому элементу.
-    const infoData = data.map((el: IelDate) => {
-    const myStylText: any = { 'transitionProperty': 'fill', 'transitionDuration': '0.5s' };
-    const myStyleGradient: any = { 'transitionProperty': 'stop-color', 'transitionDuration': '1s' };
-    const color = el.visible === false ? 'Gray' : el.color;
-     const defs = <defs>
-     <radialGradient id={`${el.id}-1`} cx="50%" cy="50%">
-       <stop offset="25%" stopColor={color} stopOpacity="1" style={myStyleGradient}/>
-       <stop offset="50%" stopColor={color === 'Gray' ? el.color : color} stopOpacity={color === 'Gray' ? 1 : 0.3} style={myStyleGradient} />
-       <stop offset="75%" stopColor={color} stopOpacity='1' style={myStyleGradient} />
-     </radialGradient>
-   </defs>
-    const circle = <circle cx="20" cy="20" r="18" fill={`url(#${el.id}-1)`} />;
-      const text = `${el.name} ${el.prochent.oldValue} %`;
-      const textСrcle = <text x="40" y="25" id={`${el.id}-render`} fontSize="18" style={myStylText} fill={color === 'Gray' ? 'Gray' : 'black'}>{text}</text>;
-      return <svg width="250" height="40" key={el.id}>
-        <g
-          onClick={handleClickShowHideElement(el.id)}
-          onMouseOut={hendleOnMouseOut(el.id)}
-          onMouseEnter={hendleOnMouseEnter(el.id)}>
-          {defs}
-          {circle}
-          {textСrcle}
-        </g>
-      </svg>
-    });
-    return (<div className={styles.containerInfo}>{infoData}</div>);
-  };
-
-useEffect(() => {
-  setTimeout(() => upTableDate(data), 0);
-}, [data]);
-
 useEffect(() => {
   setTimeout(() => {
     setRender(true);
@@ -230,39 +245,6 @@ useEffect(() => {
     return (<>{result}</>);
   };
 
-  const upTableDate = (state = data) => {  // обновлаем значение информации графика
-    const condition1 = state.filter((el) => el.visible === true).every((el) =>  el.prochent.oldValue === el.prochent.newValue);
-    const condition2 = state.filter((el) => el.visible === false).every((el) =>  el.prochent.oldValue === 0);
-      if (condition1 && condition2) {
-        return; 
-      };
-      const newState = state.map((el: IelDate) => {
-      if (el.visible === false) {
-        if (el.prochent.oldValue > 0 ) {
-          el.prochent.oldValue = Number((el.prochent.oldValue - 0.2).toFixed(2));
-          return el;
-        };
-        if (el.prochent.oldValue <= 0 ) {
-          el.prochent.oldValue = 0;
-          return el;
-        }; 
-      }
-      if (el.prochent.oldValue > el.prochent.newValue) {
-        el.prochent.oldValue = Number((el.prochent.oldValue - 0.2).toFixed(2));
-          if (el.prochent.oldValue < el.prochent.newValue) {
-            el.prochent.oldValue = el.prochent.newValue;
-          };
-        return el;
-      }
-      if (el.prochent.oldValue < el.prochent.newValue) {
-        el.prochent.oldValue = Number((el.prochent.oldValue + 0.2).toFixed(2));
-        return el;
-      };
-      return el;
-    });
-    setData(newState);
-  };
-
   const popUpWindow = () => { // окно информации
     const el = data.filter((el: IelDate) => el.id === idTarget.id)[0];
     const renderingPart = el.circle.strokeDasharray.renderingPart;
@@ -271,7 +253,7 @@ useEffect(() => {
     const tiltAngle = (((renderingPart / 2) + Math.abs(strokeDashoffset)) / pxTograd) * 0.01745329252;
     const xPointOffset = 200 * Math.cos(tiltAngle);
     const yPointOffset = 200 * Math.sin(tiltAngle);
-    const text = `${el.name} ${el.prochent.newValue} %`;
+    const text = `${el.name} ${el.newValue} %`;
     const width = text.length * 10;
     const cx = el.circle.cx;
     const cy = el.circle.cy;
@@ -281,8 +263,8 @@ useEffect(() => {
         fill={el.color} strokeWidth='1' stroke="LightCyan" opacity={opacity} />
         <path d={`M${cx + xPointOffset} ${cy + yPointOffset} ${cx + xPointOffset - 10} ${cy + yPointOffset - 5} `} className={styles.Path} opacity={opacity} stroke="LightCyan"/>
         <path d={`M${cx + xPointOffset} ${cy + yPointOffset} ${cx + xPointOffset + 10} ${cy + yPointOffset - 5} `} className={styles.Path} opacity={opacity} stroke="LightCyan"/>
-        <text fontSize="16" fill="LightCyan" className={styles.Text} opacity={opacity}
-          style={{transform: `translate(${cx + xPointOffset - width / 2.4}px, ${cy + yPointOffset - 15}px)`}}>
+        <text fontSize="16" fill="LightCyan" className={styles.Text} opacity={opacity} 
+          style={{transform: `translate(${cx + xPointOffset - width / 2.4}px, ${cy + yPointOffset - 15}px)`,}}>
           {text}
         </text>
       </>
@@ -295,7 +277,15 @@ useEffect(() => {
         {creationGraphics()}
         {popUpWindow()}
       </svg>
-      {TableDate()}
+      <div style={{width: 250}}>
+      {data.map((el: IelDate) => {
+          return <div style={{width: 'auto'}} className={styles.containerInfo}
+          onClick={handleClickShowHideElement(el.id)}
+          onMouseOut={hendleOnMouseOut(el.id)}
+          onMouseEnter={hendleOnMouseEnter(el.id)}>
+          {InformationEl(el)}</div>
+      })}
+      </div>
     </div>
   );
 };
