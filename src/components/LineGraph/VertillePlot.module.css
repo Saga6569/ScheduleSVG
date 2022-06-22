@@ -1,0 +1,35 @@
+.container {
+  margin: 20px;
+  display: flex;
+  width: max-content;
+  height: max-content;
+  justify-content: center;
+  align-items: center;
+}
+
+.containerGradient > path {
+  stroke-dasharray: 3000;
+  animation: dash 1s linear;
+  animation-fill-mode: forwards;
+}
+
+@keyframes dash {
+  from {
+    stroke-dashoffset: 3000;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.information {
+  height: 420px;
+  width: 600px;
+  flex: 2;
+  flex-direction: column-reverse;
+}
+
+table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+}

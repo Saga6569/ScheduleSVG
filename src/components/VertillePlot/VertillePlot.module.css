@@ -5,24 +5,11 @@
   height: max-content;
   justify-content: center;
   align-items: center;
-  background-color: #c0c0fa
-}
-
-.containerPDF {
-  transform-origin: 217px 231px;
-  transform: rotate(90deg);
-  margin: 20px;
-  display: flex;
-  width: max-content;
-  height: max-content;
-  justify-content: center;
-  align-items: center;
-  background-color: #c0c0fa
 }
 
 .containerGradient > path {
   stroke-dasharray: 1000;
-  animation: dash 5s linear;
+  animation: dash 2s linear;
   animation-fill-mode: forwards;
 }
 
@@ -38,5 +25,53 @@
 
 .informationWndow {
   position: relative;
-  transition: 0.5s;  
+  transition: 0.5s;
 }
+
+.ButtonMenu > button{
+  position: relative;
+  background: lightgrey;
+  padding: 0.7em;
+  width: 50%;
+  border: 0;
+}
+
+.FormS {
+  text-align: right;
+}
+
+.FormS  div {
+  display: grid;
+  padding: 1em;
+  background: #f9f9f9;
+  border: 1px solid #c1c1c1;
+  margin: 2rem auto 0 auto;
+  max-width: 600px;
+  padding: 1em;
+}
+.FormS > input {
+  background: #fff;
+  border: 1px solid #9c9c9c;
+}
+.FormS > button {
+  background: lightgrey;
+  padding: 0.7em;
+  width: 80%;
+  border: 0;
+}
+button:hover {
+  background: gold;
+}
+
+label {
+  padding: 0.5em 0.5em 0.5em 0;
+}
+
+input {
+  padding: 0.7em;
+  margin-bottom: 0.5rem;
+}
+input:focus {
+  outline: 3px solid gold;
+}
+
