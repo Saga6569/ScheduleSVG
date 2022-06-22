@@ -11,7 +11,6 @@ interface Ivalues {
 interface IdefaultOptions {
   graphRadius: number;
   strokeWidth: number;
-  background: string;
 };
 
 interface IGraphProps {
@@ -55,7 +54,6 @@ const diff = (el: IelDate, value: number) => { // Функция сравнив�
 
 // 0.01745329252 Значение для перевода градусов в радианы
 
-<<<<<<< HEAD
 const updatingData = (props: IGraphProps, dataSumm: number, graphRadius: number, initX: number, initY: number, strokeWidth: number) => { // Функция создает коллекцию элементов со свойствами для отрисовки
   const colorArr = ['blue', 'red', 'black', 'tomato', 'green', 'MediumOrchid', 'Peru', 'Lime', 'LightCyan'];
   const newData = [];
@@ -82,9 +80,6 @@ const updatingData = (props: IGraphProps, dataSumm: number, graphRadius: number,
 };
 
 const defaultOptions: IdefaultOptions = { graphRadius: 200, strokeWidth: 150 };
-=======
-const defaultOptions: IdefaultOptions = {graphRadius: 200, strokeWidth: 150, background: '#c0c0fa'};
->>>>>>> lineGraph
 
 const InformationEl = (el: IelDate) => {
   const [value, setValue] = useState<number>(0);
@@ -118,7 +113,7 @@ const InformationEl = (el: IelDate) => {
 };
 
 const GraphCircle = (props: IGraphProps) => {
-  const option = { ...defaultOptions, ...props.options };
+  const option = { ...props.options, ...defaultOptions };
   const initX = 350;
   const initY = 370;
   const graphRadius = option.graphRadius;
@@ -220,7 +215,6 @@ const GraphCircle = (props: IGraphProps) => {
     setData(result);
   };
 
-
   useEffect(() => {
     setTimeout(() => {
       setRender(true);
@@ -282,7 +276,7 @@ const GraphCircle = (props: IGraphProps) => {
   };
 
   return (
-    <div className={styles.container} style={{ backgroundColor: option.background }} >
+    <div className={styles.container} >
       <svg width="800" height="700" cx='10' xmlns="http://www.w3.org/3500/svg">
         {creationGraphics()}
         {popUpWindow()}

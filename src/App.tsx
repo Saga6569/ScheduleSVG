@@ -1,8 +1,4 @@
-import { FieldWithMoveablePoint } from './components/Fields/FieldWithMoveablePoint';
-import { FieldWithPointsGeneration } from './components/Fields/FieldWithPointsGeneration';
 import LineGraph from './components/LineGraph/LineGraph'
-import { Graph } from './components/Graph/Graph';
-import { Graph2 } from './components/Graph/Graph2';
 import GraphCircle from './components/GraphCircle/GraphCircle';
 import VertillePlot from './components/VertillePlot/VertillePlot';
 import './App.css';
@@ -19,13 +15,13 @@ const App = () => {
   ];
 
   const res = [
-    { value: 2, name: 'Пермь' },
-    { value: 4, name: 'Москва' },
-    { value: 6, name: 'Сочи' },
-    { value: 6, name: 'Осиновик' },
-    { value: 11, name: 'Новосибирск' },
-    { value: 12, name: 'Томск' },
-    { value: 5, name: 'Губаха' }
+    { value: 350, name: 'Пермь' },
+    { value: 541, name: 'Москва' },
+    { value: 312, name: 'Сочи' },
+    { value: 451, name: 'Осиновик' },
+    { value: 512, name: 'Новосибирск' },
+    { value: 655, name: 'Томск' },
+    { value: 125, name: 'Губаха' }
   ];
 
   return (
@@ -33,7 +29,6 @@ const App = () => {
       <LineGraph data={data2} />
       <GraphCircle values={res} />
       <VertillePlot values={res} />
-      <LineGraph data={data2} ></LineGraph>
     </div>
   );
 }
