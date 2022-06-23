@@ -3,20 +3,21 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@testing-library/jest-dom": "^5.16.4",
-    "@testing-library/react": "^13.3.0",
-    "@testing-library/user-event": "^14.2.1",
-    "@types/jest": "^28.1.3",
-    "@types/node": "^18.0.0",
-    "@types/react": "^18.0.14",
-    "@types/react-dom": "^18.0.5",
+    "@testing-library/jest-dom": "^5.16.2",
+    "@testing-library/react": "^12.1.3",
+    "@testing-library/user-event": "^13.5.0",
+    "@types/jest": "^27.4.0",
+    "@types/node": "^16.11.25",
+    "@types/react": "^17.0.39",
+    "@types/react-dom": "^17.0.11",
     "lodash": "^4.17.21",
-    "react": "^18.2.0",
+    "react": "^17.0.2",
     "react-component-export-image": "^1.0.6",
-    "react-dom": "^18.2.0",
-    "react-scripts": "^5.0.1",
+    "react-dom": "^17.0.2",
+    "react-scripts": "5.0.0",
+    "react-to-pdf": "^0.0.14",
     "ts-localstorage": "^2.0.0",
-    "typescript": "^4.7.4",
+    "typescript": "^4.5.5",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
@@ -44,6 +45,6 @@
     ]
   },
   "devDependencies": {
-    "@types/lodash": "^4.14.182"
+    "@types/lodash": "^4.14.178"
   }
 }

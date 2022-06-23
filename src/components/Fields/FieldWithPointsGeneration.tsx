@@ -17,14 +17,14 @@ export class FieldWithPointsGeneration extends React.Component<any, IFieldWithPo
     }
   }
 
-  onClickRect(e: React.MouseEvent<HTMLDivElement, MouseEvent> ) {
+  onClickRect(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
     e.preventDefault();
     const x = e.nativeEvent.offsetX;
     const y = e.nativeEvent.offsetY;
     const key = this.state.nextPointElementKey;
     const pointsList = [...this.state.pointsList, { x, y }];
-    const pointElements = pointsList.map((el: { x: number, y: number, key: number}) => (
-      <circle id="point" key={el.key} cx={el.x} cy={el.y} r="3" fill="#ff0000"/>
+    const pointElements = pointsList.map((el: { x: number, y: number, key: number }) => (
+      <circle id="point" key={el.key} cx={el.x} cy={el.y} r="3" fill="#ff0000" />
     ));
     console.log(this.state)
     this.setState({
@@ -35,35 +35,35 @@ export class FieldWithPointsGeneration extends React.Component<any, IFieldWithPo
   };
 
 
-  buildGraph = () =>  {
-    const data = [ 6, 7, 8 ,9, 10, 8, 6, 4, 3];
+  buildGraph = () => {
+    const data = [6, 7, 8, 9, 10, 8, 6, 4, 3];
     let count = 15
     const result = data.map((el) => {
-     count += 25;
+      count += 25;
       return `${count} ${150 - (el * 10)}`
     });
 
-    const path = <path className={styles.path} d={`M${result.join(', ')}`} stroke="black" fill="transparent"/>
+    const path = <path className={styles.path} d={`M${result.join(', ')}`} stroke="black" fill="transparent" />
+
     const circle = result.map((el) => {
-      
       const number = el.split(' ');
       const text = Math.abs(Number(number[1]) - 150) / 10
       return (<g key={el.toString()}>
-      <circle cx={number[0]} cy={number[1]} r="5" fill="green" />
-      <text x={number[0]} y={number[1]} fontSize="12" textAnchor="middle" fill="white">{text}</text>
+        <circle cx={number[0]} cy={number[1]} r="5" fill="green" />
+        <text x={number[0]} y={number[1]} fontSize="12" textAnchor="middle" fill="white">{text}</text>
       </g>)
     })
-    
+
     return (<>{path}{circle}</>
     )
   }
 
   render() {
     return (
-      <div className={styles.container} onClick={ (e) => this.onClickRect(e) }>
+      <div className={styles.container} onClick={(e) => this.onClickRect(e)}>
         <svg width="300" height="300" xmlns="http://www.w3.org/2000/svg">
-          <rect x="0" y="0" width="300" height="300" fill="#c0c0fa"/>
-          { this.state.pointElements }
+          <rect x="0" y="0" width="300" height="300" fill="#c0c0fa" />
+          {this.state.pointElements}
           {this.buildGraph()}
         </svg>
       </div>
